@@ -582,18 +582,20 @@ namespace NativeMenu {
 		optionpress = false;
 
 		if (GetTickCount() - delay > menuTime ||
-			controls->IsKeyJustPressed(MenuControls::MenuKey) ||
+			controls->IsKeyJustPressed(MenuControls::MenuKey)    ||
 			controls->IsKeyJustPressed(MenuControls::MenuSelect) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendAccept) ||
 			controls->IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendCancel) ||
-			controls->IsKeyJustPressed(MenuControls::MenuUp) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendUp) ||
-			controls->IsKeyJustPressed(MenuControls::MenuDown) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendDown) ||
-			controls->IsKeyJustPressed(MenuControls::MenuLeft) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneLeft) ||
-			controls->IsKeyJustPressed(MenuControls::MenuRight) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneRight)) {
+			controls->IsKeyJustPressed(MenuControls::MenuUp)     || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendUp)     ||
+			controls->IsKeyJustPressed(MenuControls::MenuDown)   || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendDown)   ||
+			controls->IsKeyJustPressed(MenuControls::MenuLeft)   || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneLeft)      ||
+			controls->IsKeyJustPressed(MenuControls::MenuRight)  || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneRight)) {
 
-			if (controls->IsKeyJustPressed(MenuControls::MenuDown) && !CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendDown)) {
-				useNative = false;
-			}
-			if (controls->IsKeyJustPressed(MenuControls::MenuDown) && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendDown)) {
+			if (controls->IsKeyJustPressed(MenuControls::MenuSelect) ||
+				controls->IsKeyJustPressed(MenuControls::MenuCancel) ||
+				controls->IsKeyJustPressed(MenuControls::MenuUp)     ||
+				controls->IsKeyJustPressed(MenuControls::MenuDown)   ||
+				controls->IsKeyJustPressed(MenuControls::MenuLeft)   ||
+				controls->IsKeyJustPressed(MenuControls::MenuRight)) {
 				useNative = false;
 			}
 
