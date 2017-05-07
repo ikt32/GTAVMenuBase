@@ -47,8 +47,7 @@ namespace NativeMenu {
 
 		void Title(std::string  title);
 		bool Option(std::string  option);
-		void drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines);
-		bool OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted, std::function<void()> onRight, std::function<void()> onLeft);
+		bool OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted = nullptr, std::function<void()> onRight = nullptr, std::function<void()> onLeft = nullptr);
 		bool MenuOption(std::string  option, std::string  menu);
 		bool IntOption(std::string  option, int *var, int min, int max, int step = 1);
 		bool FloatOption(std::string  option, float *var, float min, float max, float step = 0.1);
@@ -113,6 +112,7 @@ namespace NativeMenu {
 		void menuBeep();
 		void resetButtonStates();
 		bool useNative = true;
+		void drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines);
 
 	};
 
