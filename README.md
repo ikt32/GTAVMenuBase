@@ -2,10 +2,16 @@
 
 This menu base was taken from SudoMod once, but I changed things here and there and now I want to use it in multiple projects so it'll just exist here or whatever.
 
-## Usage
+## Building
 
-You'll wanna have this repo cloned to your git folder along with where you store your projects. My projects (Manual Transmission, Addon Loader, VStancer, Real Time Handling Editor) should all point to this path (relative) and just work(TM).
+### Requirements
+* [ScriptHookV SDK by Alexander Blade](http://www.dev-c.com/gtav/scripthookv/)
 
-Natives are used but you should have the ScriptHookV SDK root as an include directory in your project, as well as this folder.
+You'll wanna have this repo cloned to your git folder along with where you store your projects. All of my GTA V projects that use a menu (this menu) consume it in the same way, by having something like `-I../../GTAVMenuBase/` and `-I../../ScriptHookV_SDK/` in their VS Project files.
 
-Uh. Yeah. Hopefully this scheme will somewhat work out.
+* [Manual Transmission](https://github.com/E66666666/GTAVManualTransmission)
+* [Addon Spawner](https://github.com/E66666666/GTAVAddonLoader)
+* [VStancer](https://github.com/E66666666/GTAVStancer)
+* [Real Time Handling Editor](https://github.com/E66666666/GTAVHandlingEditor)
+
+Since native functions are used, ScriptHookV is needed.
