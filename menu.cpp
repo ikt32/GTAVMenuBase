@@ -244,40 +244,6 @@ namespace NativeMenu {
 		return false;
 	}
 
-	bool Menu::DoubleOption(std::string  option, double *var, double min, double max, double step) {
-		Option(option);
-
-		char buf[100];
-		_snprintf_s(buf, sizeof(buf), "%.5f", *var);
-
-		if (currentoption <= 16 && optioncount <= 16)
-			drawText(("<" + std::string(buf) + ">").c_str(), optionsFont, menux + 0.068f, (optioncount * 0.035f + menuy), 0.5f, 0.5f, options, true);
-		else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
-			drawText(("<" + std::string(buf) + ">").c_str(), optionsFont, menux + 0.068f, ((optioncount - (currentoption - 16)) * 0.035f + menuy), 0.5f, 0.5f, options, true);
-
-		if (currentoption == optioncount) {
-			if (leftpress) {
-				if (*var <= min) *var = max;
-				else *var -= step;
-				leftpress = false;
-				return true;
-			}
-			if (*var < min) *var = max;
-
-			if (rightpress) {
-				if (*var >= max) *var = min;
-				else *var += step;
-				rightpress = false;
-				return true;
-			}
-			if (*var > max) *var = min;
-		}
-
-		if (optionpress && currentoption == optioncount)
-			return true;
-		return false;
-	}
-
 	bool Menu::BoolOption(std::string  option, bool *b00l) {
 		Option(option);
 		if (currentoption <= 16 && optioncount <= 16)

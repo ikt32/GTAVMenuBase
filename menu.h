@@ -52,7 +52,6 @@ namespace NativeMenu {
 		bool MenuOption(std::string  option, std::string  menu);
 		bool IntOption(std::string  option, int *var, int min, int max, int step = 1);
 		bool FloatOption(std::string  option, float *var, float min, float max, float step = 0.1);
-		bool DoubleOption(std::string option, double *var, double min, double max, double step);
 		bool BoolOption(std::string  option, bool *b00l);
 		bool BoolSpriteOption(std::string  option, bool b00l, std::string  category, std::string  spriteOn, std::string  spriteOff);
 		bool IntArray(std::string  option, int display[], int *PlaceHolderInt);
