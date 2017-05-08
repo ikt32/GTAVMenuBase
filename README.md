@@ -67,6 +67,6 @@ In which update_menu() is in the main update loopy thing. `CheckKeys` accepts a 
 
 `MenuControls` does input check things so it can distinguish between key press, key being pressed, key being released. This applies both to keyboard input (`GetAsyncKeyState`) and native inputs (`IS_DISABLED_CONTROL_PRESSED`). Conflicts/delays between these two shouldn't occur as that's handled in `CheckKeys`, but I don't trust myself.
 
-If you're also not using [ScriptHookVDotNet](https://github.com/crosire/scripthookvdotnet) with [NativeUI](https://github.com/Guad/NativeUI) and just want something less painless than the mess that happens in the ScriptHookV Simple Trainer example, I hope this is of some use for you.
+If you're also not using [ScriptHookVDotNet](https://github.com/crosire/scripthookvdotnet) with [NativeUI](https://github.com/Guad/NativeUI) and just want something less painful than the mess that happens in the ScriptHookV Simple Trainer example, I hope this is of some use for you.
 
 Good luck! 
