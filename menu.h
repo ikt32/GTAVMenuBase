@@ -44,7 +44,8 @@ public:
 
 	void Title(std::string title);
 	bool Option(std::string option);
-	bool OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted = nullptr, std::function<void()> onRight = nullptr, std::function<void()> onLeft = nullptr);
+	bool OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted = nullptr, 
+					std::function<void()> onRight = nullptr, std::function<void()> onLeft = nullptr, std::string title = "Info");
 	bool MenuOption(std::string option, std::string menu);
 	bool IntOption(std::string option, int *var, int min, int max, int step = 1);
 	bool FloatOption(std::string option, float *var, float min, float max, float step = 0.1);

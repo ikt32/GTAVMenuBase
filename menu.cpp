@@ -187,7 +187,7 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 
 }
 
-bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted, std::function<void() > onRight, std::function<void() > onLeft) {
+bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted, std::function<void() > onRight, std::function<void() > onLeft, std::string title) {
 	Option(option);
 
 	size_t infoLines = extra.size();
@@ -208,7 +208,7 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool 
 
 	if (thisOption && ((currentoption <= 16 && optioncount <= 16) ||
 		((optioncount > (currentoption - 16)) && optioncount <= currentoption))) {
-		drawAdditionalInfoBox(extra, infoLines);
+		drawAdditionalInfoBox(extra, infoLines, title);
 	}
 
 	if (highlighted != nullptr) {
