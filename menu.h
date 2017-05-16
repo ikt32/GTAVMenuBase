@@ -68,8 +68,8 @@ public:
 	void CheckKeys(MenuControls* controls, std::function<void(void) > onMain, std::function<void(void) > onExit);
 	void CloseMenu();
 
-	int optionsFont = 6;
-	int titleFont = 7;
+	int optionsFont = 0;
+	int titleFont = 1;
 	float menux = 0.2f;
 	float menuy = 0.125f;
 	rgba titleText = { 0, 0, 0, 255 };
@@ -102,12 +102,12 @@ public:
 
 private:
 	/*
-		* yes hello this hurts me
-		* ok so in this menu the optioncount is final at menu.end()
-		* but if we draw sprites earlier, shit we draw in end() will overlap
-		* so we just need to save the draw calls in order to execute at the
-		* end of end() or at least after we're done drawing the background
-		*/
+	 * yes hello this hurts me
+	 * ok so in this menu the optioncount is final at menu.end()
+	 * but if we draw sprites earlier, shit we draw in end() will overlap
+	 * so we just need to save the draw calls in order to execute at the
+	 * end of end() or at least after we're done drawing the background
+	 */
 
 	typedef std::vector<std::function<void(void)>> functionList;
 	functionList backgroundDrawCalls;
@@ -118,6 +118,9 @@ private:
 	float menuWidth = 0.23f;
 	float titleHeight = 0.085f;
 	float textureTextOffset = 0.0165f;
+	float menuTextMargin = 0.0075f;
+	float optionTextSize = 0.45f;
+	float optionRightMargin = 0.015f;
 
 	int optioncount = 0;
 	int currentoption = 0;
@@ -140,7 +143,7 @@ private:
 	const unsigned int menuTimeFast = 40;
 	unsigned int menuTime = menuTimeRepeat;
 
-	void drawText(const std::string text, int font, float x, float y, float scalex, float scaley, rgba rgba, bool center);
+	void drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, rgba rgba, int justify = 1);
 	void drawRect(float x, float y, float width, float height, rgba rgba);
 	void drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, rgba rgba);
 	void changeMenu(std::string menuname);
