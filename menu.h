@@ -150,7 +150,8 @@ private:
 	void menuBeep();
 	void resetButtonStates();
 	bool useNative = true;
-	void drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines);
+	void drawAdditionalInfoBoxTitle(std::string title);
+	void drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines, std::string title = "Info");
 };
 
 }

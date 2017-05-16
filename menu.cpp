@@ -142,11 +142,44 @@ bool Menu::Option(std::string option) {
 	return false;
 }
 
-void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines) {
-	for (int i = 0; i < infoLines; i++) {
-		drawText(extra[i].c_str(), optionsFont, menux + 0.125f, i * optionHeight + (menuy + optionHeight), 0.5f, 0.5f, options, false);
-		drawRect(menux + menuWidth, i * optionHeight + (menuy + 0.0515f), menuWidth, optionHeight, optionsrect);
+void Menu::drawAdditionalInfoBoxTitle(std::string title) {
+	float extrax = menux + menuWidth;
+
+	drawText(title, titleFont, extrax, menuy - 0.03f, 0.85f, 0.85f, titleText, true);
+	if (TitleTextureIndex < 1 || TitleTextureIndex >= TextureDicts.size()) {
+		drawRect(extrax, menuy - 0.0075f, menuWidth, titleHeight, titleRect);
 	}
+	else {
+		backgroundDrawCalls.push_back(
+			std::bind(&Menu::drawSprite, this, TextureDicts[TitleTextureIndex], TextureNames[TitleTextureIndex],
+			extrax, menuy - 0.0075f, menuWidth, titleHeight, 180.0f, titleRect)
+		);
+	}
+}
+
+void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines, std::string title) {
+	float extrax = menux + menuWidth;
+
+	drawAdditionalInfoBoxTitle(title);
+	float extray;
+	for (int i = 0; i < infoLines; i++) {
+		extray = i * optionHeight + (menuy + 0.0515f);
+		drawText(extra[i].c_str(), optionsFont, menux + 0.125f, i * optionHeight + (menuy + optionHeight), 0.5f, 0.5f, options, false);
+		if (HighlTextureIndex < 1 || HighlTextureIndex >= TextureDicts.size()) {
+			drawRect(extrax, extray, menuWidth, optionHeight, scroller);
+		}
+		else {
+			optionsrect.a = 0;
+		}
+	}
+	auto tempoptions = optionsrect;
+	tempoptions.a = 255;
+	highlightsDrawCalls.push_back(
+		std::bind(&Menu::drawSprite, this, TextureDicts[BackgTextureIndex], TextureNames[BackgTextureIndex],
+		extrax, (menuy + optionHeight) + (infoLines * optionHeight) / 2, menuWidth, optionHeight * infoLines, 0.0f, tempoptions)
+	);
+
+
 }
 
 bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted, std::function<void() > onRight, std::function<void() > onLeft) {
