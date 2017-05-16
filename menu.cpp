@@ -105,30 +105,37 @@ bool Menu::Option(std::string option) {
 	bool thisOption = false;
 	if (currentoption == optioncount) thisOption = true;
 
+	bool doDraw = false;
+	float optiony;
+	float optiontexty;
+
 	if (currentoption <= 16 && optioncount <= 16)
 	{
-		drawRect(menux, ((optioncount * optionHeight) + (menuy + textureTextOffset)), menuWidth, optionHeight, optionsrect);
+		doDraw = true;
+		optiony = optioncount * optionHeight + (menuy + textureTextOffset);
+		optiontexty = (optioncount * optionHeight + menuy);
+	}
+	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
+	{
+		doDraw = true;
+		optiony = (optioncount - (currentoption - 16)) * optionHeight + (menuy + textureTextOffset);
+		optiontexty = ((optioncount - (currentoption - 16)) * optionHeight + menuy);
+	}
+
+	if (doDraw) {
+		drawRect(menux, optiony, menuWidth, optionHeight, optionsrect);
 		if (thisOption) {
 			if (HighlTextureIndex < 1 || HighlTextureIndex >= TextureDicts.size()) {
-				drawRect(menux, ((optioncount * optionHeight) + (menuy + textureTextOffset)), menuWidth, optionHeight, scroller);
+				drawRect(menux, optiony, menuWidth, optionHeight, scroller);
 			}
 			else {
 				highlightsDrawCalls.push_back(
 					std::bind(&Menu::drawSprite, this, TextureDicts[HighlTextureIndex], TextureNames[HighlTextureIndex],
-					menux, optioncount * optionHeight + (menuy + textureTextOffset), menuWidth, optionHeight, 0.0f, scroller)
+					menux, optiony, menuWidth, optionHeight, 0.0f, scroller)
 				);
 			}
 		}
-		drawText(option, optionsFont, menux - 0.1f, (optioncount * optionHeight + menuy), 0.5f, 0.5f, thisOption ? optionsBlack : options, false);
-	}
-
-	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
-	{
-		drawText(option, optionsFont, menux - 0.1f, ((optioncount - (currentoption - 16)) * optionHeight + menuy), 0.5f, 0.5f, thisOption ? optionsBlack : options, false);
-		drawRect(menux, ((optioncount - (currentoption - 16)) * optionHeight + (menuy + textureTextOffset)), menuWidth, optionHeight, optionsrect);
-		if (thisOption) {
-			drawRect(menux, ((optioncount - (currentoption - 16)) * optionHeight + (menuy + textureTextOffset)), menuWidth, optionHeight, scroller);
-		}
+		drawText(option, optionsFont, menux - 0.1f, optiontexty, 0.5f, 0.5f, thisOption ? optionsBlack : options, false);
 	}
 
 	if (optionpress && currentoption == optioncount) return true;
@@ -143,7 +150,8 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 }
 
 bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted, std::function<void() > onRight, std::function<void() > onLeft) {
-	optioncount++;
+	Option(option);
+
 	size_t infoLines = extra.size();
 	bool thisOption = false;
 	if (currentoption == optioncount) {
@@ -160,23 +168,9 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool 
 		}
 	}
 
-	if (currentoption <= 16 && optioncount <= 16) {
-		drawText(option, optionsFont, menux - 0.1f, (optioncount * optionHeight + menuy), 0.5f, 0.5f, options, false);
-		drawRect(menux, ((optioncount * optionHeight) + (menuy + textureTextOffset)), menuWidth, optionHeight, optionsrect);
-		if (thisOption) {
-			drawRect(menux, ((optioncount * optionHeight) + (menuy + textureTextOffset)), menuWidth, optionHeight, scroller); // Highlighted line
-			drawAdditionalInfoBox(extra, infoLines);
-		}
-	}
-
-	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
-	{
-		drawText(option, optionsFont, menux - 0.1f, ((optioncount - (currentoption - 16)) * optionHeight + menuy), 0.5f, 0.5f, options, false);
-		drawRect(menux, ((optioncount - (currentoption - 16)) * optionHeight + (menuy + textureTextOffset)), menuWidth, optionHeight, optionsrect);
-		if (thisOption) {
-			drawRect(menux, ((optioncount - (currentoption - 16)) * optionHeight + (menuy + textureTextOffset)), menuWidth, optionHeight, scroller);
-			drawAdditionalInfoBox(extra, infoLines);
-		}
+	if (thisOption && ((currentoption <= 16 && optioncount <= 16) ||
+		((optioncount > (currentoption - 16)) && optioncount <= currentoption))) {
+		drawAdditionalInfoBox(extra, infoLines);
 	}
 
 	if (highlighted != nullptr) {
@@ -273,19 +267,36 @@ bool Menu::BoolOption(std::string option, bool *b00l) {
 	Option(option);
 	bool thisOption = false;
 	if (currentoption == optioncount) thisOption = true;
+	char * tickBoxTexture;
+	rgba optionColors;
+	optionColors = options;
+
+	if (thisOption) {
+		tickBoxTexture = *b00l ? "shop_box_tickb" : "shop_box_blankb";
+	}
+	else {
+		tickBoxTexture = *b00l ? "shop_box_tick" : "shop_box_blank";
+	}
+
+	bool doDraw = false;
+	float textureY;
+	
 	if (currentoption <= 16 && optioncount <= 16) {
-		foregroundDrawCalls.push_back(
-			std::bind(&Menu::drawSprite, this, "commonmenu", *b00l ? "shop_box_tick" : "shop_box_blank",
-			menux + 0.068f, (optioncount * optionHeight + (menuy + 0.016f)), 0.03f, 0.05f, 0.0f, thisOption ? optionsBlack : options)
-		);
+		doDraw = true;
+		textureY = (optioncount * optionHeight + (menuy + 0.016f));
 	}
 	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption) {
-		foregroundDrawCalls.push_back(
-			std::bind(&Menu::drawSprite, this, "commonmenu", *b00l ? "shop_box_tick" : "shop_box_blank",
-			menux + 0.068f, ((optioncount - (currentoption - 16)) * optionHeight + (menuy + 0.016f)), 0.03f, 0.05f, 0.0f, thisOption ? optionsBlack : options)
-		);
-
+		doDraw = true;
+		textureY = ((optioncount - (currentoption - 16)) * optionHeight + (menuy + 0.016f));
 	}
+
+	if (doDraw) {
+		foregroundDrawCalls.push_back(
+			std::bind(&Menu::drawSprite, this, "commonmenu", tickBoxTexture,
+			menux + 0.068f, textureY, 0.03f, 0.05f, 0.0f, optionColors)
+		);
+	}
+
 	if (optionpress && currentoption == optioncount) {
 		*b00l ^= 1;
 		return true;
