@@ -78,6 +78,7 @@ public:
 	rgba options = { 0, 0, 0, 255 };
 	rgba optionsrect = { 255, 220, 30, 60 };
 	int optionsrectAlpha = 0;
+	rgba optionsBlack = { 0, 0, 0, 255 };
 
 	// probably keep this grouped like this
 	std::vector<std::string> TextureNames = {
@@ -110,11 +111,13 @@ private:
 
 	typedef std::vector<std::function<void(void)>> functionList;
 	functionList backgroundDrawCalls;
+	functionList highlightsDrawCalls;
 	functionList foregroundDrawCalls;
 
 	float optionHeight = 0.035f;
 	float menuWidth = 0.23f;
 	float titleHeight = 0.085f;
+	float textureTextOffset = 0.0165f;
 
 	int optioncount = 0;
 	int currentoption = 0;
