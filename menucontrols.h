@@ -33,6 +33,8 @@ namespace NativeMenu {
 		bool IsControlDownFor(eControl control, int millis);
 		static const int controlSize = SIZEOF_ControlType;
 		int ControlKeys[controlSize];
+		int ControllerButton1 = -1;
+		int ControllerButton2 = -1;
 	private:
 
 		bool controlCurr[controlSize];

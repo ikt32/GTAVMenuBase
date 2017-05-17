@@ -591,6 +591,10 @@ void Menu::disableKeys() {
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleDuck, true);
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleSelectNextWeapon, true);
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleSelectPrevWeapon, true);
+
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlContext, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectWeapon, true);
+
 }
 
 void Menu::EndMenu() {
@@ -698,7 +702,9 @@ void Menu::CheckKeys(MenuControls* controls, std::function<void() > onMain, std:
 			useNative = false;
 		}
 
-		if (controls->IsKeyJustPressed(MenuControls::MenuKey)) {
+		if (controls->IsKeyJustPressed(MenuControls::MenuKey) || useNative && 
+			CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, controls->ControllerButton1) &&
+			CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, controls->ControllerButton2)) {
 			if (menulevel == 0) {
 				changeMenu("mainmenu");
 				if (onMain) onMain();
