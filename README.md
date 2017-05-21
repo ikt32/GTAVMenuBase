@@ -2,7 +2,7 @@
 
 This menu base was taken from SudoMod base once, but I changed things here and there and now I want to use it in multiple projects so it'll just exist here or whatever. Full credits to those people!
 
-It's not the prettiest, but it's easy to use.
+![pic](Menus.png)
 
 ## Building
 
