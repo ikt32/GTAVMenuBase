@@ -567,10 +567,9 @@ void Menu::disableKeys() {
 	UI::HIDE_HUD_COMPONENT_THIS_FRAME(8);
 
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlNextCamera, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleCinCam, true);
 
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlPhone, true);
-
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleCinCam, true);
 
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectCharacterMichael, true);
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectCharacterFranklin, true);
@@ -588,12 +587,31 @@ void Menu::disableKeys() {
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlRadioWheelLeftRight, true);
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleNextRadio, true);
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehiclePrevRadio, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlRadioWheelUpDown, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleNextRadioTrack, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehiclePrevRadioTrack, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleRadioWheel, true);
+
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleDuck, true);
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleSelectNextWeapon, true);
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleSelectPrevWeapon, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleAttack, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleAttack2, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleExit, true);
 
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlContext, true);
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectWeapon, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleHeadlight, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleRoof, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleHorn, true);
+
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleAim, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehiclePassengerAim, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlFrontendSocialClub, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlFrontendSocialClubSecondary, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlReplayStartStopRecording, true);
+
+
 
 }
 
@@ -680,6 +698,79 @@ void Menu::EndMenu() {
 	if (currentoption < 1) currentoption = 1;
 }
 
+void Menu::ProcessMenuNav(MenuControls *controls, std::function<void()> onMain, std::function<void()> onExit) {
+	if (controls->IsKeyJustPressed(MenuControls::MenuSelect) ||
+		controls->IsKeyJustPressed(MenuControls::MenuCancel) ||
+		controls->IsKeyJustPressed(MenuControls::MenuUp)     ||
+		controls->IsKeyJustPressed(MenuControls::MenuDown)   ||
+		controls->IsKeyJustPressed(MenuControls::MenuLeft)   ||
+		controls->IsKeyJustPressed(MenuControls::MenuRight)) {
+		useNative = false;
+	}
+
+	if (controls->IsKeyJustPressed(MenuControls::MenuKey) || useNative && 
+		CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, controls->ControllerButton1) &&
+		CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, controls->ControllerButton2)) {
+		if (menulevel == 0) {
+			changeMenu("mainmenu");
+			if (onMain) onMain();
+		}
+		else {
+			CloseMenu();
+			CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
+			if (onExit) {
+				onExit();
+			}
+		}
+		delay = GetTickCount();
+		return;
+	}
+	if (controls->IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel)) {
+		if (menulevel > 0) {
+			if (menulevel == 1) {
+				CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
+				if (onExit) {
+					onExit();
+				}
+			}
+			backMenu();
+
+		}
+		delay = GetTickCount();
+	}
+	if (controls->IsKeyJustPressed(MenuControls::MenuSelect) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendAccept)) {
+		if (menulevel > 0) {
+			menuBeep();
+		}
+		optionpress = true;
+		delay = GetTickCount();
+	}
+	if (controls->IsKeyPressed(MenuControls::MenuDown) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
+		nextOption();
+		delay = GetTickCount();
+		downpress = true;
+	}
+	if (controls->IsKeyPressed(MenuControls::MenuUp) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
+		previousOption();
+		delay = GetTickCount();
+		uppress = true;
+	}
+	if (controls->IsKeyPressed(MenuControls::MenuLeft) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
+		if (menulevel > 0) {
+			menuBeep();
+		}
+		leftpress = true;
+		delay = GetTickCount();
+	}
+	if (controls->IsKeyPressed(MenuControls::MenuRight) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
+		if (menulevel > 0) {
+			menuBeep();
+		}
+		rightpress = true;
+		delay = GetTickCount();
+	}
+}
+
 void Menu::CheckKeys(MenuControls* controls, std::function<void() > onMain, std::function<void() > onExit) {
 	controls->Update();
 	optionpress = false;
@@ -693,75 +784,7 @@ void Menu::CheckKeys(MenuControls* controls, std::function<void() > onMain, std:
 		controls->IsKeyJustPressed(MenuControls::MenuLeft)   || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneLeft)      ||
 		controls->IsKeyJustPressed(MenuControls::MenuRight)  || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneRight)) {
 
-		if (controls->IsKeyJustPressed(MenuControls::MenuSelect) ||
-			controls->IsKeyJustPressed(MenuControls::MenuCancel) ||
-			controls->IsKeyJustPressed(MenuControls::MenuUp)     ||
-			controls->IsKeyJustPressed(MenuControls::MenuDown)   ||
-			controls->IsKeyJustPressed(MenuControls::MenuLeft)   ||
-			controls->IsKeyJustPressed(MenuControls::MenuRight)) {
-			useNative = false;
-		}
-
-		if (controls->IsKeyJustPressed(MenuControls::MenuKey) || useNative && 
-			CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, controls->ControllerButton1) &&
-			CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, controls->ControllerButton2)) {
-			if (menulevel == 0) {
-				changeMenu("mainmenu");
-				if (onMain) onMain();
-			}
-			else {
-				CloseMenu();
-				CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
-				if (onExit) {
-					onExit();
-				}
-			}
-			delay = GetTickCount();
-		}
-		if (controls->IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel)) {
-			if (menulevel > 0) {
-				if (menulevel == 1) {
-					CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
-					if (onExit) {
-						onExit();
-					}
-				}
-				backMenu();
-
-			}
-			delay = GetTickCount();
-		}
-		if (controls->IsKeyJustPressed(MenuControls::MenuSelect) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendAccept)) {
-			if (menulevel > 0) {
-				menuBeep();
-			}
-			optionpress = true;
-			delay = GetTickCount();
-		}
-		if (controls->IsKeyPressed(MenuControls::MenuDown) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
-			nextOption();
-			delay = GetTickCount();
-			downpress = true;
-		}
-		if (controls->IsKeyPressed(MenuControls::MenuUp) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
-			previousOption();
-			delay = GetTickCount();
-			uppress = true;
-		}
-		if (controls->IsKeyPressed(MenuControls::MenuLeft) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
-			if (menulevel > 0) {
-				menuBeep();
-			}
-			leftpress = true;
-			delay = GetTickCount();
-		}
-		if (controls->IsKeyPressed(MenuControls::MenuRight) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
-			if (menulevel > 0) {
-				menuBeep();
-			}
-			rightpress = true;
-			delay = GetTickCount();
-		}
+		ProcessMenuNav(controls, onMain, onExit);
 	}
 
 	if (controls->IsKeyJustReleased(MenuControls::MenuKey) || controls->IsKeyJustPressed(MenuControls::MenuKey) ||

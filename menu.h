@@ -66,6 +66,7 @@ public:
 	void disableKeys();
 
 	void EndMenu();
+	void ProcessMenuNav(MenuControls *controls, std::function<void()> onMain, std::function<void()> onExit);
 	void CheckKeys(MenuControls* controls, std::function<void(void) > onMain, std::function<void(void) > onExit);
 	void CloseMenu();
 
