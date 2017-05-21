@@ -17,6 +17,8 @@ namespace NativeMenu {
 class CharAdapter {
 public:
 	explicit CharAdapter(const char* s) : m_s(::_strdup(s)) { }
+	explicit CharAdapter(std::string str) : m_s(::_strdup(str.c_str())) { }
+
 	CharAdapter(const CharAdapter& other) = delete; // non construction-copyable
 	CharAdapter& operator=(const CharAdapter&) = delete; // non copyable
 
@@ -43,17 +45,17 @@ public:
 	~Menu();
 
 	void Title(std::string title);
-	bool Option(std::string option);
+	bool Option(std::string option, std::vector<std::string> details = {});
 	bool OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted = nullptr, 
 					std::function<void()> onRight = nullptr, std::function<void()> onLeft = nullptr, std::string title = "Info");
 	bool MenuOption(std::string option, std::string menu);
-	bool IntOption(std::string option, int *var, int min, int max, int step = 1);
-	bool FloatOption(std::string option, float *var, float min, float max, float step = 0.1);
-	bool BoolOption(std::string option, bool *b00l);
-	bool BoolSpriteOption(std::string option, bool b00l, std::string category, std::string spriteOn, std::string spriteOff);
-	bool IntArray(std::string option, int display[], int *PlaceHolderInt);
-	bool FloatArray(std::string option, float display[], int *PlaceHolderInt);
-	bool StringArray(std::string option, std::vector<std::string> display, int *PlaceHolderInt);
+	bool IntOption(std::string option, int *var, int min, int max, int step = 1, std::vector<std::string> details = {});
+	bool FloatOption(std::string option, float *var, float min, float max, float step = 0.1, std::vector<std::string> details = {});
+	bool BoolOption(std::string option, bool *b00l, std::vector<std::string> details = {});
+	bool BoolSpriteOption(std::string option, bool b00l, std::string category, std::string spriteOn, std::string spriteOff, std::vector<std::string> details = {});
+	bool IntArray(std::string option, int display[], int *PlaceHolderInt, std::vector<std::string> details = {});
+	bool FloatArray(std::string option, float display[], int *PlaceHolderInt, std::vector<std::string> details = {});
+	bool StringArray(std::string option, std::vector<std::string> display, int *PlaceHolderInt, std::vector<std::string> details = {});
 	void TeleportOption(std::string option, float x, float y, float z);
 
 	bool CurrentMenu(std::string menuname);
@@ -64,6 +66,7 @@ public:
 	void LoadMenuTheme(LPCWSTR file);
 	void SaveMenuTheme(LPCWSTR file);
 	void disableKeys();
+	void drawMenuDetails(std::vector<std::string> details, float y);
 
 	void EndMenu();
 	void ProcessMenuNav(MenuControls *controls, std::function<void()> onMain, std::function<void()> onExit);
@@ -115,6 +118,7 @@ private:
 	functionList backgroundDrawCalls;
 	functionList highlightsDrawCalls;
 	functionList foregroundDrawCalls;
+	std::vector<std::string> details;
 
 	float optionHeight = 0.035f;
 	float menuWidth = 0.23f;

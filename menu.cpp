@@ -104,7 +104,7 @@ void Menu::Title(std::string title) {
 
 // todo; inheritance shit
 
-bool Menu::Option(std::string option) {
+bool Menu::Option(std::string option, std::vector<std::string> details) {
 	optioncount++;
 
 	bool thisOption = false;
@@ -138,6 +138,9 @@ bool Menu::Option(std::string option) {
 					std::bind(&Menu::drawSprite, this, TextureDicts[HighlTextureIndex], TextureNames[HighlTextureIndex],
 					menux, optiony, menuWidth, optionHeight, 0.0f, scroller)
 				);
+			}
+			if (details.size() > 0) {
+				this->details = details;
 			}
 		}
 		drawText(option, optionsFont, (menux - menuWidth/2.0f) + menuTextMargin, optiontexty, optionTextSize, optionTextSize, thisOption ? optionsBlack : options);
@@ -183,8 +186,6 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 		std::bind(&Menu::drawSprite, this, TextureDicts[BackgTextureIndex], TextureNames[BackgTextureIndex],
 		extrax, (menuy + optionHeight) + (infoLines * optionHeight) / 2, menuWidth, optionHeight * infoLines, 0.0f, tempoptions)
 	);
-
-
 }
 
 bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted, std::function<void() > onRight, std::function<void() > onLeft, std::string title) {
@@ -236,8 +237,8 @@ bool Menu::MenuOption(std::string option, std::string menu) {
 	return false;
 }
 
-bool Menu::IntOption(std::string option, int *var, int min, int max, int step) {
-	Option(option);
+bool Menu::IntOption(std::string option, int *var, int min, int max, int step, std::vector<std::string> details) {
+	Option(option, details);
 	bool thisOption = false;
 	if (currentoption == optioncount) thisOption = true;
 	if (currentoption <= 16 && optioncount <= 16)
@@ -267,8 +268,8 @@ bool Menu::IntOption(std::string option, int *var, int min, int max, int step) {
 	return false;
 }
 
-bool Menu::FloatOption(std::string option, float *var, float min, float max, float step) {
-	Option(option);
+bool Menu::FloatOption(std::string option, float *var, float min, float max, float step, std::vector<std::string> details) {
+	Option(option, details);
 	bool thisOption = false;
 	if (currentoption == optioncount) thisOption = true;
 	char buf[100];
@@ -301,8 +302,8 @@ bool Menu::FloatOption(std::string option, float *var, float min, float max, flo
 	return false;
 }
 
-bool Menu::BoolOption(std::string option, bool *b00l) {
-	Option(option);
+bool Menu::BoolOption(std::string option, bool *b00l, std::vector<std::string> details) {
+	Option(option, details);
 	bool thisOption = false;
 	if (currentoption == optioncount) thisOption = true;
 	char * tickBoxTexture;
@@ -342,8 +343,8 @@ bool Menu::BoolOption(std::string option, bool *b00l) {
 	return false;
 }
 
-bool Menu::BoolSpriteOption(std::string option, bool b00l, std::string category, std::string spriteOn, std::string spriteOff) {
-	Option(option);
+bool Menu::BoolSpriteOption(std::string option, bool b00l, std::string category, std::string spriteOn, std::string spriteOff, std::vector<std::string> details) {
+	Option(option, details);
 	bool thisOption = false;
 	if (currentoption == optioncount) thisOption = true;
 	if (currentoption <= 16 && optioncount <= 16) {
@@ -362,8 +363,8 @@ bool Menu::BoolSpriteOption(std::string option, bool b00l, std::string category,
 	return false;
 }
 
-bool Menu::IntArray(std::string option, int display[], int *PlaceHolderInt) {
-	Option(option);
+bool Menu::IntArray(std::string option, int display[], int *PlaceHolderInt, std::vector<std::string> details) {
+	Option(option, details);
 	bool thisOption = false;
 	if (currentoption == optioncount) thisOption = true;
 	int min = 0;
@@ -395,8 +396,8 @@ bool Menu::IntArray(std::string option, int display[], int *PlaceHolderInt) {
 	return false;
 }
 
-bool Menu::FloatArray(std::string option, float display[], int *PlaceHolderInt) {
-	Option(option);
+bool Menu::FloatArray(std::string option, float display[], int *PlaceHolderInt, std::vector<std::string> details) {
+	Option(option, details);
 	bool thisOption = false;
 	if (currentoption == optioncount) thisOption = true;
 	int min = 0;
@@ -432,8 +433,8 @@ bool Menu::FloatArray(std::string option, float display[], int *PlaceHolderInt) 
 	return false;
 }
 
-bool Menu::StringArray(std::string option, std::vector<std::string>display, int *PlaceHolderInt) {
-	Option(option);
+bool Menu::StringArray(std::string option, std::vector<std::string>display, int *PlaceHolderInt, std::vector<std::string> details) {
+	Option(option, details);
 	bool thisOption = false;
 	if (currentoption == optioncount) thisOption = true;
 	int min = 0;
@@ -610,9 +611,19 @@ void Menu::disableKeys() {
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlFrontendSocialClub, true);
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlFrontendSocialClubSecondary, true);
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlReplayStartStopRecording, true);
+}
 
+void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
+	for (auto i = 0; i < details.size(); i++) {
+		drawText(details[i], optionsFont, (menux - menuWidth / 2.0f) + menuTextMargin, i * optionHeight + y, optionTextSize, optionTextSize, options);
+	}
+	auto tempoptions = optionsrect;
+	tempoptions.a = 255;
+	drawRect(menux, y, menuWidth, optionHeight/8, {0,0,0,255});
 
-
+	backgroundDrawCalls.push_back(
+		std::bind(&Menu::drawSprite, this, TextureDicts[BackgTextureIndex], TextureNames[BackgTextureIndex],
+		menux, (y) + (details.size() * optionHeight) / 2, menuWidth, optionHeight * details.size(), 0.0f, tempoptions));
 }
 
 void Menu::EndMenu() {
@@ -659,6 +670,12 @@ void Menu::EndMenu() {
 			std::bind(&Menu::drawSprite, this, TextureDicts[BackgTextureIndex], TextureNames[BackgTextureIndex],
 			menux, (menuy + optionHeight) + (maxOptionCount * optionHeight) / 2, menuWidth, optionHeight * maxOptionCount, 0.0f, tempoptions)
 		);
+
+		// That footer thing you also see in the native menu
+		if (details.size() > 0) {
+			drawMenuDetails(details, footerBackY + optionHeight / 1.5f);
+		}
+		
 	}
 
 	// Indicators
@@ -691,6 +708,7 @@ void Menu::EndMenu() {
 	backgroundDrawCalls.clear();
 	highlightsDrawCalls.clear();
 	foregroundDrawCalls.clear();
+	details.clear();
 
 	disableKeys();
 
