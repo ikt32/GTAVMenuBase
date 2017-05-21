@@ -220,8 +220,8 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool 
 	return false;
 }
 
-bool Menu::MenuOption(std::string option, std::string menu) {
-	Option(option);
+bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::string> details) {
+	Option(option, details);
 	bool thisOption = false;
 	if (currentoption == optioncount) thisOption = true;
 	if (currentoption <= 16 && optioncount <= 16)
