@@ -331,7 +331,7 @@ bool Menu::BoolOption(std::string option, bool *b00l, std::vector<std::string> d
 		int resX, resY;
 		GRAPHICS::_GET_ACTIVE_SCREEN_RESOLUTION(&resX, &resY);
 		float ratio = (float)resX / (float)resY;
-		float boxSz = 0.04;
+		float boxSz = 0.05;
 		foregroundDrawCalls.push_back(
 			std::bind(&Menu::drawSprite, this, "commonmenu", tickBoxTexture,
 			menux + menuWidth/2.0f - optionRightMargin, textureY, boxSz/ratio, boxSz, 0.0f, optionColors)
@@ -613,6 +613,9 @@ void Menu::disableKeys() {
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlFrontendSocialClub, true);
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlFrontendSocialClubSecondary, true);
 	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlReplayStartStopRecording, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlInteractionMenu, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSaveReplayClip, true);
+
 }
 
 void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
