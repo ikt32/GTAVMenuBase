@@ -330,9 +330,13 @@ bool Menu::BoolOption(std::string option, bool *b00l, std::vector<std::string> d
 	}
 
 	if (doDraw) {
+		int resX, resY;
+		GRAPHICS::_GET_ACTIVE_SCREEN_RESOLUTION(&resX, &resY);
+		float ratio = (float)resX / (float)resY;
+		float boxSz = 0.04;
 		foregroundDrawCalls.push_back(
 			std::bind(&Menu::drawSprite, this, "commonmenu", tickBoxTexture,
-			menux + menuWidth/2.0f - optionRightMargin, textureY, 0.03f, 0.05f, 0.0f, optionColors)
+			menux + menuWidth/2.0f - optionRightMargin, textureY, boxSz/ratio, boxSz, 0.0f, optionColors)
 		);
 	}
 
