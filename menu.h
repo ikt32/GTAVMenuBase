@@ -65,8 +65,6 @@ public:
 
 	void LoadMenuTheme(LPCWSTR file);
 	void SaveMenuTheme(LPCWSTR file);
-	void disableKeys();
-	void drawMenuDetails(std::vector<std::string> details, float y);
 
 	void EndMenu();
 	void ProcessMenuNav(MenuControls *controls, std::function<void()> onMain, std::function<void()> onExit);
@@ -107,13 +105,11 @@ public:
 
 private:
 	/*
-	 * yes hello this hurts me
 	 * ok so in this menu the optioncount is final at menu.end()
 	 * but if we draw sprites earlier, shit we draw in end() will overlap
 	 * so we just need to save the draw calls in order to execute at the
 	 * end of end() or at least after we're done drawing the background
 	 */
-
 	typedef std::vector<std::function<void(void)>> functionList;
 	functionList backgroundDrawCalls;
 	functionList highlightsDrawCalls;
@@ -148,6 +144,7 @@ private:
 	const unsigned int menuTimeMedium = 75;
 	const unsigned int menuTimeFast = 40;
 	unsigned int menuTime = menuTimeRepeat;
+	bool useNative = true;
 
 	void drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, rgba rgba, int justify = 1);
 	void drawRect(float x, float y, float width, float height, rgba rgba);
@@ -158,9 +155,10 @@ private:
 	void backMenu();
 	void menuBeep();
 	void resetButtonStates();
-	bool useNative = true;
 	void drawAdditionalInfoBoxTitle(std::string title);
 	void drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines, std::string title = "Info");
+	void disableKeys();
+	void drawMenuDetails(std::vector<std::string> details, float y);
 };
 
 }
