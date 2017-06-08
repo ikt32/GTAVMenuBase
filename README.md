@@ -25,31 +25,55 @@ Nifty guys, who made this SudoMod menu base. The menu is (imo) rather easy to us
 A simple example would be this:
 
 ```c++
-
+/*
+ * We need to have a controls object. Another function can fill in the public
+ * members of this object, to specify custom controls.
+ */
 NativeMenu::MenuControls controls;
 
+/*
+ * This simple function is executed when the menu opens.
+ */
 void onMain() {
   logger.Write("Menu was opened");
 }
 
-void onExit() {
+/*
+ * This simple function is executed when the menu closes. You can handle things
+ * you temporarily stored in the menu, for example.
+ */
+ void onExit() {
   logger.Write("Menu was closed");
 }
 
+/*
+ * update_menu() should be called each tick.
+ */
 void update_menu() {
+  // Each tick, the controls are checked. If the key is hit to open
+  // or close the menu, the binded functions are called.
   menu.CheckKeys(&controls, std::bind(onMain), std::bind(onExit));
 
+  // You can define a menu like this. The main menu should always be
+  // called "mainmenu".
   if (menu.CurrentMenu("mainmenu")) {
+    // The title is NOT optional.
     menu.Title("Whoopie!");
     
     if (menu.Option("Click me!")) {
       logger.Write("Option was chosen");
     }
+    // This will open a submenu with the name "submenu"
     menu.MenuOption("Look, a submenu!", "submenu");
   }
   
+  // Any submenus can have any titles. They should only need to match
+  // the name used to call them.
   if (menu.CurrentMenu("submenu")) {
     menu.Title("I'm a submenu!");
+    
+    // Some extra information can be shown on the right of the the menu.
+    // You do need to manage newlines yourself.
     std::vector<std::string> extraInfo = {
       "There's also some additional info",
       "You can put descriptions or info here",
@@ -59,6 +83,7 @@ void update_menu() {
     menu.OptionPlus("Look to the right!", extraInfo);
   }
 
+  // Finally, draw all textures.
   menu.EndMenu();
 }
 ```
