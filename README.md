@@ -18,72 +18,97 @@ Mods using this:
 * [Addon Spawner](https://github.com/E66666666/GTAVAddonLoader)
 * [VStancer](https://github.com/E66666666/GTAVStancer)
 
+Full menu example:
+* [GTAVMenuExample](https://github.com/E66666666/GTAVMenuExample)
+
 Since native functions are used, ScriptHookV is needed. ScriptHookV should be extracted into a
 `ScriptHookV_SDK` folder parallel to this repo's folder and your mod folder that uses this.
 
 ## Usage
 
-A simple menu example:
+A menu example:
 
 ```c++
-/*
- * We need to have a controls object. Another function can fill in the public
- * members of this object, to specify custom controls.
- */
-NativeMenu::MenuControls controls;
-
 /*
  * This simple function is executed when the menu opens.
  */
 void onMain() {
-  logger.Write("Menu was opened");
+	logger.Write("Menu was opened");
 }
 
 /*
  * This simple function is executed when the menu closes. You can handle things
  * you temporarily stored in the menu, for example.
  */
- void onExit() {
-  logger.Write("Menu was closed");
+void onExit() {
+	logger.Write("Menu was closed");
+}
+
+void onRight() {
+	showNotification("You pressed RIGHT on an OptionPlus");
+}
+
+void onLeft() {
+	showNotification("You pressed LEFT on an OptionPlus");
 }
 
 /*
  * update_menu() should be called each tick.
  */
+
 void update_menu() {
-  // Each tick, the controls are checked. If the key is hit to open
-  // or close the menu, the binded functions are called.
-  menu.CheckKeys(&controls, std::bind(onMain), std::bind(onExit));
+	// Each tick, the controls are checked. If the key is hit to open
+	// or close the menu, the binded functions are called.
+	menu.CheckKeys(&controls, std::bind(onMain), std::bind(onExit));
 
-  // You can define a menu like this. The main menu should always be
-  // called "mainmenu".
-  if (menu.CurrentMenu("mainmenu")) {
-    // The title is NOT optional.
-    menu.Title("Whoopie!");
-    
-    if (menu.Option("Click me!")) {
-      logger.Write("Option was chosen");
-    }
-    // This will open a submenu with the name "submenu"
-    menu.MenuOption("Look, a submenu!", "submenu");
-  }
-  
-  // Any submenus can have any titles. They should only need to match
-  // the name used to call them.
-  if (menu.CurrentMenu("submenu")) {
-    menu.Title("I'm a submenu!");
-    
-    // Some extra information can be shown on the right of the the menu.
-    std::vector<std::string> extraInfo = {
-      "There's also some additional info! You can put descriptions"
-      " or info here. This automatically splits the lines so they"
-      " fit in the menu."
-    };
-    menu.OptionPlus("Look to the right!", extraInfo);
-  }
+	// You can define a menu like this. The main menu should always be
+	// called "mainmenu".
+	if (menu.CurrentMenu("mainmenu")) {
+		// The title is NOT optional.
+		menu.Title("Example!");
 
-  // Finally, draw all textures.
-  menu.EndMenu();
+		// This will open a submenu with the name "submenu"
+		menu.MenuOption("Look, a submenu!", "submenu", { "This submenu demonstrates a few settings."});
+	}
+
+	// Any submenus can have any titles. They should only need to match
+	// the name used to call them.
+	if (menu.CurrentMenu("submenu")) {
+		menu.Title("I'm a submenu!");
+
+		if (menu.Option("Click me!", { "This will log something to " + Paths::GetModuleNameWithoutExtension() + ".log" })) {
+			showNotification("Check the logfile!");
+			logger.Write("\"Click me!\" was selected!");
+		}
+
+		menu.BoolOption("Here's a checkbox", &checkBoxStatus, { std::string("Boolean is ") + (checkBoxStatus ? "checked" : "not checked") + "." });
+		menu.IntOption("Ints!", &someInt, -100, 100, intStep, { "Stepsize can be changed!" });
+		menu.IntOption("Int step size", &intStep, 1, 100, 1, { "Stepsize can be changed!" });
+		menu.FloatOption("Floats?", &someFloat, -100.0f, 100.0f, floatStep, { "Try holding left/right, things should speed up." });
+		menu.FloatOption("Float step size", &floatStep, 0.01f, 100.0f, 0.01f, { "Steps smaller than 0.01 aren't visible until they go over the 0.01 mark." });
+		menu.StringArray("String arrays", strings, &stringsPos, { "You can also show different strings" });
+
+		menu.Option("Description info",
+		{ "You can put arbitarily long texts in the description. "
+		"Word wrapping magic should work! "
+		"That's why this subtext is so big ;)",
+		"Newlines",
+		"like so."});
+
+		// Some extra information can be shown on the right of the the menu.
+		// You do need to manage newlines yourself.
+		std::vector<std::string> extraInfo = {
+			"There's also some additional info",
+			"You can put descriptions or info here",
+			"Each string is a new line",
+			"The box expands by itself"
+		};
+		menu.OptionPlus("Look to the right!", extraInfo, nullptr, std::bind(onLeft), std::bind(onRight), "Something", 
+		{"You do need to manage the line splitting yourself, as it's meant for short pieces of info."});
+	}
+
+	// Finally, draw all textures.
+	menu.EndMenu();
 }
 ```
 
@@ -102,6 +127,8 @@ Required menus and items:
   * Check the description how to do this
 * Title
   * You'll need to specify a menu title
+
+For a more complete example (working build), check [GTAVMenuExample](https://github.com/E66666666/GTAVMenuExample).
 
 ## Input handling
 `MenuControls` does input checking, so it can distinguish between key press, key being pressed, key being released. This applies both to keyboard input (`GetAsyncKeyState`) and native inputs (`IS_DISABLED_CONTROL_PRESSED`). Conflicts/delays between these two shouldn't occur as that's handled in `CheckKeys`: if a GetAsyncKeyState is detected, native controls are temporarily 
