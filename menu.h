@@ -116,6 +116,10 @@ private:
 	functionList foregroundDrawCalls;
 	std::vector<std::string> details;
 
+	float detailLineHeight = 0.025f;
+	float detailLineTextTopPadding = 0.005f;
+	float detailLineBottomPadding = 0.017f;
+
 	float optionHeight = 0.035f;
 	float menuWidth = 0.23f;
 	float titleHeight = 0.085f;

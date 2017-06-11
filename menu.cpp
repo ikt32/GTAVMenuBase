@@ -690,16 +690,16 @@ void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 	}
 
 	for (auto i = 0; i < splitDetails.size(); i++) {
-		drawText(splitDetails[i], optionsFont, (menux - menuWidth / 2.0f) + menuTextMargin, i * optionHeight + y, optionTextSize, optionTextSize, options);
+		drawText(splitDetails[i], optionsFont, (menux - menuWidth / 2.0f) + menuTextMargin, i * detailLineHeight + y + detailLineTextTopPadding, optionTextSize, optionTextSize, options);
 	}
 
 	auto tempoptions = optionsrect;
 	tempoptions.a = 255;
-	drawRect(menux, y, menuWidth, optionHeight/8, {0,0,0,255});
+	// drawRect(menux, y, menuWidth, optionHeight/8, {0,0,0,255});
 
 	backgroundDrawCalls.push_back(
 		std::bind(&Menu::drawSprite, this, TextureDicts[BackgTextureIndex], TextureNames[BackgTextureIndex],
-		menux, y + (splitDetails.size() * optionHeight) / 2, menuWidth, optionHeight * splitDetails.size(), 0.0f, tempoptions));
+		menux, y + (splitDetails.size() * detailLineHeight + detailLineBottomPadding) / 2, menuWidth, detailLineHeight * splitDetails.size() + + detailLineBottomPadding, 0.0f, tempoptions));
 }
 
 void Menu::EndMenu() {
