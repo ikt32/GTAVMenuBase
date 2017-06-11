@@ -136,7 +136,7 @@ blocked. This should prevent ghosting when a menu key is assigned to the same ke
 navigation controls are binded to.
 
 ## Details
-There are two detail panes available (mutually exclusive until whenever):
+There are two detail panes available:
 * Info pane to the right
 * Details pane below the menu
 
@@ -144,15 +144,12 @@ A menu option with the info pane on the right can be created with `OptionPlus`. 
 functions to left/right press, and the original `return-true-when-option-pressed` is also
 still available. The pane can be filled with a string vector, where each item represents a new
 line. As of now these aren't split automatically yet, so you'll need to manually manage the
-line length.
+line length. It's originally made to show short pieces of information.
 
-Detail panes are available for all option types except `OptionPlus`. The example features an
-example of this: It also accepts a string vector. Due to less-than-optimal decisions in the past
-and legacy reasons, it's not a string. You don't need to manage the length of your text here
-though, as all items are concatenated and split into lines automatically.
-
-If you still need to have manual line management, making the first vector item `"RAW"` will make
-the menu use your string vector as it is originally (with each item on a new line).
+Detail panes are available for all option types. It accepts a string vector. Each item in this
+vector is automatically split up so it fits nicely within the detail pane. A newline can be
+forced by adding more string items to the vector. For normal use a vector with a simple string
+should be enough.
 
 ## Remarks
 If you're also not using [ScriptHookVDotNet](https://github.com/crosire/scripthookvdotnet) with [NativeUI](https://github.com/Guad/NativeUI) and just want something less painful than the mess that happens in the ScriptHookV Simple Trainer example, I hope this is of some use for you.
@@ -160,4 +157,4 @@ If you're also not using [ScriptHookVDotNet](https://github.com/crosire/scriptho
 This thing started out as something I needed for [VStancer](https://github.com/E66666666/GTAVStancer) 
 where unknown modder on GTA5-Mods linked me the SudoMod menu sources. 
 
-Good luck! 
+Good luck modding! 
