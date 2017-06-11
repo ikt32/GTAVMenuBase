@@ -569,53 +569,64 @@ void Menu::disableKeys() {
 	UI::HIDE_HUD_COMPONENT_THIS_FRAME(9);
 	UI::HIDE_HUD_COMPONENT_THIS_FRAME(8);
 
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlNextCamera, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleCinCam, true);
+	for (int i = 0; i <= 2; i++) {
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlNextCamera, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleCinCam, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlCinematicSlowMo, true);
 
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlPhone, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlPhone, true);
 
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectCharacterMichael, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectCharacterFranklin, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectCharacterTrevor, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectCharacterMultiplayer, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlCharacterWheel, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterMichael, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterFranklin, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterTrevor, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterMultiplayer, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlCharacterWheel, true);
+										 
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMeleeAttackLight, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMeleeAttackHeavy, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMeleeAttackAlternate, true);
+										 
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMap, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMultiplayerInfo, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMapPointOfInterest, true);
+										 
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlRadioWheelLeftRight, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleNextRadio, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehiclePrevRadio, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlRadioWheelUpDown, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleNextRadioTrack, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehiclePrevRadioTrack, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleRadioWheel, true);
+										 
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleDuck, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleSelectNextWeapon, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleSelectPrevWeapon, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleAttack, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleAttack2, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleExit, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectWeapon, true);
 
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackLight, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackHeavy, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackAlternate, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlWeaponWheelNext, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlWeaponWheelPrev, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlNextWeapon, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlPrevWeapon, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectWeapon, true);
 
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMultiplayerInfo, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMapPointOfInterest, true);
-
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlRadioWheelLeftRight, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleNextRadio, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehiclePrevRadio, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlRadioWheelUpDown, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleNextRadioTrack, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehiclePrevRadioTrack, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleRadioWheel, true);
-
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleDuck, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleSelectNextWeapon, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleSelectPrevWeapon, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleAttack, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleAttack2, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleExit, true);
-
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlContext, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectWeapon, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleHeadlight, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleRoof, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleHorn, true);
-
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleAim, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehiclePassengerAim, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlFrontendSocialClub, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlFrontendSocialClubSecondary, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlReplayStartStopRecording, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlInteractionMenu, true);
-	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSaveReplayClip, true);
-
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlContext, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlContextSecondary, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectWeapon, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleHeadlight, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleRoof, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleHorn, true);
+										 
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleAim, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehiclePassengerAim, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlFrontendSocialClub, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlFrontendSocialClubSecondary, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlReplayStartStopRecording, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlInteractionMenu, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSaveReplayClip, true);
+	}
 }
 
 void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
@@ -628,7 +639,7 @@ void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 
 	backgroundDrawCalls.push_back(
 		std::bind(&Menu::drawSprite, this, TextureDicts[BackgTextureIndex], TextureNames[BackgTextureIndex],
-		menux, (y) + (details.size() * optionHeight) / 2, menuWidth, optionHeight * details.size(), 0.0f, tempoptions));
+		menux, y + (splitDetails.size() * optionHeight) / 2, menuWidth, optionHeight * splitDetails.size(), 0.0f, tempoptions));
 }
 
 void Menu::EndMenu() {
