@@ -2,6 +2,7 @@
 
 #include "menu.h"
 #include <functional>
+#include <sstream>
 
 #include "inc/natives.h"
 #include "inc/enums.h"
@@ -629,10 +630,81 @@ void Menu::disableKeys() {
 	}
 }
 
-void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
-	for (auto i = 0; i < details.size(); i++) {
-		drawText(details[i], optionsFont, (menux - menuWidth / 2.0f) + menuTextMargin, i * optionHeight + y, optionTextSize, optionTextSize, options);
+
+float Menu::getStringWidth(std::string text) {
+	float scale = optionTextSize;
+	if (optionsFont == 0) { // big-ass Chalet London
+		scale *= 0.75f;
 	}
+
+	UI::_SET_TEXT_ENTRY_FOR_WIDTH("STRING");
+	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
+	return UI::_GET_TEXT_SCREEN_WIDTH(optionsFont) * scale;
+}
+
+// https://stackoverflow.com/questions/236129/split-a-string-in-c
+template<typename Out>
+void split(const std::string &s, char delim, Out result) {
+	std::stringstream ss;
+	ss.str(s);
+	std::string item;
+	while (std::getline(ss, item, delim)) {
+		*(result++) = item;
+	}
+}
+
+
+std::vector<std::string> split(const std::string &s, char delim) {
+	std::vector<std::string> elems;
+	split(s, delim, std::back_inserter(elems));
+	return elems;
+}
+
+std::vector<std::string> Menu::splitString(float maxWidth, const std::vector<std::string> &details) {
+	std::vector<std::string> splitLines;
+	std::string totalString;
+	// Stick it back together again.
+	for (auto detailLine : details) {
+		totalString += detailLine;
+		// Very naively assume the dev didn't split a string mid-word.
+		if (detailLine != details.back() && detailLine.back() != ' ') {
+			totalString += ' ';
+		}
+	}
+
+	std::vector<std::string> words = split(totalString, ' ');
+
+	std::string line;
+	for (std::string word : words) {
+		float lineWidth = getStringWidth(line);
+		float wordWidth = getStringWidth(word);
+		if (lineWidth + wordWidth > maxWidth) {
+			splitLines.push_back(line);
+			line.clear();
+		}
+		line += word + ' ';
+		if (word == words.back()) {
+			splitLines.push_back(line);
+		}
+	}
+
+	return splitLines;
+}
+
+void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
+	std::vector<std::string> splitDetails;
+	if (details.front() == "RAW") {
+		splitDetails = details;
+		splitDetails.erase(splitDetails.begin());
+	}
+	else {
+		splitDetails = splitString(menuWidth, details);
+	}
+
+	for (auto i = 0; i < splitDetails.size(); i++) {
+		drawText(splitDetails[i], optionsFont, (menux - menuWidth / 2.0f) + menuTextMargin, i * optionHeight + y, optionTextSize, optionTextSize, options);
+	}
+
 	auto tempoptions = optionsrect;
 	tempoptions.a = 255;
 	drawRect(menux, y, menuWidth, optionHeight/8, {0,0,0,255});

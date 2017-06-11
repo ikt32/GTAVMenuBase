@@ -158,6 +158,8 @@ private:
 	void drawAdditionalInfoBoxTitle(std::string title);
 	void drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines, std::string title = "Info");
 	void disableKeys();
+	float getStringWidth(std::string text);
+	std::vector<std::string> Menu::splitString(float menu_width, const std::vector<std::string> &details);
 	void drawMenuDetails(std::vector<std::string> details, float y);
 };
 
