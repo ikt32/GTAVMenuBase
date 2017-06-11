@@ -660,19 +660,10 @@ std::vector<std::string> split(const std::string &s, char delim) {
 	return elems;
 }
 
-std::vector<std::string> Menu::splitString(float maxWidth, const std::vector<std::string> &details) {
+std::vector<std::string> Menu::splitString(float maxWidth, std::string &details) {
 	std::vector<std::string> splitLines;
-	std::string totalString;
-	// Stick it back together again.
-	for (auto detailLine : details) {
-		totalString += detailLine;
-		// Very naively assume the dev didn't split a string mid-word.
-		if (detailLine != details.back() && detailLine.back() != ' ') {
-			totalString += ' ';
-		}
-	}
 
-	std::vector<std::string> words = split(totalString, ' ');
+	std::vector<std::string> words = split(details, ' ');
 
 	std::string line;
 	for (std::string word : words) {
@@ -693,12 +684,9 @@ std::vector<std::string> Menu::splitString(float maxWidth, const std::vector<std
 
 void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 	std::vector<std::string> splitDetails;
-	if (details.front() == "RAW") {
-		splitDetails = details;
-		splitDetails.erase(splitDetails.begin());
-	}
-	else {
-		splitDetails = splitString(menuWidth, details);
+	for (auto detailLine : details) {
+		auto splitLines = splitString(menuWidth, detailLine);
+		splitDetails.insert(std::end(splitDetails), std::begin(splitLines), std::end(splitLines));
 	}
 
 	for (auto i = 0; i < splitDetails.size(); i++) {
