@@ -697,11 +697,14 @@ void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 
 	auto tempoptions = optionsrect;
 	tempoptions.a = 255;
-	// drawRect(menux, y, menuWidth, optionHeight/8, {0,0,0,255});
+	
+	drawRect(menux, y, menuWidth, optionHeight/8, {0,0,0,255});
+
+	float boxHeight = (splitDetails.size() * detailLineHeight) + (optionHeight - detailLineHeight);
 
 	backgroundDrawCalls.push_back(
 		std::bind(&Menu::drawSprite, this, TextureDicts[BackgTextureIndex], TextureNames[BackgTextureIndex],
-		menux, y + (splitDetails.size() * detailLineHeight + detailLineBottomPadding) / 2, menuWidth, detailLineHeight * splitDetails.size() + + detailLineBottomPadding, 0.0f, tempoptions));
+		menux, y + boxHeight / 2, menuWidth, boxHeight, 0.0f, tempoptions));
 }
 
 void Menu::EndMenu() {
