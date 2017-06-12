@@ -334,7 +334,7 @@ bool Menu::BoolOption(std::string option, bool *b00l, std::vector<std::string> d
 		int resX, resY;
 		GRAPHICS::_GET_ACTIVE_SCREEN_RESOLUTION(&resX, &resY);
 		float ratio = (float)resX / (float)resY;
-		float boxSz = 0.05;
+		float boxSz = 0.05f;
 		foregroundDrawCalls.push_back(
 			std::bind(&Menu::drawSprite, this, "commonmenu", tickBoxTexture,
 			menux + menuWidth/2.0f - optionRightMargin, textureY, boxSz/ratio, boxSz, 0.0f, optionColors)
@@ -692,7 +692,7 @@ void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 	}
 
 	for (auto i = 0; i < splitDetails.size(); i++) {
-		drawText(splitDetails[i], optionsFont, (menux - menuWidth / 2.0f) + menuTextMargin, i * detailLineHeight + y + detailLineTextTopPadding, optionTextSize, optionTextSize, options);
+		drawText(splitDetails[i], optionsFont, (menux - menuWidth / 2.0f) + menuTextMargin, i * detailLineHeight + y, optionTextSize, optionTextSize, options);
 	}
 
 	auto tempoptions = optionsrect;
