@@ -474,16 +474,6 @@ bool Menu::StringArray(std::string option, std::vector<std::string>display, int 
 	return false;
 }
 
-void Menu::TeleportOption(std::string option, float x, float y, float z) {
-	Option(option);
-
-	if (currentoption == optioncount && optionpress) {
-		Entity handle = PLAYER::PLAYER_PED_ID();
-		if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false)) handle = PED::GET_VEHICLE_PED_IS_USING(PLAYER::PLAYER_PED_ID());
-		ENTITY::SET_ENTITY_COORDS_NO_OFFSET(handle, x, y, z, false, false, false);
-	}
-}
-
 void Menu::IniWriteInt(LPCWSTR file, LPCWSTR section, LPCWSTR key, int value) {
 	wchar_t newValue[256];
 	wsprintfW(newValue, L"%d", value);
