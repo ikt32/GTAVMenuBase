@@ -52,11 +52,11 @@ public:
 	bool MenuOption(std::string option, std::string menu, std::vector<std::string> details = {});
 	bool IntOption(std::string option, int *var, int min, int max, int step = 1, std::vector<std::string> details = {});
 	bool FloatOption(std::string option, float *var, float min, float max, float step = 0.1, std::vector<std::string> details = {});
-	bool BoolOption(std::string option, bool *b00l, std::vector<std::string> details = {});
-	bool BoolSpriteOption(std::string option, bool b00l, std::string category, std::string spriteOn, std::string spriteOff, std::vector<std::string> details = {});
-	bool IntArray(std::string option, int display[], int *PlaceHolderInt, std::vector<std::string> details = {});
-	bool FloatArray(std::string option, float display[], int *PlaceHolderInt, std::vector<std::string> details = {});
-	bool StringArray(std::string option, std::vector<std::string> display, int *PlaceHolderInt, std::vector<std::string> details = {});
+	bool BoolOption(std::string option, bool *var, std::vector<std::string> details = {});
+	bool BoolSpriteOption(std::string option, bool var, std::string category, std::string spriteOn, std::string spriteOff, std::vector<std::string> details = {});
+	bool IntArray(std::string option, std::vector<int> display, int *iterator, std::vector<std::string> details = {});
+	bool FloatArray(std::string option, std::vector<float> display, int *iterator, std::vector<std::string> details = {});
+	bool StringArray(std::string option, std::vector<std::string> display, int *iterator, std::vector<std::string> details = {});
 	void TeleportOption(std::string option, float x, float y, float z);
 
 	bool CurrentMenu(std::string menuname);
@@ -107,9 +107,9 @@ public:
 private:
 	/*
 	 * ok so in this menu the optioncount is final at menu.end()
-	 * but if we draw sprites earlier, shit we draw in end() will overlap
+	 * but if we draw sprites earlier, what we draw in end() will overlap
 	 * so we just need to save the draw calls in order to execute at the
-	 * end of end() or at least after we're done drawing the background
+	 * end of end() or at least after we're done drawing the backgrounds
 	 */
 	typedef std::vector<std::function<void(void)>> functionList;
 	functionList backgroundDrawCalls;

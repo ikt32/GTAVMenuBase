@@ -368,12 +368,12 @@ bool Menu::BoolSpriteOption(std::string option, bool b00l, std::string category,
 	return false;
 }
 
-bool Menu::IntArray(std::string option, int display[], int *PlaceHolderInt, std::vector<std::string> details) {
+bool Menu::IntArray(std::string option, std::vector<int> display, int *PlaceHolderInt, std::vector<std::string> details) {
 	Option(option, details);
 	bool thisOption = false;
 	if (currentoption == optioncount) thisOption = true;
 	int min = 0;
-	int max = sizeof(display) / sizeof(*display);
+	int max = display.size();
 
 	if (currentoption == optioncount) {
 		if (leftpress) {
@@ -401,12 +401,12 @@ bool Menu::IntArray(std::string option, int display[], int *PlaceHolderInt, std:
 	return false;
 }
 
-bool Menu::FloatArray(std::string option, float display[], int *PlaceHolderInt, std::vector<std::string> details) {
+bool Menu::FloatArray(std::string option, std::vector<float> display, int *PlaceHolderInt, std::vector<std::string> details) {
 	Option(option, details);
 	bool thisOption = false;
 	if (currentoption == optioncount) thisOption = true;
 	int min = 0;
-	int max = sizeof(display) / sizeof(*display);
+	int max = display.size();
 
 	if (currentoption == optioncount) {
 		if (leftpress) {
