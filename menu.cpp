@@ -106,8 +106,8 @@ void Menu::Title(std::string title) {
 bool Menu::Option(std::string option, std::vector<std::string> details) {
 	optioncount++;
 
-	bool thisOption = false;
-	if (currentoption == optioncount) thisOption = true;
+	bool thisOption = currentoption == optioncount;
+	
 
 	bool doDraw = false;
 	float optiony;
@@ -193,9 +193,8 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool 
 	Option(option, details);
 
 	size_t infoLines = extra.size();
-	bool thisOption = false;
+	bool thisOption = currentoption == optioncount;
 	if (currentoption == optioncount) {
-		thisOption = true;
 		if (onLeft && leftpress) {
 			onLeft();
 			leftpress = false;
@@ -223,8 +222,8 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool 
 
 bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::string> details) {
 	Option(option, details);
-	bool thisOption = false;
-	if (currentoption == optioncount) thisOption = true;
+	bool thisOption = currentoption == optioncount;
+	
 	if (currentoption <= 16 && optioncount <= 16)
 		drawText(">>", optionsFont, menux + menuWidth/2.0f - optionRightMargin, (optioncount * optionHeight + menuy), optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
 	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
@@ -239,74 +238,32 @@ bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::str
 }
 
 bool Menu::IntOption(std::string option, int &var, int min, int max, int step, std::vector<std::string> details) {
+	std::string printVar = std::to_string(var);
+
 	Option(option, details);
-	bool thisOption = false;
-	if (currentoption == optioncount) thisOption = true;
-	if (currentoption <= 16 && optioncount <= 16)
-		drawText("< " + std::to_string(var) + " >", optionsFont, menux + menuWidth/2.0f - optionRightMargin, (optioncount * optionHeight + menuy), optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
-	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
-		drawText("< " + std::to_string(var) + " >", optionsFont, menux + menuWidth/2.0f - optionRightMargin, ((optioncount - (currentoption - 16)) * optionHeight + menuy), optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
+	bool thisOption = currentoption == optioncount;
 
-	if (currentoption == optioncount) {
-		if (leftpress) {
-			if (var <= min) var = max;
-			else var -= step;
-			leftpress = false;
-			return true;
-		}
-		if (var < min) var = max;
-		if (rightpress) {
-			if (var >= max) var = min;
-			else var += step;
-			rightpress = false;
-			return true;
-		}
-		if (var > max) var = min;
-	}
-
-	if (optionpress && currentoption == optioncount)
-		return true;
-	return false;
+	drawOptionValue(printVar, thisOption, max - min);
+	return processOptionItemControls(var, min, max, step);
 }
 
 bool Menu::FloatOption(std::string option, float &var, float min, float max, float step, std::vector<std::string> details) {
-	Option(option, details);
-	bool thisOption = false;
-	if (currentoption == optioncount) thisOption = true;
 	char buf[100];
 	_snprintf_s(buf, sizeof(buf), "%.2f", var);
+	std::string printVar = buf;
+	int items = min != max ? 1 : 0;
 
-	if (currentoption <= 16 && optioncount <= 16)
-		drawText("< " + std::string(buf) + " >", optionsFont, menux + menuWidth/2.0f - optionRightMargin, optioncount * optionHeight + menuy, optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
-	else if (optioncount > currentoption - 16 && optioncount <= currentoption)
-		drawText("< " + std::string(buf) + " >", optionsFont, menux + menuWidth/2.0f - optionRightMargin, (optioncount - (currentoption - 16)) * optionHeight + menuy, optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
-
-	if (currentoption == optioncount) {
-		if (leftpress) {
-			if (var <= min) var = max;
-			else var -= step;
-			leftpress = false;
-			return true;
-		}
-		if (var < min) var = max;
-		if (rightpress) {
-			if (var >= max) var = min;
-			else var += step;
-			rightpress = false;
-			return true;
-		}
-		if (var > max) var = min;
-	}
-
-	if (optionpress && currentoption == optioncount)
-		return true;
-	return false;
+	Option(option, details);
+	bool thisOption = currentoption == optioncount;
+	
+	drawOptionValue(printVar, thisOption, items);
+	return processOptionItemControls(var, min, max, step);
 }
 
 bool Menu::BoolOption(std::string option, bool &var, std::vector<std::string> details) {
 	Option(option, details);
-	bool thisOption = false;
-	if (currentoption == optioncount) thisOption = true;
+	bool thisOption = currentoption == optioncount;
+	
 	char * tickBoxTexture;
 	rgba optionColors;
 	optionColors = options;
@@ -348,18 +305,18 @@ bool Menu::BoolOption(std::string option, bool &var, std::vector<std::string> de
 	return false;
 }
 
-bool Menu::BoolSpriteOption(std::string option, bool b00l, std::string category, std::string spriteOn, std::string spriteOff, std::vector<std::string> details) {
+bool Menu::BoolSpriteOption(std::string option, bool enabled, std::string category, std::string spriteOn, std::string spriteOff, std::vector<std::string> details) {
 	Option(option, details);
-	bool thisOption = false;
-	if (currentoption == optioncount) thisOption = true;
+	bool thisOption = currentoption == optioncount;
+	
 	if (currentoption <= 16 && optioncount <= 16) {
 		foregroundDrawCalls.push_back(
-			std::bind(&Menu::drawSprite, this, category, b00l ? spriteOn : spriteOff,
+			std::bind(&Menu::drawSprite, this, category, enabled ? spriteOn : spriteOff,
 			menux + menuWidth/2.0f - optionRightMargin, (optioncount * optionHeight + (menuy + 0.016f)), 0.03f, 0.05f, 0.0f, thisOption ? optionsBlack : options));
 	}
 	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption) {
 		foregroundDrawCalls.push_back(
-			std::bind(&Menu::drawSprite, this, category, b00l ? spriteOn : spriteOff,
+			std::bind(&Menu::drawSprite, this, category, enabled ? spriteOn : spriteOff,
 			menux + menuWidth/2.0f - optionRightMargin, ((optioncount - (currentoption - 16)) * optionHeight + (menuy + 0.016f)), 0.03f, 0.05f, 0.0f, thisOption ? optionsBlack : options));
 	}
 			
@@ -369,109 +326,44 @@ bool Menu::BoolSpriteOption(std::string option, bool b00l, std::string category,
 }
 
 bool Menu::IntArray(std::string option, std::vector<int> display, int &iterator, std::vector<std::string> details) {
+	std::string printVar = std::to_string(display[iterator]);
+	
 	Option(option, details);
-	bool thisOption = false;
-	if (currentoption == optioncount) thisOption = true;
+	bool thisOption = currentoption == optioncount;
+	
 	int min = 0;
-	int max = display.size();
-
-	if (currentoption == optioncount) {
-		if (leftpress) {
-			if (iterator <= min) iterator = max;
-			else iterator -= 1;
-			leftpress = false;
-			return true;
-		}
-		if (iterator < min) iterator = max;
-		if (rightpress) {
-			if (iterator >= max) iterator = min;
-			else iterator += 1;
-			rightpress = false;
-			return true;
-		}
-		if (iterator > max) iterator = min;
-	}
-	if (currentoption <= 16 && optioncount <= 16)
-		drawText("< " + std::to_string(display[iterator]) + " >", optionsFont, menux + menuWidth/2.0f - optionRightMargin, (optioncount * optionHeight + menuy), optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
-	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
-		drawText("< " + std::to_string(display[iterator]) + " >", optionsFont, menux + menuWidth/2.0f - optionRightMargin, ((optioncount - (currentoption - 16)) * optionHeight + menuy), optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
-
-	if (optionpress && currentoption == optioncount)
-		return true;
-	return false;
+	int max = static_cast<int>(display.size());
+	
+	drawOptionValue(printVar, thisOption, max);
+	return processOptionItemControls(iterator, min, max, 1);
 }
 
 bool Menu::FloatArray(std::string option, std::vector<float> display, int &iterator, std::vector<std::string> details) {
-	Option(option, details);
-	bool thisOption = false;
-	if (currentoption == optioncount) thisOption = true;
-	int min = 0;
-	int max = display.size();
-
-	if (currentoption == optioncount) {
-		if (leftpress) {
-			if (iterator <= min) iterator = max;
-			else iterator -= 1;
-			leftpress = false;
-			return true;
-		}
-		if (iterator < min) iterator = max;
-		if (rightpress) {
-			if (iterator >= max) iterator = min;
-			else iterator += 1;
-			rightpress = false;
-			return true;
-		}
-		if (iterator > max) iterator = min;
-	}
-
 	char buf[30];
 	_snprintf_s(buf, sizeof(buf), "%.2f", display[iterator]);
+	std::string printVar = buf;
 
-	if (currentoption <= 16 && optioncount <= 16)
-		drawText("< " + std::string(buf) + " >", optionsFont, menux + menuWidth/2.0f - optionRightMargin, (optioncount * optionHeight + menuy), optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
-	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
-		drawText("< " + std::string(buf) + " >", optionsFont, menux + menuWidth/2.0f - optionRightMargin, ((optioncount - (currentoption - 16)) * optionHeight + menuy), optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
+	Option(option, details);
+	bool thisOption = currentoption == optioncount;
+	
+	int min = 0;
+	int max = static_cast<int>(display.size());
 
-	if (optionpress && currentoption == optioncount)
-		return true;
-	return false;
+	drawOptionValue(printVar, thisOption, max);
+	return processOptionItemControls(iterator, min, max, 1);
 }
 
 bool Menu::StringArray(std::string option, std::vector<std::string>display, int &iterator, std::vector<std::string> details) {
+	std::string printVar = display[iterator];
+	
 	Option(option, details);
-	bool thisOption = false;
-	if (currentoption == optioncount) thisOption = true;
+	bool thisOption = currentoption == optioncount;
+	
 	int min = 0;
 	int max = static_cast<int>(display.size()) - 1;
 
-	if (currentoption == optioncount) {
-		if (leftpress) {
-			if (iterator <= min) iterator = max;
-			else iterator -= 1;
-			leftpress = false;
-		}
-		if (iterator < min) iterator = max;
-		if (rightpress) {
-			if (iterator >= max) iterator = min;
-			else iterator += 1;
-			rightpress = false;
-		}
-		if (iterator > max) iterator = min;
-	}
-	std::string leftArrow = "< ";
-	std::string rightArrow = " >";
-	if (max == 0) {
-		leftArrow = rightArrow = "";
-	}
-	if (currentoption <= 16 && optioncount <= 16)
-		drawText(leftArrow + std::string(display[iterator]) + rightArrow, optionsFont, menux + menuWidth/2.0f - optionRightMargin, (optioncount * optionHeight + menuy), optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
-	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
-		drawText(leftArrow + std::string(display[iterator]) + rightArrow, optionsFont, menux + menuWidth/2.0f - optionRightMargin, ((optioncount - (currentoption - 16)) * optionHeight + menuy), optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
-
-	if (optionpress && currentoption == optioncount)
-		return true;
-	return false;
+	drawOptionValue(printVar, thisOption, max);
+	return processOptionItemControls(iterator, min, max, 1);
 }
 
 void Menu::IniWriteInt(LPCWSTR file, LPCWSTR section, LPCWSTR key, int value) {
@@ -934,4 +826,17 @@ void Menu::CloseMenu() {
 		backMenu();
 	}
 }
+
+void Menu::drawOptionValue(std::string printVar, bool thisOption, int items) {
+	std::string leftArrow = "< ";
+	std::string rightArrow = " >";
+	if (items == 0) {
+		leftArrow = rightArrow = "";
+	}
+	if (currentoption <= 16 && optioncount <= 16)
+		drawText(leftArrow + printVar + rightArrow, optionsFont, menux + menuWidth / 2.0f - optionRightMargin, (optioncount * optionHeight + menuy), optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
+	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
+		drawText(leftArrow + printVar + rightArrow, optionsFont, menux + menuWidth / 2.0f - optionRightMargin, ((optioncount - (currentoption - 16)) * optionHeight + menuy), optionTextSize, optionTextSize, thisOption ? optionsBlack : options, 2);
+}
+
 }

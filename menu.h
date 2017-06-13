@@ -165,7 +165,33 @@ private:
 	void disableKeys();
 	float getStringWidth(std::string text);
 	std::vector<std::string> splitString(float maxWidth, std::string &details);
+	
 	void drawMenuDetails(std::vector<std::string> details, float y);
+	void drawOptionValue(std::string printVar, bool thisOption, int max = 0);
+
+	template <typename T>
+	bool processOptionItemControls(T &var, T min, T max, T step) {
+		if (currentoption == optioncount) {
+			if (leftpress) {
+				if (var <= min) var = max;
+				else var -= step;
+				leftpress = false;
+				return true;
+			}
+			if (var < min) var = max;
+			if (rightpress) {
+				if (var >= max) var = min;
+				else var += step;
+				rightpress = false;
+				return true;
+			}
+			if (var > max) var = min;
+		}
+
+		if (optionpress && currentoption == optioncount)
+			return true;
+		return false;
+	}
 };
 
 }
