@@ -92,12 +92,12 @@ void Menu::drawSprite(std::string textureDict, std::string textureName, float x,
 void Menu::Title(std::string title) {
 	optioncount = 0;
 	drawText(title, titleFont, menux, menuy - 0.03f, 0.85f, 0.85f, titleText, 0);
-	if (TitleTextureIndex < 1 || TitleTextureIndex >= TextureDicts.size()) {
+	if (titleTextureIndex < 1 || titleTextureIndex >= textureDicts.size()) {
 		drawRect(menux, menuy - 0.0075f, menuWidth, titleHeight, titleRect);
 	}
 	else {
 		backgroundDrawCalls.push_back(
-			std::bind(&Menu::drawSprite, this, TextureDicts[TitleTextureIndex], TextureNames[TitleTextureIndex], 
+			std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], 
 			menux, menuy - 0.0075f, menuWidth, titleHeight, 0.0f, titleRect)
 		);
 	}
@@ -129,12 +129,12 @@ bool Menu::Option(std::string option, std::vector<std::string> details) {
 	if (doDraw) {
 		drawRect(menux, optiony, menuWidth, optionHeight, optionsrect);
 		if (thisOption) {
-			if (HighlTextureIndex < 1 || HighlTextureIndex >= TextureDicts.size()) {
+			if (highlTextureIndex < 1 || highlTextureIndex >= textureDicts.size()) {
 				drawRect(menux, optiony, menuWidth, optionHeight, scroller);
 			}
 			else {
 				highlightsDrawCalls.push_back(
-					std::bind(&Menu::drawSprite, this, TextureDicts[HighlTextureIndex], TextureNames[HighlTextureIndex],
+					std::bind(&Menu::drawSprite, this, textureDicts[highlTextureIndex], textureNames[highlTextureIndex],
 					menux, optiony, menuWidth, optionHeight, 0.0f, scroller)
 				);
 			}
@@ -153,12 +153,12 @@ void Menu::drawAdditionalInfoBoxTitle(std::string title) {
 	float extrax = menux + menuWidth;
 
 	drawText(title, titleFont, extrax, menuy - 0.03f, 0.85f, 0.85f, titleText, 0);
-	if (TitleTextureIndex < 1 || TitleTextureIndex >= TextureDicts.size()) {
+	if (titleTextureIndex < 1 || titleTextureIndex >= textureDicts.size()) {
 		drawRect(extrax, menuy - 0.0075f, menuWidth, titleHeight, titleRect);
 	}
 	else {
 		backgroundDrawCalls.push_back(
-			std::bind(&Menu::drawSprite, this, TextureDicts[TitleTextureIndex], TextureNames[TitleTextureIndex],
+			std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
 			extrax, menuy - 0.0075f, menuWidth, titleHeight, 180.0f, titleRect)
 		);
 	}
@@ -172,7 +172,7 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 	for (int i = 0; i < infoLines; i++) {
 		extray = i * optionHeight + (menuy + 0.0515f);
 		drawText(extra[i], optionsFont, menux + 0.125f, i * optionHeight + (menuy + optionHeight), optionTextSize, optionTextSize, options);
-		if (HighlTextureIndex < 1 || HighlTextureIndex >= TextureDicts.size()) {
+		if (highlTextureIndex < 1 || highlTextureIndex >= textureDicts.size()) {
 			drawRect(extrax, extray, menuWidth, optionHeight, scroller);
 		}
 		else {
@@ -182,7 +182,7 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 	auto tempoptions = optionsrect;
 	tempoptions.a = 255;
 	highlightsDrawCalls.push_back(
-		std::bind(&Menu::drawSprite, this, TextureDicts[BackgTextureIndex], TextureNames[BackgTextureIndex],
+		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
 		extrax, (menuy + optionHeight) + (infoLines * optionHeight) / 2, menuWidth, optionHeight * infoLines, 0.0f, tempoptions)
 	);
 }
@@ -585,7 +585,7 @@ void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 	float boxHeight = (splitDetails.size() * detailLineHeight) + (optionHeight - detailLineHeight);
 
 	backgroundDrawCalls.push_back(
-		std::bind(&Menu::drawSprite, this, TextureDicts[BackgTextureIndex], TextureNames[BackgTextureIndex],
+		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
 		menux, y + boxHeight / 2, menuWidth, boxHeight, 0.0f, tempoptions));
 }
 
@@ -608,12 +608,12 @@ void Menu::EndMenu() {
 
 
 	// Footer
-	if (TitleTextureIndex < 1 || TitleTextureIndex >= TextureDicts.size()) {
+	if (titleTextureIndex < 1 || titleTextureIndex >= textureDicts.size()) {
 		drawRect(menux, footerBackY, menuWidth, optionHeight, titleRect);
 	}
 	else {
 		backgroundDrawCalls.push_back(
-			std::bind(&Menu::drawSprite, this, TextureDicts[TitleTextureIndex], TextureNames[TitleTextureIndex],
+			std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
 			menux, footerBackY, menuWidth, optionHeight, 0.0f, titleRect)
 		);
 	}
@@ -622,7 +622,7 @@ void Menu::EndMenu() {
 	         optionsFont, menux - 0.1f, footerTextY, optionTextSize, optionTextSize, titleText, 2);
 
 	// Options background
-	if (BackgTextureIndex < 1 || BackgTextureIndex >= TextureDicts.size()) {
+	if (backgTextureIndex < 1 || backgTextureIndex >= textureDicts.size()) {
 		optionsrect.a = optionsrectAlpha;
 	}
 	else {
@@ -630,7 +630,7 @@ void Menu::EndMenu() {
 		auto tempoptions = optionsrect;
 		tempoptions.a = 255;
 		backgroundDrawCalls.push_back(
-			std::bind(&Menu::drawSprite, this, TextureDicts[BackgTextureIndex], TextureNames[BackgTextureIndex],
+			std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
 			menux, (menuy + optionHeight) + (maxOptionCount * optionHeight) / 2, menuWidth, optionHeight * maxOptionCount, 0.0f, tempoptions)
 		);
 
@@ -679,7 +679,7 @@ void Menu::EndMenu() {
 	if (currentoption < 1) currentoption = 1;
 }
 
-void Menu::ProcessMenuNav(MenuControls *controls, std::function<void()> onMain, std::function<void()> onExit) {
+void Menu::processMenuNav(MenuControls *controls, std::function<void()> onMain, std::function<void()> onExit) {
 	if (controls->IsKeyJustPressed(MenuControls::MenuSelect) ||
 		controls->IsKeyJustPressed(MenuControls::MenuCancel) ||
 		controls->IsKeyJustPressed(MenuControls::MenuUp)     ||
@@ -753,6 +753,7 @@ void Menu::ProcessMenuNav(MenuControls *controls, std::function<void()> onMain, 
 }
 
 void Menu::CheckKeys(MenuControls* controls, std::function<void() > onMain, std::function<void() > onExit) {
+	this->onExit = onExit;
 	controls->Update();
 	optionpress = false;
 
@@ -765,7 +766,7 @@ void Menu::CheckKeys(MenuControls* controls, std::function<void() > onMain, std:
 		controls->IsKeyJustPressed(MenuControls::MenuLeft)   || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneLeft)      ||
 		controls->IsKeyJustPressed(MenuControls::MenuRight)  || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneRight)) {
 
-		ProcessMenuNav(controls, onMain, onExit);
+		processMenuNav(controls, onMain, onExit);
 	}
 
 	if (controls->IsKeyJustReleased(MenuControls::MenuKey) || controls->IsKeyJustPressed(MenuControls::MenuKey) ||
@@ -825,6 +826,7 @@ void Menu::CloseMenu() {
 	while (menulevel > 0) {
 		backMenu();
 	}
+	if (onExit) onExit();
 }
 
 void Menu::drawOptionValue(std::string printVar, bool thisOption, int items) {

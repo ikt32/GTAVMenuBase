@@ -1,9 +1,9 @@
 #pragma once
 
 /*
-* Menu system that was originally from sudomod, but with a bunch of
-* changes to make working with it easier.
-*/
+ * Menu system that was originally from sudomod, but with a bunch of
+ * changes to make working with it easier.
+ */
 
 #include <string>
 #include <windows.h>
@@ -11,9 +11,13 @@
 #include <functional>
 #include <array>
 
-//http://stackoverflow.com/questions/36789380/how-to-store-a-const-char-to-a-char
+// TODO: menuutils.h for string utils
+// TODO: menusettings class
+// TODO: MenuControls owned by Menu
 namespace NativeMenu {
 
+// TODO: Refactor into some Utils class
+// http://stackoverflow.com/questions/36789380/how-to-store-a-const-char-to-a-char
 class CharAdapter {
 public:
 	explicit CharAdapter(const char* s) : m_s(::_strdup(s)) { }
@@ -41,40 +45,133 @@ struct rgba {
 
 class Menu {
 public:
+	/*
+	 * c'tor and d'tor. As of current they don't do a lot.
+	 */
 	Menu();
 	~Menu();
 
+	/*
+	 * Main menu is always called "mainmenu".
+	 * Otherwise menuname is a submenu name.
+	 * Returns true when inside the submenu menuname.
+	 */
+	bool CurrentMenu(std::string menuname);
+
+	/*
+	 * Always assign a title to a submenu!
+	 */
 	void Title(std::string title);
+
+	/*
+	 * Submenu option.
+	 * Shows option with menu sign.
+	 * Switches menu on action.
+	 * Returns true on accept.
+	 */
 	bool MenuOption(std::string option, std::string menu, std::vector<std::string> details = {});
 
+	/*
+	 * Normal option.
+	 * Shows nothing special.
+	 * Returns true on accept.
+	 */
 	bool Option(std::string option, std::vector<std::string> details = {});
+
+	/*
+	 * Option that shows an extra pane to the right.
+	 * Shows text with extra's specifyable in the detail pane.
+	 * Indicates when it's highlighted.
+	 * Function pointers can be passed and are called on right, left press.
+	 * Custom pane title can be specified.
+	 * Returns true on accept.
+	 */
 	bool OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted = nullptr, 
 					std::function<void()> onRight = nullptr, std::function<void()> onLeft = nullptr, 
 					std::string title = "Info", std::vector<std::string> details = {}); // help
 
+	/*
+	 * Option that changes an int value with optional custom-sized steps.
+	 * Shows option with the value inside < > brackets.
+	 * Returns true on accept, left and right.
+	 */
 	bool IntOption(		std::string option, int &var,	int min,	int max,	int step = 1,		std::vector<std::string> details = {});
+
+	/*
+	 * Option that changes a float value with optional custom-sized steps.
+	 * Shows option with the value inside < > brackets.
+	 * Returns true on accept, left and right.
+	 */
 	bool FloatOption(	std::string option, float &var, float min,	float max,	float step = 0.1f,	std::vector<std::string> details = {});
 
+	/*
+	 * Option that toggles a boolean.
+	 * Shows option with a checkbox, which is checked when the passed var is "true".
+	 * Returns true on accept.
+	 */
 	bool BoolOption(std::string option, bool &var, std::vector<std::string> details = {});
+
+	/*
+	 * Option that displays a boolean with a specifyable texture.
+	 * Shows option with a checkbox, which is checked when the passed var is "true".
+	 * Returns true on accept.
+	 */
 	bool BoolSpriteOption(std::string option, bool var, std::string category, std::string spriteOn, std::string spriteOff, std::vector<std::string> details = {});
 
+	/*
+	 * Option that shows a scrollable list of supplied ints.
+	 * Shows option with the current value inside < > brackets.
+	 * Value shown is display[iterator].
+	 * On left or right press, iterator's value is incremented or decremented.
+	 * Returns true on accept, left and right.
+	 */
 	bool IntArray(std::string option, std::vector<int> display, int &iterator, std::vector<std::string> details = {});
+
+	/*
+	 * Option that shows a scrollable list of supplied floats.
+	 * Shows option with the current value inside < > brackets.
+	 * Value shown is display[iterator].
+	 * On left or right press, iterator's value is incremented or decremented.
+	 * Returns true on accept, left and right.
+	 */
 	bool FloatArray(std::string option, std::vector<float> display, int &iterator, std::vector<std::string> details = {});
+	
+	/*
+	 * Option that shows a scrollable list of supplied strings.
+	 * Shows option with the current value inside < > brackets.
+	 * Value shown is display[iterator].
+	 * On left or right press, iterator's value is incremented or decremented.
+	 * Returns true on accept, left and right.
+	 */
 	bool StringArray(std::string option, std::vector<std::string> display, int &iterator, std::vector<std::string> details = {});
 
-	bool CurrentMenu(std::string menuname);
+	/*
+	 * Draws the menu backgrounds and processes menu navigation key inputs.
+	 */
+	void EndMenu();
 
+	/*
+	 * Use at the beginning of the menu update loop!
+	 * Checks input keys and processes them for navigation in the menu with MenuControls
+	 * Function pointers can be passed. 
+	 * onMain is executed on main menu open. 
+	 * onExit is executed on main menu close.
+	 */
+	void CheckKeys(MenuControls* controls, std::function<void() > onMain = nullptr, std::function<void() > onExit = nullptr);
+
+	/*
+	 * Closes the menu and calls onExit
+	 */
+	void CloseMenu();
+
+
+	// TODO: Refactor into Menu.Settings
 	void IniWriteInt(LPCWSTR file, LPCWSTR section, LPCWSTR key, int value);
 	int IniReadInt(LPCWSTR file, LPCWSTR section, LPCWSTR key);
-
 	void LoadMenuTheme(LPCWSTR file);
 	void SaveMenuTheme(LPCWSTR file);
 
-	void EndMenu();
-	void ProcessMenuNav(MenuControls *controls, std::function<void()> onMain, std::function<void()> onExit);
-	void CheckKeys(MenuControls* controls, std::function<void(void) > onMain, std::function<void(void) > onExit);
-	void CloseMenu();
-
+	// TODO: Refactor into Menu.Settings or provide accessors.
 	int optionsFont = 0;
 	int titleFont = 1;
 	float menux = 0.2f;
@@ -87,27 +184,9 @@ public:
 	int optionsrectAlpha = 0;
 	rgba optionsBlack = { 0, 0, 0, 255 };
 
-	// probably keep this grouped like this
-	std::vector<std::string> TextureNames = {
-		"",
-		"gradient_nav",
-		"interaction_bgd",
-		"gradient_bgd",
-		"gradient_nav",
-	};
-	std::vector<std::string> TextureDicts = {
-		"",
-		"commonmenu",
-		"commonmenu",
-		"commonmenu",
-		"commonmenu",
-	};
-
-	int TitleTextureIndex = 2;
-	int BackgTextureIndex = 3;
-	int HighlTextureIndex = 4;
-
 private:
+	std::function<void() > onExit = nullptr;
+
 	/*
 	 * ok so in this menu the optioncount is final at menu.end()
 	 * but if we draw sprites earlier, what we draw in end() will overlap
@@ -151,6 +230,25 @@ private:
 	unsigned int menuTime = menuTimeRepeat;
 	bool useNative = true;
 
+	std::vector<std::string> textureNames = {
+		"",
+		"gradient_nav",
+		"interaction_bgd",
+		"gradient_bgd",
+		"gradient_nav",
+	};
+	std::vector<std::string> textureDicts = {
+		"",
+		"commonmenu",
+		"commonmenu",
+		"commonmenu",
+		"commonmenu",
+	};
+
+	int titleTextureIndex = 2;
+	int backgTextureIndex = 3;
+	int highlTextureIndex = 4;
+
 	void drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, rgba rgba, int justify = 1);
 	void drawRect(float x, float y, float width, float height, rgba rgba);
 	void drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, rgba rgba);
@@ -165,6 +263,8 @@ private:
 	void disableKeys();
 	float getStringWidth(std::string text);
 	std::vector<std::string> splitString(float maxWidth, std::string &details);
+	void processMenuNav(MenuControls *controls, std::function<void()> onMain, std::function<void()> onExit);
+
 	
 	void drawMenuDetails(std::vector<std::string> details, float y);
 	void drawOptionValue(std::string printVar, bool thisOption, int max = 0);
