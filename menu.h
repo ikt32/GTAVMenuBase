@@ -82,12 +82,11 @@ public:
 	/*
 	 * Option that shows an extra pane to the right.
 	 * Shows text with extra's specifyable in the detail pane.
-	 * Indicates when it's highlighted.
 	 * Function pointers can be passed and are called on right, left press.
 	 * Custom pane title can be specified.
 	 * Returns true on accept.
 	 */
-	bool OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted = nullptr, 
+	bool OptionPlus(std::string option, std::vector<std::string> &extra,
 					std::function<void()> onRight = nullptr, std::function<void()> onLeft = nullptr, 
 					std::string title = "Info", std::vector<std::string> details = {}); // help
 
@@ -203,11 +202,13 @@ private:
 	float detailLineHeight = 0.025f;
 	float optionHeight = 0.035f;
 	float menuWidth = 0.23f;
+	float titleTextSize = 0.85f;
 	float titleHeight = 0.085f;
 	float textureTextOffset = 0.0165f;
 	float menuTextMargin = 0.0075f;
 	float optionTextSize = 0.45f;
 	float optionRightMargin = 0.015f;
+	
 
 	int optioncount = 0;
 	int currentoption = 0;
@@ -268,7 +269,7 @@ private:
 
 	
 	void drawMenuDetails(std::vector<std::string> details, float y);
-	void drawOptionValue(std::string printVar, bool thisOption, int max = 0);
+	void drawOptionValue(std::string printVar, bool highlighted, int max = 0);
 
 	template <typename T>
 	bool processOptionItemControls(T &var, T min, T max, T step) {
