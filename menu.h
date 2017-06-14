@@ -164,13 +164,14 @@ public:
 	 * Use at the beginning of the menu update loop!
 	 * Checks input keys and processes them for navigation in the menu with MenuControls
 	 */
-	void CheckKeys(MenuControls* controls);
+	void CheckKeys();
 
 	/*
 	 * Closes the menu and calls onExit
 	 */
 	void CloseMenu();
 
+	MenuControls controls;
 
 	// TODO: Refactor into Menu.Settings
 	void IniWriteInt(LPCWSTR file, LPCWSTR section, LPCWSTR key, int value);
@@ -273,7 +274,7 @@ private:
 	void disableKeys();
 	float getStringWidth(std::string text);
 	std::vector<std::string> splitString(float maxWidth, std::string &details);
-	void processMenuNav(MenuControls *controls, std::function<void()> onMain, std::function<void()> onExit);
+	void processMenuNav(std::function<void()> onMain, std::function<void()> onExit);
 
 	
 	void drawMenuDetails(std::vector<std::string> details, float y);
