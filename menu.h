@@ -11,6 +11,7 @@
 #include <functional>
 #include <array>
 #include <sstream>
+#include "menucontrols.h"
 
 // TODO: menuutils.h for string utils
 // TODO: menusettings class

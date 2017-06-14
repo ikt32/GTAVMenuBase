@@ -6,6 +6,7 @@
 #include "inc/natives.h"
 #include "inc/enums.h"
 #include "menucontrols.h"
+#include "menuutils.h"
 
 namespace NativeMenu {
 
@@ -141,20 +142,13 @@ bool Menu::IntOption(std::string option, int &var, int min, int max, int step, s
 	return processOptionItemControls(var, min, max, step);
 }
 
-unsigned significance(float f) {
-	float base = 1;
-	for (int i = 1; i < 99; i++) {
-		if (f > base) return i;
-		base /= 10;
-	}
-}
-
 bool Menu::FloatOption(std::string option, float &var, float min, float max, float step, std::vector<std::string> details) {
-	unsigned minPrecision = 2;
-	unsigned precision = 2;
+	unsigned precision = behindDec(step);
+	if (precision < 2) precision = 2;
+	if (precision > 6) precision = 6;
 
 	char buf[100];
-	_snprintf_s(buf, sizeof(buf), "%.*f", var, precision);
+	_snprintf_s(buf, sizeof(buf), "%.*f", precision, var);
 	std::string printVar = buf;
 	int items = min != max ? 1 : 0;
 
@@ -170,8 +164,7 @@ bool Menu::BoolOption(std::string option, bool &var, std::vector<std::string> de
 	bool highlighted = currentoption == optioncount;
 	
 	char * tickBoxTexture;
-	rgba optionColors;
-	optionColors = options;
+	rgba optionColors = options;
 
 	if (highlighted) {
 		tickBoxTexture = var ? "shop_box_tickb" : "shop_box_blankb";
@@ -243,30 +236,43 @@ bool Menu::IntArray(std::string option, std::vector<int> display, int &iterator,
 	return processOptionItemControls(iterator, min, max, 1);
 }
 
+// TODO: Refactor first part since Arrays are similar?
+// TODO: Refactor second part since FloatOption is similar?
 bool Menu::FloatArray(std::string option, std::vector<float> display, int &iterator, std::vector<std::string> details) {
-	char buf[30];
-	_snprintf_s(buf, sizeof(buf), "%.2f", display[iterator]);
-	std::string printVar = buf;
-
 	Option(option, details);
 	bool highlighted = currentoption == optioncount;
-	
 	int min = 0;
-	int max = static_cast<int>(display.size());
+	int max = static_cast<int>(display.size()) - 1;
+
+	if (iterator > display.size() || iterator < 0) {
+		drawOptionValue("error", highlighted, max);
+		return false;
+	}
+
+	unsigned precision = behindDec(display[iterator]);
+	if (precision < 2) precision = 2;
+	if (precision > 6) precision = 6;
+
+	char buf[100];
+	_snprintf_s(buf, sizeof(buf), "%.*f", precision, display[iterator]);
+	std::string printVar = buf;
 
 	drawOptionValue(printVar, highlighted, max);
 	return processOptionItemControls(iterator, min, max, 1);
 }
 
 bool Menu::StringArray(std::string option, std::vector<std::string>display, int &iterator, std::vector<std::string> details) {
-	std::string printVar = display[iterator];
-	
 	Option(option, details);
-	bool highlighted = currentoption == optioncount;
-	
+	bool highlighted = currentoption == optioncount; 
 	int min = 0;
 	int max = static_cast<int>(display.size()) - 1;
 
+	if (iterator > display.size() || iterator < 0) {
+		drawOptionValue("error", highlighted, max);
+		return false;
+	}
+
+	std::string printVar = display[iterator];
 	drawOptionValue(printVar, highlighted, max);
 	return processOptionItemControls(iterator, min, max, 1);
 }
