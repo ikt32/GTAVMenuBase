@@ -217,7 +217,6 @@ bool Menu::BoolSpriteOption(std::string option, bool enabled, std::string catego
 			std::bind(&Menu::drawSprite, this, category, enabled ? spriteOn : spriteOff,
 			menux + menuWidth/2.0f - optionRightMargin, ((optioncount - (currentoption - 16)) * optionHeight + (menuy + 0.016f)), 0.03f, 0.05f, 0.0f, highlighted ? optionsBlack : options));
 	}
-			
 
 	if (optionpress && currentoption == optioncount) return true;
 	return false;

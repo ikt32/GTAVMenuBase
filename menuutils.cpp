@@ -1,8 +1,6 @@
 #include "menuutils.h"
 
-// I have no idea what's happening here.
-unsigned NativeMenu::numZeroes(unsigned number)
-{
+unsigned NativeMenu::numZeroes(unsigned number) {
 	unsigned digits = 0;
 	while (number % 10 == 0) {
 		if (number == 0) break;
