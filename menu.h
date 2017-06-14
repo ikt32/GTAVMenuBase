@@ -53,6 +53,16 @@ public:
 	~Menu();
 
 	/*
+	 * Registers a function that will be called when the menu is opened.
+	 */
+	void RegisterOnMain(std::function<void() > onMain);
+
+	/*
+	 * Registers a function that will be called when the menu is closed.
+	 */
+	void RegisterOnExit(std::function<void() > onExit);
+
+	/*
 	 * Main menu is always called "mainmenu".
 	 * Otherwise menuname is a submenu name.
 	 * Returns true when inside the submenu menuname.
@@ -153,11 +163,8 @@ public:
 	/*
 	 * Use at the beginning of the menu update loop!
 	 * Checks input keys and processes them for navigation in the menu with MenuControls
-	 * Function pointers can be passed. 
-	 * onMain is executed on main menu open. 
-	 * onExit is executed on main menu close.
 	 */
-	void CheckKeys(MenuControls* controls, std::function<void() > onMain = nullptr, std::function<void() > onExit = nullptr);
+	void CheckKeys(MenuControls* controls);
 
 	/*
 	 * Closes the menu and calls onExit
@@ -185,6 +192,7 @@ public:
 	rgba optionsBlack = { 0, 0, 0, 255 };
 
 private:
+	std::function<void() > onMain = nullptr;
 	std::function<void() > onExit = nullptr;
 
 	/*

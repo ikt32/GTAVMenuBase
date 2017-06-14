@@ -12,6 +12,13 @@ namespace NativeMenu {
 Menu::Menu() { }
 
 Menu::~Menu() { }
+void Menu::RegisterOnMain(std::function<void()> onMain) {
+	this->onMain = onMain;
+}
+
+void Menu::RegisterOnExit(std::function<void()> onExit) {
+	this->onExit = onExit;
+}
 
 bool Menu::CurrentMenu(std::string menuname) {
 	if (menuname == actualmenu) return true;
@@ -134,9 +141,20 @@ bool Menu::IntOption(std::string option, int &var, int min, int max, int step, s
 	return processOptionItemControls(var, min, max, step);
 }
 
+unsigned significance(float f) {
+	float base = 1;
+	for (int i = 1; i < 99; i++) {
+		if (f > base) return i;
+		base /= 10;
+	}
+}
+
 bool Menu::FloatOption(std::string option, float &var, float min, float max, float step, std::vector<std::string> details) {
+	unsigned minPrecision = 2;
+	unsigned precision = 2;
+
 	char buf[100];
-	_snprintf_s(buf, sizeof(buf), "%.2f", var);
+	_snprintf_s(buf, sizeof(buf), "%.*f", var, precision);
 	std::string printVar = buf;
 	int items = min != max ? 1 : 0;
 
@@ -343,8 +361,7 @@ void Menu::EndMenu() {
 	if (currentoption < 1) currentoption = 1;
 }
 
-void Menu::CheckKeys(MenuControls* controls, std::function<void() > onMain, std::function<void() > onExit) {
-	this->onExit = onExit;
+void Menu::CheckKeys(MenuControls* controls) {
 	controls->Update();
 	optionpress = false;
 
