@@ -13,6 +13,15 @@ namespace NativeMenu {
 Menu::Menu() { }
 
 Menu::~Menu() { }
+
+void Menu::SetFiles(const std::string &fileName) {
+	settings.SetFiles(fileName);
+}
+
+void Menu::ReadSettings() {
+	settings.ReadSettings(&controls, this);
+}
+
 void Menu::RegisterOnMain(std::function<void()> onMain) {
 	this->onMain = onMain;
 }
@@ -430,154 +439,6 @@ void Menu::CloseMenu() {
 	if (onExit) onExit();
 }
 
-void Menu::IniWriteInt(LPCWSTR file, LPCWSTR section, LPCWSTR key, int value) {
-	wchar_t newValue[256];
-	wsprintfW(newValue, L"%d", value);
-	WritePrivateProfileStringW(section, key, newValue, file);
-}
-
-int Menu::IniReadInt(LPCWSTR file, LPCWSTR section, LPCWSTR key) {
-	int returning = GetPrivateProfileIntW(section, key, NULL, file);
-	return returning;
-}
-
-void Menu::LoadMenuTheme(LPCWSTR file) {
-	// Title Text
-	titleText.r = IniReadInt(file, L"Title Text", L"Red");
-	titleText.g = IniReadInt(file, L"Title Text", L"Green");
-	titleText.b = IniReadInt(file, L"Title Text", L"Blue");
-	titleText.a = IniReadInt(file, L"Title Text", L"Alpha");
-	titleFont = IniReadInt(file, L"Title Text", L"Font");
-	// Title Rect
-	titleRect.r = IniReadInt(file, L"Title Rect", L"Red");
-	titleRect.g = IniReadInt(file, L"Title Rect", L"Green");
-	titleRect.b = IniReadInt(file, L"Title Rect", L"Blue");
-	titleRect.a = IniReadInt(file, L"Title Rect", L"Alpha");
-
-	// Scroller
-	scroller.r = IniReadInt(file, L"Scroller", L"Red");
-	scroller.g = IniReadInt(file, L"Scroller", L"Green");
-	scroller.b = IniReadInt(file, L"Scroller", L"Blue");
-	scroller.a = IniReadInt(file, L"Scroller", L"Alpha");
-
-	// Option Text
-	options.r = IniReadInt(file, L"Options Text", L"Red");
-	options.g = IniReadInt(file, L"Options Text", L"Green");
-	options.b = IniReadInt(file, L"Options Text", L"Blue");
-	options.a = IniReadInt(file, L"Options Text", L"Alpha");
-	optionsFont = IniReadInt(file, L"Options Text", L"Font");
-
-	// Option Rect
-	optionsrect.r = IniReadInt(file, L"Options Rect", L"Red");
-	optionsrect.g = IniReadInt(file, L"Options Rect", L"Green");
-	optionsrect.b = IniReadInt(file, L"Options Rect", L"Blue");
-	optionsrect.a = IniReadInt(file, L"Options Rect", L"Alpha");
-	optionsrectAlpha = optionsrect.a;
-}
-
-void Menu::SaveMenuTheme(LPCWSTR file) {
-	// Title Text
-	IniWriteInt(file, L"Title Text", L"Red", titleText.r);
-	IniWriteInt(file, L"Title Text", L"Green", titleText.g);
-	IniWriteInt(file, L"Title Text", L"Blue", titleText.b);
-	IniWriteInt(file, L"Title Text", L"Alpha", titleText.a);
-	IniWriteInt(file, L"Title Text", L"Font", titleFont);
-
-	// Title Rect
-	IniWriteInt(file, L"Title Rect", L"Red", titleRect.r);
-	IniWriteInt(file, L"Title Rect", L"Green", titleRect.g);
-	IniWriteInt(file, L"Title Rect", L"Blue", titleRect.b);
-	IniWriteInt(file, L"Title Rect", L"Alpha", titleRect.a);
-
-	// Scroller 
-	IniWriteInt(file, L"Scroller", L"Red", scroller.r);
-	IniWriteInt(file, L"Scroller", L"Green", scroller.g);
-	IniWriteInt(file, L"Scroller", L"Blue", scroller.b);
-	IniWriteInt(file, L"Scroller", L"Alpha", scroller.a);
-
-	// Options Text
-	IniWriteInt(file, L"Options Text", L"Red", options.r);
-	IniWriteInt(file, L"Options Text", L"Green", options.g);
-	IniWriteInt(file, L"Options Text", L"Blue", options.b);
-	IniWriteInt(file, L"Options Text", L"Alpha", options.a);
-	IniWriteInt(file, L"Options Text", L"Font", optionsFont);
-
-	// Options Rect
-	IniWriteInt(file, L"Options Rect", L"Red", optionsrect.r);
-	IniWriteInt(file, L"Options Rect", L"Green", optionsrect.g);
-	IniWriteInt(file, L"Options Rect", L"Blue", optionsrect.b);
-	IniWriteInt(file, L"Options Rect", L"Alpha", optionsrect.a);
-}
-
-void Menu::disableKeys() {
-	UI::HIDE_HELP_TEXT_THIS_FRAME();
-	CAM::SET_CINEMATIC_BUTTON_ACTIVE(0);
-	UI::HIDE_HUD_COMPONENT_THIS_FRAME(10);
-	UI::HIDE_HUD_COMPONENT_THIS_FRAME(6);
-	UI::HIDE_HUD_COMPONENT_THIS_FRAME(7);
-	UI::HIDE_HUD_COMPONENT_THIS_FRAME(9);
-	UI::HIDE_HUD_COMPONENT_THIS_FRAME(8);
-
-	for (int i = 0; i <= 2; i++) {
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlNextCamera, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleCinCam, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlCinematicSlowMo, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlPhone, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterMichael, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterFranklin, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterTrevor, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterMultiplayer, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlCharacterWheel, true);
-										 
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMeleeAttackLight, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMeleeAttackHeavy, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMeleeAttackAlternate, true);
-										 
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMap, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMultiplayerInfo, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMapPointOfInterest, true);
-										 
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlRadioWheelLeftRight, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleNextRadio, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehiclePrevRadio, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlRadioWheelUpDown, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleNextRadioTrack, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehiclePrevRadioTrack, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleRadioWheel, true);
-										 
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleDuck, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleSelectNextWeapon, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleSelectPrevWeapon, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleAttack, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleAttack2, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleExit, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectWeapon, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlWeaponWheelNext, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlWeaponWheelPrev, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlNextWeapon, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlPrevWeapon, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectWeapon, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlContext, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlContextSecondary, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectWeapon, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleHeadlight, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleRoof, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleHorn, true);
-										 
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleAim, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehiclePassengerAim, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlFrontendSocialClub, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlFrontendSocialClubSecondary, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlReplayStartStopRecording, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlInteractionMenu, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSaveReplayClip, true);
-	}
-}
-
 float Menu::getStringWidth(std::string text) {
 	float scale = optionTextSize;
 	if (optionsFont == 0) { // big-ass Chalet London
@@ -609,176 +470,6 @@ std::vector<std::string> Menu::splitString(float maxWidth, std::string &details)
 	}
 
 	return splitLines;
-}
-
-void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
-	std::vector<std::string> splitDetails;
-	for (auto detailLine : details) {
-		auto splitLines = splitString(menuWidth, detailLine);
-		splitDetails.insert(std::end(splitDetails), std::begin(splitLines), std::end(splitLines));
-	}
-
-	for (auto i = 0; i < splitDetails.size(); i++) {
-		drawText(splitDetails[i], optionsFont, (menux - menuWidth / 2.0f) + menuTextMargin, i * detailLineHeight + y, optionTextSize, optionTextSize, options);
-	}
-
-	auto tempoptions = optionsrect;
-	tempoptions.a = 255;
-	
-	drawRect(menux, y, menuWidth, optionHeight/8, {0,0,0,255});
-
-	float boxHeight = (splitDetails.size() * detailLineHeight) + (optionHeight - detailLineHeight);
-
-	backgroundDrawCalls.push_back(
-		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
-		menux, y + boxHeight / 2, menuWidth, boxHeight, 0.0f, tempoptions));
-}
-
-void Menu::processMenuNav(std::function<void()> onMain, std::function<void()> onExit) {
-	if (controls.IsKeyJustPressed(MenuControls::MenuSelect) ||
-		controls.IsKeyJustPressed(MenuControls::MenuCancel) ||
-		controls.IsKeyJustPressed(MenuControls::MenuUp)     ||
-		controls.IsKeyJustPressed(MenuControls::MenuDown)   ||
-		controls.IsKeyJustPressed(MenuControls::MenuLeft)   ||
-		controls.IsKeyJustPressed(MenuControls::MenuRight)) {
-		useNative = false;
-	}
-
-	if (controls.IsKeyJustPressed(MenuControls::MenuKey) || useNative && 
-		CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, controls.ControllerButton1) &&
-		CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, controls.ControllerButton2)) {
-		if (menulevel == 0) {
-			changeMenu("mainmenu");
-			if (onMain) onMain();
-		}
-		else {
-			CloseMenu();
-			CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
-			if (onExit) {
-				onExit();
-			}
-		}
-		delay = GetTickCount();
-		return;
-	}
-	if (controls.IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel)) {
-		if (menulevel > 0) {
-			if (menulevel == 1) {
-				CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
-				if (onExit) {
-					onExit();
-				}
-			}
-			backMenu();
-
-		}
-		delay = GetTickCount();
-	}
-	if (controls.IsKeyJustPressed(MenuControls::MenuSelect) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendAccept)) {
-		if (menulevel > 0) {
-			menuBeep();
-		}
-		optionpress = true;
-		delay = GetTickCount();
-	}
-	if (controls.IsKeyPressed(MenuControls::MenuDown) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
-		nextOption();
-		delay = GetTickCount();
-		downpress = true;
-	}
-	if (controls.IsKeyPressed(MenuControls::MenuUp) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
-		previousOption();
-		delay = GetTickCount();
-		uppress = true;
-	}
-	if (controls.IsKeyPressed(MenuControls::MenuLeft) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
-		if (menulevel > 0) {
-			menuBeep();
-		}
-		leftpress = true;
-		delay = GetTickCount();
-	}
-	if (controls.IsKeyPressed(MenuControls::MenuRight) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
-		if (menulevel > 0) {
-			menuBeep();
-		}
-		rightpress = true;
-		delay = GetTickCount();
-	}
-}
-
-void Menu::menuBeep() {
-	AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", 0);
-}
-
-void Menu::resetButtonStates() {
-	optionpress = false;
-	leftpress = false;
-	rightpress = false;
-	uppress = false;
-	downpress = false;
-}
-
-void Menu::drawOptionValue(std::string printVar, bool highlighted, int items) {
-	std::string leftArrow = "< ";
-	std::string rightArrow = " >";
-	if (items == 0) {
-		leftArrow = rightArrow = "";
-	}
-	if (currentoption <= 16 && optioncount <= 16)
-		drawText(leftArrow + printVar + rightArrow, optionsFont, 
-				 menux + menuWidth / 2.0f - optionRightMargin, 
-				 optioncount * optionHeight + menuy, 
-				 optionTextSize, optionTextSize, 
-				 highlighted ? optionsBlack : options, 2);
-	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
-		drawText(leftArrow + printVar + rightArrow, optionsFont, 
-				 menux + menuWidth / 2.0f - optionRightMargin, 
-				 (optioncount - (currentoption - 16)) * optionHeight + menuy, 
-				 optionTextSize, optionTextSize, 
-				 highlighted ? optionsBlack : options, 2);
-}
-
-void Menu::changeMenu(std::string menuname) {
-	currentmenu[menulevel] = actualmenu;
-	lastoption[menulevel] = currentoption;
-	menulevel++;
-	actualmenu = menuname;
-	currentoption = 1;
-	menuBeep();
-	resetButtonStates();
-}
-
-void Menu::nextOption() {
-	if (currentoption < optioncount)
-		currentoption++;
-	else
-		currentoption = 1;
-	if (menulevel > 0) {
-		menuBeep();
-	}
-	resetButtonStates();
-}
-
-void Menu::previousOption() {
-	if (currentoption > 1)
-		currentoption--;
-	else
-		currentoption = optioncount;
-	if (menulevel > 0) {
-		menuBeep();
-	}
-	resetButtonStates();
-}
-
-void Menu::backMenu() {
-	if (menulevel > 0) {
-		menuBeep();
-	}
-	menulevel--;
-	actualmenu = currentmenu[menulevel];
-	currentoption = lastoption[menulevel];
-
 }
 
 void Menu::drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, rgba rgba, int justify) {
@@ -846,5 +537,247 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 		extrax, (menuy + optionHeight) + (infoLines * optionHeight) / 2, menuWidth, optionHeight * infoLines, 0.0f, tempoptions)
 	);
 }
+
+void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
+	std::vector<std::string> splitDetails;
+	for (auto detailLine : details) {
+		auto splitLines = splitString(menuWidth, detailLine);
+		splitDetails.insert(std::end(splitDetails), std::begin(splitLines), std::end(splitLines));
+	}
+
+	for (auto i = 0; i < splitDetails.size(); i++) {
+		drawText(splitDetails[i], optionsFont, (menux - menuWidth / 2.0f) + menuTextMargin, i * detailLineHeight + y, optionTextSize, optionTextSize, options);
+	}
+
+	auto tempoptions = optionsrect;
+	tempoptions.a = 255;
+
+	drawRect(menux, y, menuWidth, optionHeight / 8, { 0,0,0,255 });
+
+	float boxHeight = (splitDetails.size() * detailLineHeight) + (optionHeight - detailLineHeight);
+
+	backgroundDrawCalls.push_back(
+		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
+		menux, y + boxHeight / 2, menuWidth, boxHeight, 0.0f, tempoptions));
+}
+
+void Menu::drawOptionValue(std::string printVar, bool highlighted, int items) {
+	std::string leftArrow = "< ";
+	std::string rightArrow = " >";
+	if (items == 0) {
+		leftArrow = rightArrow = "";
+	}
+	if (currentoption <= 16 && optioncount <= 16)
+		drawText(leftArrow + printVar + rightArrow, optionsFont,
+				 menux + menuWidth / 2.0f - optionRightMargin,
+				 optioncount * optionHeight + menuy,
+				 optionTextSize, optionTextSize,
+				 highlighted ? optionsBlack : options, 2);
+	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
+		drawText(leftArrow + printVar + rightArrow, optionsFont,
+				 menux + menuWidth / 2.0f - optionRightMargin,
+				 (optioncount - (currentoption - 16)) * optionHeight + menuy,
+				 optionTextSize, optionTextSize,
+				 highlighted ? optionsBlack : options, 2);
+}
+
+void Menu::changeMenu(std::string menuname) {
+	currentmenu[menulevel] = actualmenu;
+	lastoption[menulevel] = currentoption;
+	menulevel++;
+	actualmenu = menuname;
+	currentoption = 1;
+	menuBeep();
+	resetButtonStates();
+}
+
+void Menu::nextOption() {
+	if (currentoption < optioncount)
+		currentoption++;
+	else
+		currentoption = 1;
+	if (menulevel > 0) {
+		menuBeep();
+	}
+	resetButtonStates();
+}
+
+void Menu::previousOption() {
+	if (currentoption > 1)
+		currentoption--;
+	else
+		currentoption = optioncount;
+	if (menulevel > 0) {
+		menuBeep();
+	}
+	resetButtonStates();
+}
+
+void Menu::backMenu() {
+	if (menulevel > 0) {
+		menuBeep();
+	}
+	menulevel--;
+	actualmenu = currentmenu[menulevel];
+	currentoption = lastoption[menulevel];
+
+}
+
+void Menu::menuBeep() {
+	AUDIO::PLAY_SOUND_FRONTEND(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", 0);
+}
+
+void Menu::resetButtonStates() {
+	optionpress = false;
+	leftpress = false;
+	rightpress = false;
+	uppress = false;
+	downpress = false;
+}
+
+void Menu::disableKeys() {
+	UI::HIDE_HELP_TEXT_THIS_FRAME();
+	CAM::SET_CINEMATIC_BUTTON_ACTIVE(0);
+	UI::HIDE_HUD_COMPONENT_THIS_FRAME(10);
+	UI::HIDE_HUD_COMPONENT_THIS_FRAME(6);
+	UI::HIDE_HUD_COMPONENT_THIS_FRAME(7);
+	UI::HIDE_HUD_COMPONENT_THIS_FRAME(9);
+	UI::HIDE_HUD_COMPONENT_THIS_FRAME(8);
+
+	for (int i = 0; i <= 2; i++) {
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlNextCamera, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleCinCam, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlCinematicSlowMo, true);
+
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlPhone, true);
+
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterMichael, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterFranklin, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterTrevor, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterMultiplayer, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlCharacterWheel, true);
+
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMeleeAttackLight, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMeleeAttackHeavy, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMeleeAttackAlternate, true);
+
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMap, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMultiplayerInfo, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMapPointOfInterest, true);
+
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlRadioWheelLeftRight, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleNextRadio, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehiclePrevRadio, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlRadioWheelUpDown, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleNextRadioTrack, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehiclePrevRadioTrack, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleRadioWheel, true);
+
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleDuck, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleSelectNextWeapon, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleSelectPrevWeapon, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleAttack, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleAttack2, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleExit, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectWeapon, true);
+
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlWeaponWheelNext, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlWeaponWheelPrev, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlNextWeapon, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlPrevWeapon, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectWeapon, true);
+
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlContext, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlContextSecondary, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectWeapon, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleHeadlight, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleRoof, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleHorn, true);
+
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleAim, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehiclePassengerAim, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlFrontendSocialClub, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlFrontendSocialClubSecondary, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlReplayStartStopRecording, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlInteractionMenu, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSaveReplayClip, true);
+	}
+}
+
+void Menu::processMenuNav(std::function<void()> onMain, std::function<void()> onExit) {
+	if (controls.IsKeyJustPressed(MenuControls::MenuSelect) ||
+		controls.IsKeyJustPressed(MenuControls::MenuCancel) ||
+		controls.IsKeyJustPressed(MenuControls::MenuUp) ||
+		controls.IsKeyJustPressed(MenuControls::MenuDown) ||
+		controls.IsKeyJustPressed(MenuControls::MenuLeft) ||
+		controls.IsKeyJustPressed(MenuControls::MenuRight)) {
+		useNative = false;
+	}
+
+	if (controls.IsKeyJustPressed(MenuControls::MenuKey) || useNative &&
+		CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, controls.ControllerButton1) &&
+		CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, controls.ControllerButton2)) {
+		if (menulevel == 0) {
+			changeMenu("mainmenu");
+			if (onMain) onMain();
+		}
+		else {
+			CloseMenu();
+			CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
+			if (onExit) {
+				onExit();
+			}
+		}
+		delay = GetTickCount();
+		return;
+	}
+	if (controls.IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel)) {
+		if (menulevel > 0) {
+			if (menulevel == 1) {
+				CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
+				if (onExit) {
+					onExit();
+				}
+			}
+			backMenu();
+
+		}
+		delay = GetTickCount();
+	}
+	if (controls.IsKeyJustPressed(MenuControls::MenuSelect) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendAccept)) {
+		if (menulevel > 0) {
+			menuBeep();
+		}
+		optionpress = true;
+		delay = GetTickCount();
+	}
+	if (controls.IsKeyPressed(MenuControls::MenuDown) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
+		nextOption();
+		delay = GetTickCount();
+		downpress = true;
+	}
+	if (controls.IsKeyPressed(MenuControls::MenuUp) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
+		previousOption();
+		delay = GetTickCount();
+		uppress = true;
+	}
+	if (controls.IsKeyPressed(MenuControls::MenuLeft) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
+		if (menulevel > 0) {
+			menuBeep();
+		}
+		leftpress = true;
+		delay = GetTickCount();
+	}
+	if (controls.IsKeyPressed(MenuControls::MenuRight) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
+		if (menulevel > 0) {
+			menuBeep();
+		}
+		rightpress = true;
+		delay = GetTickCount();
+	}
+}
+
+
+
 
 }

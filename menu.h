@@ -11,40 +11,13 @@
 #include <functional>
 #include <array>
 #include <sstream>
+
 #include "menucontrols.h"
+#include "menuutils.h"
+#include "menusettings.h"
 
 // TODO: menuutils.h for string utils
-// TODO: menusettings class
-// TODO: MenuControls owned by Menu
 namespace NativeMenu {
-
-// TODO: Refactor into some Utils class
-// http://stackoverflow.com/questions/36789380/how-to-store-a-const-char-to-a-char
-class CharAdapter {
-public:
-	explicit CharAdapter(const char* s) : m_s(::_strdup(s)) { }
-	explicit CharAdapter(std::string str) : m_s(::_strdup(str.c_str())) { }
-
-	CharAdapter(const CharAdapter& other) = delete; // non construction-copyable
-	CharAdapter& operator=(const CharAdapter&) = delete; // non copyable
-
-	~CharAdapter() /*free memory on destruction*/ {
-		::free(m_s); /*use free to release strdup memory*/
-	}
-	operator char*() /*implicit cast to char* */ {
-		return m_s;
-	}
-
-private:
-	char* m_s;
-};
-
-class MenuControls;
-
-struct rgba {
-	int r, g, b, a;
-};
-
 class Menu {
 public:
 	/*
@@ -52,6 +25,20 @@ public:
 	 */
 	Menu();
 	~Menu();
+
+	/*
+	 * Specify settings file name/location. If not set, it will use default settings.
+	 * Calling this is pretty much mandatory. It's advised to call this just once after
+	 * figuring out the directory structure.
+	 */
+	void SetFiles(const std::string & fileName);
+
+	/*
+	 * Read settings file. If no specified settings file, it'll use default settings.
+	 * Calling this is pretty much mandatory. It's advised to call this whenever new settings
+	 * need to be parsed, for example, on re-opening the menu or something.
+	 */
+	void ReadSettings();
 
 	/*
 	 * Registers a function that will be called when the menu is opened.
@@ -172,15 +159,8 @@ public:
 	 */
 	void CloseMenu();
 
-	MenuControls controls;
 
-	// TODO: Refactor into Menu.Settings
-	void IniWriteInt(LPCWSTR file, LPCWSTR section, LPCWSTR key, int value);
-	int IniReadInt(LPCWSTR file, LPCWSTR section, LPCWSTR key);
-	void LoadMenuTheme(LPCWSTR file);
-	void SaveMenuTheme(LPCWSTR file);
-
-	// TODO: Refactor into Menu.Settings or provide accessors.
+	// TODO: Refactor into Menu.Settings or provide accessors (r/w).
 	int optionsFont = 0;
 	int titleFont = 1;
 	float menux = 0.2f;
@@ -194,21 +174,37 @@ public:
 	rgba optionsBlack = { 0, 0, 0, 255 };
 
 private:
+	MenuControls controls;
+	MenuSettings settings;
+
 	std::function<void() > onMain = nullptr;
 	std::function<void() > onExit = nullptr;
 
 	/*
-	 * ok so in this menu the optioncount is final at menu.end()
-	 * but if we draw sprites earlier, what we draw in end() will overlap
-	 * so we just need to save the draw calls in order to execute at the
-	 * end of end() or at least after we're done drawing the backgrounds
+	 * Due to how this menu was designed initially, it's expected that 
+	 * Menu.End() would be called at the end of the menu tick. At Menu.End(),
+	 * all menu options and option counts are known. This information is needed
+	 * by the background drawing tasks, so we will store the functions until
+	 * the information we need is known. Since we're storing draw calls anyway,
+	 * we can split them to draw them in specific "layers". This wasn't a 
+	 * problem when the backgrounds were just rects, but with sprites this is
+	 * important.
 	 */
 	typedef std::vector<std::function<void(void)>> functionList;
 	functionList backgroundDrawCalls;
 	functionList highlightsDrawCalls;
 	functionList foregroundDrawCalls;
+	
+	/*
+	 * Detail text also needs to know Y-coordinate to start drawing properly.
+	 */
 	std::vector<std::string> details;
 
+	/*
+	 * These members aren't as modifyable, as they depend on one another. I
+	 * wasn't able to find relations between them, so these should not be changed
+	 * runtime. They're set to resemble NativeUI / GTA V's UI as much as possible.
+	 */
 	float detailLineHeight = 0.025f;
 	float optionHeight = 0.035f;
 	float menuWidth = 0.23f;
@@ -219,7 +215,9 @@ private:
 	float optionTextSize = 0.45f;
 	float optionRightMargin = 0.015f;
 	
-
+	/*
+	 * Members for menu state.
+	 */
 	int optioncount = 0;
 	int currentoption = 0;
 	bool optionpress = false;
@@ -227,14 +225,16 @@ private:
 	bool rightpress = false;
 	bool uppress = false;
 	bool downpress = false;
-
+	// Looks like we have 100 menu levels.
 	std::array<std::string, 100> currentmenu;
 	std::string actualmenu;
 	int lastoption[100];
 	int menulevel = 0;
-	int infocount = 0;
-	unsigned int delay = GetTickCount();
 
+	/*
+	 * Navigation-related members.
+	 */
+	unsigned int delay = GetTickCount();
 	const unsigned int menuTimeRepeat = 240;
 	const unsigned int menuTimeSlow = 120;
 	const unsigned int menuTimeMedium = 75;
@@ -242,14 +242,17 @@ private:
 	unsigned int menuTime = menuTimeRepeat;
 	bool useNative = true;
 
-	std::vector<std::string> textureNames = {
+	/*
+	 * Background textures!
+	 */
+	const std::vector<std::string> textureNames = {
 		"",
 		"gradient_nav",
 		"interaction_bgd",
 		"gradient_bgd",
 		"gradient_nav",
 	};
-	std::vector<std::string> textureDicts = {
+	const std::vector<std::string> textureDicts = {
 		"",
 		"commonmenu",
 		"commonmenu",
@@ -261,25 +264,28 @@ private:
 	int backgTextureIndex = 3;
 	int highlTextureIndex = 4;
 
+	float getStringWidth(std::string text);
+	std::vector<std::string> splitString(float maxWidth, std::string &details);
+
 	void drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, rgba rgba, int justify = 1);
 	void drawRect(float x, float y, float width, float height, rgba rgba);
 	void drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, rgba rgba);
+	void drawAdditionalInfoBoxTitle(std::string title);
+	void drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines, std::string title = "Info");
+	void drawMenuDetails(std::vector<std::string> details, float y);
+	void drawOptionValue(std::string printVar, bool highlighted, int max = 0);
+
 	void changeMenu(std::string menuname);
 	void nextOption();
 	void previousOption();
 	void backMenu();
 	void menuBeep();
 	void resetButtonStates();
-	void drawAdditionalInfoBoxTitle(std::string title);
-	void drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines, std::string title = "Info");
 	void disableKeys();
-	float getStringWidth(std::string text);
-	std::vector<std::string> splitString(float maxWidth, std::string &details);
 	void processMenuNav(std::function<void()> onMain, std::function<void()> onExit);
 
 	
-	void drawMenuDetails(std::vector<std::string> details, float y);
-	void drawOptionValue(std::string printVar, bool highlighted, int max = 0);
+
 
 	template <typename T>
 	bool processOptionItemControls(T &var, T min, T max, T step) {
@@ -303,23 +309,6 @@ private:
 		if (optionpress && currentoption == optioncount)
 			return true;
 		return false;
-	}
-
-	// https://stackoverflow.com/questions/236129/split-a-string-in-c
-	template<typename Out>
-	void split(const std::string &s, char delim, Out result) {
-		std::stringstream ss;
-		ss.str(s);
-		std::string item;
-		while (std::getline(ss, item, delim)) {
-			*(result++) = item;
-		}
-	}
-
-	std::vector<std::string> split(const std::string &s, char delim) {
-		std::vector<std::string> elems;
-		split(s, delim, std::back_inserter(elems));
-		return elems;
 	}
 };
 
