@@ -281,6 +281,8 @@ private:
 	void backMenu();
 	void menuBeep();
 	void resetButtonStates();
+	void disableKeysOnce();
+	void enableKeysOnce();
 	void disableKeys();
 	void processMenuNav(std::function<void()> onMain, std::function<void()> onExit);
 

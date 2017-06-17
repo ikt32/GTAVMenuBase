@@ -7,6 +7,7 @@
 #include "inc/enums.h"
 #include "menucontrols.h"
 #include "menuutils.h"
+#include "Util/Versions.h"
 
 namespace NativeMenu {
 
@@ -635,9 +636,24 @@ void Menu::resetButtonStates() {
 	downpress = false;
 }
 
-void Menu::disableKeys() {
-	UI::HIDE_HELP_TEXT_THIS_FRAME();
+void Menu::disableKeysOnce() {
 	CAM::SET_CINEMATIC_BUTTON_ACTIVE(0);
+	if (getGameVersion() > G_VER_1_0_877_1_NOSTEAM) {
+		*getGlobalPtr(0x42FF + 0x82) = 1;
+	}
+}
+
+void Menu::enableKeysOnce() {
+	CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
+	if (getGameVersion() > G_VER_1_0_877_1_NOSTEAM) {
+		*getGlobalPtr(0x42FF + 0x82) = 0;
+	}
+}
+
+void Menu::disableKeys() {
+	disableKeysOnce();
+
+	UI::HIDE_HELP_TEXT_THIS_FRAME();
 	UI::HIDE_HUD_COMPONENT_THIS_FRAME(10);
 	UI::HIDE_HUD_COMPONENT_THIS_FRAME(6);
 	UI::HIDE_HUD_COMPONENT_THIS_FRAME(7);
@@ -723,7 +739,7 @@ void Menu::processMenuNav(std::function<void()> onMain, std::function<void()> on
 		}
 		else {
 			CloseMenu();
-			CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
+			enableKeysOnce();
 			if (onExit) {
 				onExit();
 			}
@@ -734,7 +750,7 @@ void Menu::processMenuNav(std::function<void()> onMain, std::function<void()> on
 	if (controls.IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel)) {
 		if (menulevel > 0) {
 			if (menulevel == 1) {
-				CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
+				enableKeysOnce();
 				if (onExit) {
 					onExit();
 				}

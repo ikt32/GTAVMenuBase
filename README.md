@@ -10,7 +10,10 @@ This menu base was taken from SudoMod base once, but I changed things here and t
 * [ScriptHookV SDK by Alexander Blade](http://www.dev-c.com/gtav/scripthookv/)
 * [simpleini (included as submodule)](https://github.com/brofield/simpleini)
 
-You'll want to have this repo cloned to your git folder along with where you store your projects. All of my GTA V projects that use a menu (this menu) consume it in the same way, by having something like `-I../../GTAVMenuBase/` and `-I../../ScriptHookV_SDK/` in their VS Project files.
+Clone this repository recursively, such that simpleini is cloned with it:  
+`git clone --recursive https://github.com/E66666666/GTAVMenuBase`
+
+You'll want to have this repo cloned to your git folder along with where you store your projects. All of my GTA V projects that use this menu, use it in the same way, by having something like `-I../../GTAVMenuBase/` and `-I../../ScriptHookV_SDK/` in their VS Project files.
 
 Just make sure this repo folder is in your additional include files.
 
