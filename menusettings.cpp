@@ -1,7 +1,7 @@
 #include "menusettings.h"
 #include "menucontrols.h"
 #include "thirdparty/simpleini/SimpleIni.h"
-#include "keyboard.h"
+#include "menukeyboard.h"
 #include "menu.h"
 
 namespace NativeMenu {
