@@ -8,12 +8,16 @@ This menu base was taken from SudoMod base once, but I changed things here and t
 
 ### Requirements
 * [ScriptHookV SDK by Alexander Blade](http://www.dev-c.com/gtav/scripthookv/)
+* [simpleini (included as submodule)](https://github.com/brofield/simpleini)
 
-You'll wanna have this repo cloned to your git folder along with where you store your projects. All of my GTA V projects that use a menu (this menu) consume it in the same way, by having something like `-I../../GTAVMenuBase/` and `-I../../ScriptHookV_SDK/` in their VS Project files.
+Clone this repository recursively, such that simpleini is cloned with it:  
+`git clone --recursive https://github.com/E66666666/GTAVMenuBase`
+
+You'll want to have this repo cloned to your git folder along with where you store your projects. All of my GTA V projects that use this menu, use it in the same way, by having something like `-I../../GTAVMenuBase/` and `-I../../ScriptHookV_SDK/` in their VS Project files.
 
 Just make sure this repo folder is in your additional include files.
 
-Mods using this:
+Mods using this menu:
 * [Manual Transmission](https://github.com/E66666666/GTAVManualTransmission)
 * [Addon Spawner](https://github.com/E66666666/GTAVAddonLoader)
 * [VStancer](https://github.com/E66666666/GTAVStancer)
@@ -24,51 +28,56 @@ Full menu example:
 Since native functions are used, ScriptHookV is needed. ScriptHookV should be extracted into a
 `ScriptHookV_SDK` folder parallel to this repo's folder and your mod folder that uses this.
 
+Directory structure example:
+
+```
+git
+└───ScriptHookV_SDK
+│	└───inc
+│	└───lib
+└───GTAVMenuBase
+│	└───thirdparty
+│		└───simpleini
+└───YourProject
+```
+
 ## Usage
 
 A menu example:
 
 ```c++
 /*
- * This simple function is executed when the menu opens.
- */
-void onMain() {
-	logger.Write("Menu was opened");
-}
-
-/*
- * This simple function is executed when the menu closes. You can handle things
- * you temporarily stored in the menu, for example.
- */
-void onExit() {
-	logger.Write("Menu was closed");
-}
-
-void onRight() {
-	showNotification("You pressed RIGHT on an OptionPlus");
-}
-
-void onLeft() {
-	showNotification("You pressed LEFT on an OptionPlus");
-}
-
-/*
  * update_menu() should be called each tick.
  */
-
 void update_menu() {
-	// Each tick, the controls are checked. If the key is hit to open
-	// or close the menu, the binded functions are called.
-	menu.CheckKeys(&controls, std::bind(onMain), std::bind(onExit));
+	/*
+	 * Each tick, the controls are checked. If the key is hit to open
+	 * or close the menu, the binded functions are called.
+	 * This function has to be called for navigation to work.
+	 */
+	menu.CheckKeys();
 
-	// You can define a menu like this. The main menu should always be
-	// called "mainmenu".
+	/*
+	 *  You can define a menu like this. 
+	 *  The main menu should always be called "mainmenu".
+	 */ 
 	if (menu.CurrentMenu("mainmenu")) {
 		// The title is NOT optional.
-		menu.Title("Example!");
+		menu.Title("Menu example");
+
+		// This is a normal option. It'll return true when "select" is presed.
+		if (menu.Option("Click me!", { "This will log something to " + Paths::GetModuleNameWithoutExtension() + ".log" })) {
+			showNotification("Check the logfile!");
+			logger.Write("\"Click me!\" was selected!");
+		}
 
 		// This will open a submenu with the name "submenu"
 		menu.MenuOption("Look, a submenu!", "submenu", { "This submenu demonstrates a few settings."});
+
+		// Showing static information is also possible if a string vector only contains one element.
+		int nothing = 0;
+		menu.StringArray("Version", { DISPLAY_VERSION }, nothing, 
+						 { "Thanks for checking out this menu!", "-ikt",  eGameVersionToString(getGameVersion())});
 	}
 
 	// Any submenus can have any titles. They should only need to match
@@ -76,17 +85,12 @@ void update_menu() {
 	if (menu.CurrentMenu("submenu")) {
 		menu.Title("I'm a submenu!");
 
-		if (menu.Option("Click me!", { "This will log something to " + Paths::GetModuleNameWithoutExtension() + ".log" })) {
-			showNotification("Check the logfile!");
-			logger.Write("\"Click me!\" was selected!");
-		}
-
-		menu.BoolOption("Here's a checkbox", &checkBoxStatus, { std::string("Boolean is ") + (checkBoxStatus ? "checked" : "not checked") + "." });
-		menu.IntOption("Ints!", &someInt, -100, 100, intStep, { "Stepsize can be changed!" });
-		menu.IntOption("Int step size", &intStep, 1, 100, 1, { "Stepsize can be changed!" });
-		menu.FloatOption("Floats?", &someFloat, -100.0f, 100.0f, floatStep, { "Try holding left/right, things should speed up." });
-		menu.FloatOption("Float step size", &floatStep, 0.01f, 100.0f, 0.01f, { "Steps smaller than 0.01 aren't visible until they go over the 0.01 mark." });
-		menu.StringArray("String arrays", strings, &stringsPos, { "You can also show different strings" });
+		menu.BoolOption("Here's a checkbox", checkBoxStatus, { std::string("Boolean is ") + (checkBoxStatus ? "checked" : "not checked") + "." });
+		menu.IntOption("Ints!", someInt, -100, 100, intStep, { "Stepsize can be changed!" });
+		menu.IntOption("Int step size", intStep, 1, 100, 1, { "Stepsize can be changed!" });
+		menu.FloatOption("Floats?", someFloat, -100.0f, 100.0f, floatSteps[stepChoice], { "Try holding left/right, things should speed up." });
+		menu.FloatArray("Float step size", floatSteps, stepChoice, { "Something something magic!" });
+		menu.StringArray("String arrays", strings, stringsPos, { "You can also show different strings" });
 
 		menu.Option("Description info",
 		{ "You can put arbitarily long texts in the description. "
@@ -103,12 +107,24 @@ void update_menu() {
 			"Each string is a new line",
 			"The box expands by itself"
 		};
-		menu.OptionPlus("Look to the right!", extraInfo, nullptr, std::bind(onLeft), std::bind(onRight), "Something", 
+		menu.OptionPlus("Look to the right!", extraInfo, std::bind(onLeft), std::bind(onRight), "Something", 
 		{"You do need to manage the line splitting yourself, as it's meant for short pieces of info."});
 	}
 
 	// Finally, draw all textures.
 	menu.EndMenu();
+}
+
+void main() {
+	menu.SetFiles(settingsMenuFile);
+	menu.RegisterOnMain(std::bind(onMain));
+	menu.RegisterOnExit(std::bind(onExit));
+
+	while (true) {
+		update_game();
+		update_menu();
+		WAIT(0);
+	}
 }
 ```
 
