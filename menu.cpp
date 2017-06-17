@@ -440,6 +440,10 @@ void Menu::CloseMenu() {
 	if (onExit) onExit();
 }
 
+const MenuControls &Menu::GetControls() {
+	return controls;
+}
+
 float Menu::getStringWidth(std::string text) {
 	float scale = optionTextSize;
 	if (optionsFont == 0) { // big-ass Chalet London

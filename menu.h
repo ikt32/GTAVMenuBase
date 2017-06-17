@@ -159,6 +159,7 @@ public:
 	 */
 	void CloseMenu();
 
+	const MenuControls &GetControls();
 
 	// TODO: Refactor into Menu.Settings or provide accessors (r/w).
 	int optionsFont = 0;
