@@ -179,12 +179,11 @@ public:
 	int titleFont = 1;
 	float menux = 0.2f;
 	float menuy = 0.125f;
-	rgba titleText = { 0, 0, 0, 255 };
+	rgba titleTextColor = { 0, 0, 0, 255 };
 	rgba titleRect = { 255, 200, 0, 255 };
 	rgba scroller = { 80, 80, 80, 200 };
 	rgba options = { 0, 0, 0, 255 };
 	rgba optionsrect = { 255, 220, 30, 60 };
-	int optionsrectAlpha = 0;
 	rgba optionsBlack = { 0, 0, 0, 255 };
 
 private:
@@ -222,22 +221,34 @@ private:
 	float menuTextMargin = 0.0075f;
 	float optionRightMargin = 0.015f;
 
-	float menuWidth = 0.22f;
+	float menuWidth = 0.225f;
 
 	float optionHeight = 0.035f;
 	float optionTextSize = 0.45f;
 	float optionTextureOffset = optionHeight/2.0f;
 
-	float titleHeight = 0.085f;
+	float titleHeight = 0.1f;
 	float titleTextSize = 0.85f;
-	float titleTextOffset = -0.03f;
-	float titleTextureOffset = -0.0075f;
+	float titleTextOffset = 0.025f;
+	float titleTextureOffset = titleHeight/2.0f;
 	
+	float subtitleHeight = optionHeight;
+	float subtitleTextureOffset = subtitleHeight / 2.0f;
+	float subtitleTextSize = 0.45f;
+
 	float detailLineHeight = 0.025f;
+
+	/*
+	 * Max items to display. Can be higher or lower, but 12 is a nice
+	 * number so the radar doesn't get covered while the description is
+	 * readable.
+	 */
+	int maxDisplay = 12;
 
 	/*
 	 * Members for menu state.
 	 */
+	float totalHeight = 0.0f;
 	int optioncount = 0;
 	int currentoption = 0;
 	bool optionpress = false;
@@ -250,6 +261,7 @@ private:
 	std::string actualmenu;
 	int lastoption[100];
 	int menulevel = 0;
+	float headerHeight = 0.0f;
 
 	/*
 	 * Navigation-related members.
