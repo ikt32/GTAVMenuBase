@@ -86,7 +86,15 @@ public:
 	 */
 	bool OptionPlus(std::string option, std::vector<std::string> &extra,
 					std::function<void()> onRight = nullptr, std::function<void()> onLeft = nullptr, 
-					std::string title = "Info", std::vector<std::string> details = {}); // help
+					std::string title = "Info", std::vector<std::string> details = {});
+	/*
+	 * Same as above but with an additional bool ptr for indicating if the option
+	 * is being highlighted. Added back because it's needed by some types of options
+	 * after all. (Menu-assisted keyboard/text input)
+	 */
+	bool OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted = nullptr, 
+					std::function<void()> onRight = nullptr, std::function<void()> onLeft = nullptr ,
+					std::string title = "Info", std::vector<std::string> details = {});
 
 	/*
 	 * Option that changes an int value with optional custom-sized steps.

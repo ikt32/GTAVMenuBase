@@ -142,6 +142,16 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra,
 	return false;
 }
 
+bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool *_highlighted,
+					  std::function<void() > onRight, std::function<void() > onLeft,
+					  std::string title, std::vector<std::string> details) {
+	bool highlighted = currentoption == optioncount;
+	if (_highlighted != nullptr) {
+		*_highlighted = highlighted;
+	}
+	return OptionPlus(option, extra, onRight, onLeft, title, details);
+}
+
 bool Menu::IntOption(std::string option, int &var, int min, int max, int step, std::vector<std::string> details) {
 	std::string printVar = std::to_string(var);
 
