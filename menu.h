@@ -238,8 +238,11 @@ private:
 
 	float detailLineHeight = 0.025f;
 
-	float headerHeight = 0.0f;
-
+	/*
+	 * Max items to display. Can be higher or lower, but 12 is a nice
+	 * number so the radar doesn't get covered while the description is
+	 * readable.
+	 */
 	int maxDisplay = 12;
 
 	/*
@@ -258,6 +261,7 @@ private:
 	std::string actualmenu;
 	int lastoption[100];
 	int menulevel = 0;
+	float headerHeight = 0.0f;
 
 	/*
 	 * Navigation-related members.
