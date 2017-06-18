@@ -39,15 +39,10 @@ bool Menu::CurrentMenu(std::string menuname) {
 void Menu::Title(std::string title) {
 	optioncount = 0;
 	drawText(title, titleFont, menux, menuy + titleTextOffset, titleTextSize, titleTextSize, titleText, 0);
-	if (titleTextureIndex < 1 || titleTextureIndex >= textureDicts.size()) {
-		drawRect(menux, menuy + titleTextureOffset, menuWidth, titleHeight, titleRect);
-	}
-	else {
-		backgroundDrawCalls.push_back(
-			std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], 
-			menux, menuy + titleTextureOffset, menuWidth, titleHeight, 0.0f, titleRect)
-		);
-	}
+	backgroundDrawCalls.push_back(
+		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], 
+		menux, menuy + titleTextureOffset, menuWidth, titleHeight, 0.0f, titleRect)
+	);
 }
 
 void Menu::Subtitle(std::string subtitle) {
@@ -83,15 +78,12 @@ bool Menu::Option(std::string option, std::vector<std::string> details) {
 	if (doDraw) {
 		drawRect(menux, optiony, menuWidth, optionHeight, optionsrect);
 		if (highlighted) {
-			if (highlTextureIndex < 1 || highlTextureIndex >= textureDicts.size()) {
-				drawRect(menux, optiony, menuWidth, optionHeight, scroller);
-			}
-			else {
-				highlightsDrawCalls.push_back(
-					std::bind(&Menu::drawSprite, this, textureDicts[highlTextureIndex], textureNames[highlTextureIndex],
-					menux, optiony, menuWidth, optionHeight, 0.0f, scroller)
-				);
-			}
+
+			highlightsDrawCalls.push_back(
+				std::bind(&Menu::drawSprite, this, textureDicts[highlTextureIndex], textureNames[highlTextureIndex],
+				menux, optiony, menuWidth, optionHeight, 0.0f, scroller)
+			);
+			
 			if (details.size() > 0) {
 				this->details = details;
 			}
@@ -322,38 +314,32 @@ void Menu::EndMenu() {
 
 
 	// Footer
-	if (titleTextureIndex < 1 || titleTextureIndex >= textureDicts.size()) {
-		drawRect(menux, footerBackY, menuWidth, optionHeight, titleRect);
-	}
-	else {
-		backgroundDrawCalls.push_back(
-			std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
-			menux, footerBackY, menuWidth, optionHeight, 0.0f, titleRect)
-		);
-	}
+
+	backgroundDrawCalls.push_back(
+		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
+		menux, footerBackY, menuWidth, optionHeight, 0.0f, titleRect)
+	);
+	
 
 	drawText(std::to_string(currentoption) + " / " + std::to_string(optioncount),
 			 optionsFont, menux - 0.1f, footerTextY, optionTextSize, optionTextSize, titleText, 2);
 
 	// Options background
-	if (backgTextureIndex < 1 || backgTextureIndex >= textureDicts.size()) {
-		optionsrect.a = optionsrectAlpha;
-	}
-	else {
-		optionsrect.a = 0;
-		auto tempoptions = optionsrect;
-		tempoptions.a = 255;
-		backgroundDrawCalls.push_back(
-			std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
-			menux, (menuy + optionHeight) + (maxOptionCount * optionHeight) / 2, menuWidth, optionHeight * maxOptionCount, 0.0f, tempoptions)
-		);
+	
+	optionsrect.a = 0;
+	auto tempoptions = optionsrect;
+	tempoptions.a = 255;
+	backgroundDrawCalls.push_back(
+		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
+		menux, (menuy + optionHeight) + (maxOptionCount * optionHeight) / 2, menuWidth, optionHeight * maxOptionCount, 0.0f, tempoptions)
+	);
 
-		// That footer thing you also see in the native menu
-		if (details.size() > 0) {
-			drawMenuDetails(details, footerBackY + optionHeight / 1.5f);
-		}
-
+	// That footer thing you also see in the native menu
+	if (details.size() > 0) {
+		drawMenuDetails(details, footerBackY + optionHeight / 1.5f);
 	}
+
+	
 
 	// Indicators
 	if (currentoption == 1) {
@@ -517,15 +503,12 @@ void Menu::drawAdditionalInfoBoxTitle(std::string title) {
 	float extrax = menux + menuWidth;
 
 	drawText(title, titleFont, extrax, menuy - 0.03f, titleTextSize, titleTextSize, titleText, 0);
-	if (titleTextureIndex < 1 || titleTextureIndex >= textureDicts.size()) {
-		drawRect(extrax, menuy - 0.0075f, menuWidth, titleHeight, titleRect);
-	}
-	else {
-		backgroundDrawCalls.push_back(
-			std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
-			extrax, menuy - 0.0075f, menuWidth, titleHeight, 180.0f, titleRect)
-		);
-	}
+	
+	backgroundDrawCalls.push_back(
+		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
+		extrax, menuy - 0.0075f, menuWidth, titleHeight, 180.0f, titleRect)
+	);
+	
 }
 
 void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines, std::string title) {
