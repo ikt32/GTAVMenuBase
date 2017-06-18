@@ -34,10 +34,10 @@ namespace NativeMenu {
 #pragma warning(pop)
 
 		// Title Text
-		menuOpts->titleText.r =   settingsMenu.GetLongValue("Title Text",   "Red"	, 255);
-		menuOpts->titleText.g =   settingsMenu.GetLongValue("Title Text",   "Green", 255);
-		menuOpts->titleText.b =   settingsMenu.GetLongValue("Title Text",   "Blue"	, 255);
-		menuOpts->titleText.a =   settingsMenu.GetLongValue("Title Text",   "Alpha", 255);
+		menuOpts->titleTextColor.r =   settingsMenu.GetLongValue("Title Text",   "Red"	, 255);
+		menuOpts->titleTextColor.g =   settingsMenu.GetLongValue("Title Text",   "Green", 255);
+		menuOpts->titleTextColor.b =   settingsMenu.GetLongValue("Title Text",   "Blue"	, 255);
+		menuOpts->titleTextColor.a =   settingsMenu.GetLongValue("Title Text",   "Alpha", 255);
 		menuOpts->titleFont =	  settingsMenu.GetLongValue("Title Text",   "Font"	, 1);
 
 		menuOpts->titleRect.r =   settingsMenu.GetLongValue("Title Rect",   "Red"	, 255);
