@@ -236,10 +236,17 @@ private:
 	 * Navigation-related members.
 	 */
 	unsigned int delay = GetTickCount();
-	const unsigned int menuTimeRepeat = 240;
-	const unsigned int menuTimeSlow = 120;
-	const unsigned int menuTimeMedium = 75;
-	const unsigned int menuTimeFast = 40;
+	std::vector<int> menuTimeDelays = {
+		240,
+		120,
+		75,
+		40,
+		20,
+		10,
+	};
+
+	const unsigned int menuTimeRepeat = menuTimeDelays[0];
+
 	unsigned int menuTime = menuTimeRepeat;
 	bool useNative = true;
 

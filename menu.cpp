@@ -408,24 +408,15 @@ void Menu::CheckKeys() {
 		menuTime = menuTimeRepeat;
 	}
 
-	if (controls.IsKeyDownFor(MenuControls::MenuUp, 2 * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendUp, 2 * menuTimeRepeat) ||
-		controls.IsKeyDownFor(MenuControls::MenuDown, 2 * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendDown, 2 * menuTimeRepeat) ||
-		controls.IsKeyDownFor(MenuControls::MenuLeft, 2 * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendLeft, 2 * menuTimeRepeat) ||
-		controls.IsKeyDownFor(MenuControls::MenuRight, 2 * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendRight, 2 * menuTimeRepeat)) {
-		menuTime = menuTimeSlow;
+	for (int i = 1; i < menuTimeDelays.size(); i++) {
+		if (controls.IsKeyDownFor(MenuControls::MenuUp, (i+1) * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendUp, (i + 1) * menuTimeRepeat) ||
+			controls.IsKeyDownFor(MenuControls::MenuDown, (i + 1) * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendDown, (i + 1) * menuTimeRepeat) ||
+			controls.IsKeyDownFor(MenuControls::MenuLeft, (i + 1) * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendLeft, (i + 1) * menuTimeRepeat) ||
+			controls.IsKeyDownFor(MenuControls::MenuRight, (i + 1) * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendRight, (i + 1) * menuTimeRepeat)) {
+			menuTime = menuTimeDelays[i]; 
+		}
 	}
-	if (controls.IsKeyDownFor(MenuControls::MenuUp, 3 * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendUp, 3 * menuTimeRepeat) ||
-		controls.IsKeyDownFor(MenuControls::MenuDown, 3 * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendDown, 3 * menuTimeRepeat) ||
-		controls.IsKeyDownFor(MenuControls::MenuLeft, 3 * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendLeft, 3 * menuTimeRepeat) ||
-		controls.IsKeyDownFor(MenuControls::MenuRight, 3 * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendRight, 3 * menuTimeRepeat)) {
-		menuTime = menuTimeMedium;
-	}
-	if (controls.IsKeyDownFor(MenuControls::MenuUp, 4 * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendUp, 4 * menuTimeRepeat) ||
-		controls.IsKeyDownFor(MenuControls::MenuDown, 4 * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendDown, 4 * menuTimeRepeat) ||
-		controls.IsKeyDownFor(MenuControls::MenuLeft, 4 * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendLeft, 4 * menuTimeRepeat) ||
-		controls.IsKeyDownFor(MenuControls::MenuRight, 4 * menuTimeRepeat) || controls.IsControlDownFor(ControlFrontendRight, 4 * menuTimeRepeat)) {
-		menuTime = menuTimeFast;
-	}
+
 
 	if (!useNative && GetTickCount() - delay > 1000) {
 		useNative = true;
