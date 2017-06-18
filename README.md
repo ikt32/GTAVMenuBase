@@ -167,6 +167,13 @@ vector is automatically split up so it fits nicely within the detail pane. A new
 forced by adding more string items to the vector. For normal use a vector with a simple string
 should be enough.
 
+## Positioning
+Since [#PR 3](https://github.com/E66666666/GTAVMenuBase/commit/1e67e104453e5d401e6c171aadf8b6b86ae99efd), the Y-positioning of the menu changed. Previously Y = 0.0 used to put the title rectangle half off-screen. Now Y = 0.0 puts the title rectangle flush with the screen.
+
+To match the interaction menu, previously a Y of 0.1 was used. This should now be 0.05.
+
+The X-position stays the same. This means X = 0.0 puts half the menu off-screen, since the center is taken as menu X-position.
+
 ## Remarks
 If you're also not using [ScriptHookVDotNet](https://github.com/crosire/scripthookvdotnet) with [NativeUI](https://github.com/Guad/NativeUI) and just want something less painful than the mess that happens in the ScriptHookV Simple Trainer example, I hope this is of some use for you.
 
