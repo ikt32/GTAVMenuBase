@@ -38,33 +38,23 @@ bool Menu::CurrentMenu(std::string menuname) {
 
 void Menu::Title(std::string title) {
 	optioncount = 0;
-	drawText(title, titleFont, menux, menuy - 0.03f, titleTextSize, titleTextSize, titleText, 0);
+	drawText(title, titleFont, menux, menuy + titleTextOffset, titleTextSize, titleTextSize, titleText, 0);
 	if (titleTextureIndex < 1 || titleTextureIndex >= textureDicts.size()) {
-		drawRect(menux, menuy - 0.0075f, menuWidth, titleHeight, titleRect);
+		drawRect(menux, menuy + titleTextureOffset, menuWidth, titleHeight, titleRect);
 	}
 	else {
 		backgroundDrawCalls.push_back(
 			std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], 
-			menux, menuy - 0.0075f, menuWidth, titleHeight, 0.0f, titleRect)
+			menux, menuy + titleTextureOffset, menuWidth, titleHeight, 0.0f, titleRect)
 		);
 	}
 }
 
-bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::string> details) {
-	Option(option, details);
-	bool highlighted = currentoption == optioncount;
-
-	if (currentoption <= 16 && optioncount <= 16)
-		drawText(">>", optionsFont, menux + menuWidth / 2.0f - optionRightMargin, (optioncount * optionHeight + menuy), optionTextSize, optionTextSize, highlighted ? optionsBlack : options, 2);
-	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
-		drawText(">>", optionsFont, menux + menuWidth / 2.0f - optionRightMargin, ((optioncount - (currentoption - 16)) * optionHeight + menuy), optionTextSize, optionTextSize, highlighted ? optionsBlack : options, 2);
-
-	if (optionpress && currentoption == optioncount) {
-		optionpress = false;
-		changeMenu(menu);
-		return true;
-	}
-	return false;
+void Menu::Subtitle(std::string subtitle) {
+	/*float subTitleHeight = 0.020f;
+	float subtitleY = subTitleHeight + (menuy);
+	float subtitleTextY = subTitleHeight + menuy;
+	drawRect(menux, subtitleY, menuWidth*2, subTitleHeight, {0, 0, 0, 255});*/
 }
 
 bool Menu::Option(std::string option, std::vector<std::string> details) {
@@ -80,13 +70,13 @@ bool Menu::Option(std::string option, std::vector<std::string> details) {
 	if (currentoption <= 16 && optioncount <= 16)
 	{
 		doDraw = true;
-		optiony = optioncount * optionHeight + (menuy + textureTextOffset);
+		optiony = optioncount * optionHeight + (menuy + optionTextureOffset);
 		optiontexty = (optioncount * optionHeight + menuy);
 	}
 	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
 	{
 		doDraw = true;
-		optiony = (optioncount - (currentoption - 16)) * optionHeight + (menuy + textureTextOffset);
+		optiony = (optioncount - (currentoption - 16)) * optionHeight + (menuy + optionTextureOffset);
 		optiontexty = ((optioncount - (currentoption - 16)) * optionHeight + menuy);
 	}
 
@@ -110,6 +100,23 @@ bool Menu::Option(std::string option, std::vector<std::string> details) {
 	}
 
 	if (optionpress && currentoption == optioncount) return true;
+	return false;
+}
+
+bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::string> details) {
+	Option(option, details);
+	bool highlighted = currentoption == optioncount;
+
+	if (currentoption <= 16 && optioncount <= 16)
+		drawText(">>", optionsFont, menux + menuWidth / 2.0f - optionRightMargin, (optioncount * optionHeight + menuy), optionTextSize, optionTextSize, highlighted ? optionsBlack : options, 2);
+	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
+		drawText(">>", optionsFont, menux + menuWidth / 2.0f - optionRightMargin, ((optioncount - (currentoption - 16)) * optionHeight + menuy), optionTextSize, optionTextSize, highlighted ? optionsBlack : options, 2);
+
+	if (optionpress && currentoption == optioncount) {
+		optionpress = false;
+		changeMenu(menu);
+		return true;
+	}
 	return false;
 }
 
@@ -311,7 +318,7 @@ void Menu::EndMenu() {
 	else {
 		footerTextY = (optioncount + 1) * optionHeight + menuy;
 	}
-	footerBackY = footerTextY + textureTextOffset;
+	footerBackY = footerTextY + optionTextureOffset;
 
 
 	// Footer
@@ -558,7 +565,8 @@ void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 	auto tempoptions = optionsrect;
 	tempoptions.a = 255;
 
-	drawRect(menux, y, menuWidth, optionHeight / 8, { 0,0,0,255 });
+	// The thin line
+	drawRect(menux, y, menuWidth, optionHeight / 12.0f, { 0,0,0,255 });
 
 	float boxHeight = (splitDetails.size() * detailLineHeight) + (optionHeight - detailLineHeight);
 

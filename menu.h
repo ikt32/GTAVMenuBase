@@ -63,12 +63,9 @@ public:
 	void Title(std::string title);
 
 	/*
-	 * Submenu option.
-	 * Shows option with menu sign.
-	 * Switches menu on action.
-	 * Returns true on accept.
+	 * A menu subtitle.
 	 */
-	bool MenuOption(std::string option, std::string menu, std::vector<std::string> details = {});
+	void Subtitle(std::string subtitle);
 
 	/*
 	 * Normal option.
@@ -76,6 +73,14 @@ public:
 	 * Returns true on accept.
 	 */
 	bool Option(std::string option, std::vector<std::string> details = {});
+
+	/*
+	 * Submenu option.
+	 * Shows option with menu sign.
+	 * Switches menu on action.
+	 * Returns true on accept.
+	 */
+	bool MenuOption(std::string option, std::string menu, std::vector<std::string> details = {});
 
 	/*
 	 * Option that shows an extra pane to the right.
@@ -214,16 +219,22 @@ private:
 	 * wasn't able to find relations between them, so these should not be changed
 	 * runtime. They're set to resemble NativeUI / GTA V's UI as much as possible.
 	 */
-	float detailLineHeight = 0.025f;
-	float optionHeight = 0.035f;
-	float menuWidth = 0.23f;
-	float titleTextSize = 0.85f;
-	float titleHeight = 0.085f;
-	float textureTextOffset = 0.0165f;
 	float menuTextMargin = 0.0075f;
-	float optionTextSize = 0.45f;
 	float optionRightMargin = 0.015f;
+
+	float menuWidth = 0.22f;
+
+	float optionHeight = 0.035f;
+	float optionTextSize = 0.45f;
+	float optionTextureOffset = optionHeight/2.0f;
+
+	float titleHeight = 0.085f;
+	float titleTextSize = 0.85f;
+	float titleTextOffset = -0.03f;
+	float titleTextureOffset = -0.0075f;
 	
+	float detailLineHeight = 0.025f;
+
 	/*
 	 * Members for menu state.
 	 */
