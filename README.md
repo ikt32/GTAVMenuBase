@@ -2,7 +2,7 @@
 
 This menu base was taken from SudoMod base once, but I changed things here and there and now I want to use it in multiple projects, so here's a repo. Full credits to the original authors!
 
-![pic](Menus.png)
+![Comparison](MenuCompare.png)
 
 ## Building
 
