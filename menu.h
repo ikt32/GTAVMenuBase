@@ -239,11 +239,11 @@ private:
 	float detailLineHeight = 0.025f;
 
 	/*
-	 * Max items to display. Can be higher or lower, but 12 is a nice
+	 * Max items to display. Can be higher or lower, but 10 is a nice
 	 * number so the radar doesn't get covered while the description is
 	 * readable.
 	 */
-	int maxDisplay = 12;
+	int maxDisplay = 10;
 
 	/*
 	 * Members for menu state.
