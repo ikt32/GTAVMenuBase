@@ -16,7 +16,6 @@
 #include "menuutils.h"
 #include "menusettings.h"
 
-// TODO: menuutils.h for string utils
 namespace NativeMenu {
 class Menu {
 public:
@@ -175,16 +174,22 @@ public:
 	const MenuControls &GetControls();
 
 	// TODO: Refactor into Menu.Settings or provide accessors (r/w).
-	int optionsFont = 0;
+	/*
+	 * These should be filled in by MenuSettings.ReadSettings().
+	 */
+	float menuX = 0.165f;
+	float menuY = 0.050f;
+	
+	Color titleTextColor = solidWhite;
+	Color titleBgColor = solidWhite;
 	int titleFont = 1;
-	float menux = 0.2f;
-	float menuy = 0.125f;
-	rgba titleTextColor = { 0, 0, 0, 255 };
-	rgba titleRect = { 255, 200, 0, 255 };
-	rgba scroller = { 80, 80, 80, 200 };
-	rgba options = { 0, 0, 0, 255 };
-	rgba optionsrect = { 255, 220, 30, 60 };
-	rgba optionsBlack = { 0, 0, 0, 255 };
+
+	Color optionsTextColor = solidWhite;
+	Color optionsBgColor = solidBlack;
+
+	Color optionsTextHlColor = solidBlack;
+	Color optionsBgHlColor = solidWhite;
+	int optionsFont = 0;
 
 private:
 	MenuControls controls;
@@ -306,9 +311,9 @@ private:
 	float getStringWidth(std::string text);
 	std::vector<std::string> splitString(float maxWidth, std::string &details);
 
-	void drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, rgba rgba, int justify = 1);
-	void drawRect(float x, float y, float width, float height, rgba rgba);
-	void drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, rgba rgba);
+	void drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, Color color, int justify = 1);
+	void drawRect(float x, float y, float width, float height, Color color);
+	void drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, Color color);
 	void drawAdditionalInfoBoxTitle(std::string title);
 	void drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines, std::string title = "Info");
 	void drawMenuDetails(std::vector<std::string> details, float y);
