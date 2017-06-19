@@ -59,10 +59,10 @@ namespace NativeMenu {
 		menuOpts->optionsrect.r = settingsMenu.GetLongValue("Options Rect", "Red"	, 0);
 		menuOpts->optionsrect.g = settingsMenu.GetLongValue("Options Rect", "Green", 0);
 		menuOpts->optionsrect.b = settingsMenu.GetLongValue("Options Rect", "Blue"	, 0);
-		menuOpts->optionsrect.a = settingsMenu.GetLongValue("Options Rect", "Alpha", 0);
+		menuOpts->optionsrect.a = settingsMenu.GetLongValue("Options Rect", "Alpha", 255);
 	}
 
 	void MenuSettings::SaveSettings() {
-
+		// Make an issue or do a PR or something when you want to have this implemented...
 	}
 }

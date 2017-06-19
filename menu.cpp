@@ -533,11 +533,14 @@ void Menu::drawSprite(std::string textureDict, std::string textureName, float x,
 void Menu::drawAdditionalInfoBoxTitle(std::string title) {
 	float extrax = menux + menuWidth;
 
-	drawText(title, titleFont, extrax, menuy - 0.03f, titleTextSize, titleTextSize, titleTextColor, 0);
-	
+	float titletexty = menuy + titleTextOffset;
+	float titley = menuy + titleTextureOffset;
+
+	drawText(title, titleFont, extrax, titletexty, titleTextSize, titleTextSize, titleTextColor, 0);
+
 	backgroundDrawCalls.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
-		extrax, menuy - 0.0075f, menuWidth, titleHeight, 180.0f, titleRect)
+		extrax, titley, menuWidth, titleHeight, 180.0f, titleRect)
 	);
 	
 }
@@ -546,13 +549,17 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 	float extrax = menux + menuWidth;
 
 	drawAdditionalInfoBoxTitle(title);
+
+	float subtitleY = subtitleTextureOffset + menuy + titleHeight;
+	drawRect(extrax, subtitleY, menuWidth, subtitleHeight, {0,0,0,255});
+
 	for (int i = 0; i < infoLines; i++) {
-		drawText(extra[i], optionsFont, menux + 0.125f, i * optionHeight + (menuy + optionHeight), optionTextSize, optionTextSize, options);
+		drawText(extra[i], optionsFont, menux + menuWidth / 2.0f + menuTextMargin, i * optionHeight + (menuy + headerHeight), optionTextSize, optionTextSize, options);
 	}
 
 	highlightsDrawCalls.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
-		extrax, (menuy + optionHeight) + (infoLines * optionHeight) / 2, menuWidth, optionHeight * infoLines, 0.0f, optionsrect)
+		extrax, (menuy + headerHeight) + (infoLines * optionHeight) / 2, menuWidth, optionHeight * infoLines, 0.0f, optionsrect)
 	);
 }
 
