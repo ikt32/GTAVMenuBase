@@ -1,4 +1,5 @@
 #include "menuutils.h"
+#include <locale>
 
 namespace NativeMenu {
 	unsigned numZeroes(unsigned number) {
@@ -25,5 +26,13 @@ namespace NativeMenu {
 		std::vector<std::string> elems;
 		split(s, delim, std::back_inserter(elems));
 		return elems;
+	}
+
+std::string makeCaps(std::string input) {
+		std::locale loc;
+		std::stringstream caps;
+		for (std::string::size_type i = 0; i < input.length(); ++i)
+			caps << std::toupper(input[i], loc);
+		return caps.str();
 	}
 }

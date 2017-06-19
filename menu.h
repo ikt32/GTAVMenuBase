@@ -65,7 +65,7 @@ public:
 	/*
 	 * A menu subtitle.
 	 */
-	void Subtitle(std::string subtitle);
+	void Subtitle(std::string subtitle, bool allcaps = true);
 
 	/*
 	 * Normal option.

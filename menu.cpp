@@ -52,15 +52,14 @@ void Menu::Title(std::string title) {
 	headerHeight = titleHeight;
 }
 
-void Menu::Subtitle(std::string subtitle) {
-	std::locale loc; 
-	std::stringstream caps;
-	for (std::string::size_type i = 0; i<subtitle.length(); ++i)
-		caps << std::toupper(subtitle[i], loc);
+void Menu::Subtitle(std::string subtitle, bool allcaps) {
+	if (allcaps)
+		subtitle = makeCaps(subtitle);
+	
 	float subtitleY = subtitleTextureOffset + menuy + totalHeight;
 	float subtitleTextY = menuy + totalHeight;
 	drawRect(menux, subtitleY, menuWidth, subtitleHeight, {0, 0, 0, 255});
-	drawText(caps.str(), optionsFont, (menux - menuWidth / 2.0f) + menuTextMargin, subtitleTextY, subtitleTextSize, subtitleTextSize, titleTextColor);
+	drawText(subtitle, optionsFont, (menux - menuWidth / 2.0f) + menuTextMargin, subtitleTextY, subtitleTextSize, subtitleTextSize, titleTextColor);
 	totalHeight += subtitleHeight;
 	headerHeight += subtitleHeight;
 }
