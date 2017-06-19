@@ -218,7 +218,7 @@ private:
 	 * wasn't able to find relations between them, so these should not be changed
 	 * runtime. They're set to resemble NativeUI / GTA V's UI as much as possible.
 	 */
-	float menuTextMargin = 0.0075f;
+	float menuTextMargin = 0.005f;
 	float optionRightMargin = 0.015f;
 
 	float menuWidth = 0.225f;
@@ -228,8 +228,8 @@ private:
 	float optionTextureOffset = optionHeight/2.0f;
 
 	float titleHeight = 0.1f;
-	float titleTextSize = 0.85f;
-	float titleTextOffset = 0.025f;
+	float titleTextSize = 1.15f;
+	float titleTextOffset = 0.015f;
 	float titleTextureOffset = titleHeight/2.0f;
 	
 	float subtitleHeight = optionHeight;
