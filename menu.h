@@ -181,14 +181,14 @@ public:
 	float menuY = 0.050f;
 	
 	Color titleTextColor = solidWhite;
-	Color titleBgColor = solidWhite;
+	Color titleBackgroundColor = solidWhite;
 	int titleFont = 1;
 
 	Color optionsTextColor = solidWhite;
-	Color optionsBgColor = solidBlack;
+	Color optionsBackgroundColor = solidBlack;
 
-	Color optionsTextHlColor = solidBlack;
-	Color optionsBgHlColor = solidWhite;
+	Color optionsTextSelectColor = solidBlack;
+	Color optionsBackgroundSelectColor = solidWhite;
 	int optionsFont = 0;
 
 private:

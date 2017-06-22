@@ -40,15 +40,15 @@ namespace NativeMenu {
 		menuOpts->titleTextColor.A =   settingsMenu.GetLongValue("Title Text",   "Alpha", 255);
 		menuOpts->titleFont =	  settingsMenu.GetLongValue("Title Text",   "Font"	, 1);
 
-		menuOpts->titleBgColor.R =   settingsMenu.GetLongValue("Title Rect",   "Red"	, 255);
-		menuOpts->titleBgColor.G =   settingsMenu.GetLongValue("Title Rect",   "Green", 255);
-		menuOpts->titleBgColor.B =   settingsMenu.GetLongValue("Title Rect",   "Blue"	, 255);
-		menuOpts->titleBgColor.A =   settingsMenu.GetLongValue("Title Rect",   "Alpha", 255);
+		menuOpts->titleBackgroundColor.R =   settingsMenu.GetLongValue("Title Rect",   "Red"	, 255);
+		menuOpts->titleBackgroundColor.G =   settingsMenu.GetLongValue("Title Rect",   "Green", 255);
+		menuOpts->titleBackgroundColor.B =   settingsMenu.GetLongValue("Title Rect",   "Blue"	, 255);
+		menuOpts->titleBackgroundColor.A =   settingsMenu.GetLongValue("Title Rect",   "Alpha", 255);
 		
-		menuOpts->optionsBgHlColor.R =	  settingsMenu.GetLongValue("Scroller",     "Red"	, 255);
-		menuOpts->optionsBgHlColor.G =	  settingsMenu.GetLongValue("Scroller",     "Green", 255);
-		menuOpts->optionsBgHlColor.B =	  settingsMenu.GetLongValue("Scroller",     "Blue"	, 255);
-		menuOpts->optionsBgHlColor.A =	  settingsMenu.GetLongValue("Scroller",     "Alpha", 255);
+		menuOpts->optionsBackgroundSelectColor.R =	  settingsMenu.GetLongValue("Scroller",     "Red"	, 255);
+		menuOpts->optionsBackgroundSelectColor.G =	  settingsMenu.GetLongValue("Scroller",     "Green", 255);
+		menuOpts->optionsBackgroundSelectColor.B =	  settingsMenu.GetLongValue("Scroller",     "Blue"	, 255);
+		menuOpts->optionsBackgroundSelectColor.A =	  settingsMenu.GetLongValue("Scroller",     "Alpha", 255);
 		
 		menuOpts->optionsTextColor.R =	  settingsMenu.GetLongValue("Options Text", "Red"	, 255);
 		menuOpts->optionsTextColor.G =	  settingsMenu.GetLongValue("Options Text", "Green", 255);
@@ -56,10 +56,10 @@ namespace NativeMenu {
 		menuOpts->optionsTextColor.A =	  settingsMenu.GetLongValue("Options Text", "Alpha", 255);
 		menuOpts->optionsFont =   settingsMenu.GetLongValue("Options Text", "Font"	, 0);
 		
-		menuOpts->optionsBgColor.R = settingsMenu.GetLongValue("Options Rect", "Red"	, 0);
-		menuOpts->optionsBgColor.G = settingsMenu.GetLongValue("Options Rect", "Green", 0);
-		menuOpts->optionsBgColor.B = settingsMenu.GetLongValue("Options Rect", "Blue"	, 0);
-		menuOpts->optionsBgColor.A = settingsMenu.GetLongValue("Options Rect", "Alpha", 255);
+		menuOpts->optionsBackgroundColor.R = settingsMenu.GetLongValue("Options Rect", "Red"	, 0);
+		menuOpts->optionsBackgroundColor.G = settingsMenu.GetLongValue("Options Rect", "Green", 0);
+		menuOpts->optionsBackgroundColor.B = settingsMenu.GetLongValue("Options Rect", "Blue"	, 0);
+		menuOpts->optionsBackgroundColor.A = settingsMenu.GetLongValue("Options Rect", "Alpha", 255);
 	}
 
 	void MenuSettings::SaveSettings() {

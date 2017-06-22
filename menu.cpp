@@ -46,7 +46,7 @@ void Menu::Title(std::string title) {
 	drawText(title, titleFont, menuX, titletexty, titleTextSize, titleTextSize, titleTextColor, 0);
 	backgroundDrawCalls.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], 
-		menuX, titley, menuWidth, titleHeight, 0.0f, titleBgColor)
+		menuX, titley, menuWidth, titleHeight, 0.0f, titleBackgroundColor)
 	);
 	totalHeight = titleHeight;
 	headerHeight = titleHeight;
@@ -86,11 +86,11 @@ bool Menu::Option(std::string option, std::vector<std::string> details) {
 	}
 
 	if (visible) {
-		drawText(option, optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, optiontexty, optionTextSize, optionTextSize, highlighted ? optionsTextHlColor : optionsTextColor);
+		drawText(option, optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, optiontexty, optionTextSize, optionTextSize, highlighted ? optionsTextSelectColor : optionsTextColor);
 		if (highlighted) {
 			highlightsDrawCalls.push_back(
 				std::bind(&Menu::drawSprite, this, textureDicts[highlTextureIndex], textureNames[highlTextureIndex],
-				menuX, optiony, menuWidth, optionHeight, 0.0f, optionsBgHlColor)
+				menuX, optiony, menuWidth, optionHeight, 0.0f, optionsBackgroundSelectColor)
 			);
 			
 			if (details.size() > 0) {
@@ -114,14 +114,14 @@ bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::str
 				 menuX + menuWidth / 2.0f - optionRightMargin, 
 				 indicatorHeight + menuY, 
 				 optionTextSize, optionTextSize, 
-				 highlighted ? optionsTextHlColor : optionsTextColor, 2);
+				 highlighted ? optionsTextSelectColor : optionsTextColor, 2);
 	}
 	else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption) {
 		drawText(">>", optionsFont,
 				 menuX + menuWidth / 2.0f - optionRightMargin, 
 				 menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight,
 				 optionTextSize, optionTextSize, 
-				 highlighted ? optionsTextHlColor : optionsTextColor, 2);
+				 highlighted ? optionsTextSelectColor : optionsTextColor, 2);
 	}
 
 	if (optionpress && currentoption == optioncount) {
@@ -253,14 +253,14 @@ bool Menu::BoolSpriteOption(std::string option, bool enabled, std::string catego
 			std::bind(&Menu::drawSprite, this, category, enabled ? spriteOn : spriteOff,
 			menuX + menuWidth/2.0f - optionRightMargin, 
 			(indicatorHeight + (menuY + 0.016f)), 
-			0.03f, 0.05f, 0.0f, highlighted ? optionsTextHlColor : optionsTextColor));
+			0.03f, 0.05f, 0.0f, highlighted ? optionsTextSelectColor : optionsTextColor));
 	}
 	else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption) {
 		foregroundDrawCalls.push_back(
 			std::bind(&Menu::drawSprite, this, category, enabled ? spriteOn : spriteOff,
 			menuX + menuWidth/2.0f - optionRightMargin, 
 			menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight + 0.016f,
-			0.03f, 0.05f, 0.0f, highlighted ? optionsTextHlColor : optionsTextColor));
+			0.03f, 0.05f, 0.0f, highlighted ? optionsTextSelectColor : optionsTextColor));
 	}
 
 	if (optionpress && currentoption == optioncount) return true;
@@ -342,7 +342,7 @@ void Menu::EndMenu() {
 	// Footer
 	backgroundDrawCalls.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
-		menuX, footerBackY, menuWidth, optionHeight, 0.0f, titleBgColor)
+		menuX, footerBackY, menuWidth, optionHeight, 0.0f, titleBackgroundColor)
 	);
 	
 
@@ -355,10 +355,10 @@ void Menu::EndMenu() {
 		menuX, 
 		menuY + headerHeight + maxOptionCount * optionHeight / 2,
 		menuWidth, 
-		optionHeight * maxOptionCount, 0.0f, optionsBgColor)
+		optionHeight * maxOptionCount, 0.0f, optionsBackgroundColor)
 	);
 
-	// That footer thing you also see in the native menu
+	// Menu detail box
 	if (details.size() > 0) {
 		drawMenuDetails(details, footerBackY + optionHeight / 1.5f);
 	}
@@ -539,7 +539,7 @@ void Menu::drawAdditionalInfoBoxTitle(std::string title) {
 
 	backgroundDrawCalls.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
-		extrax, titley, menuWidth, titleHeight, 180.0f, titleBgColor)
+		extrax, titley, menuWidth, titleHeight, 180.0f, titleBackgroundColor)
 	);
 	
 }
@@ -558,7 +558,7 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 
 	highlightsDrawCalls.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
-		extrax, (menuY + headerHeight) + (infoLines * optionHeight) / 2, menuWidth, optionHeight * infoLines, 0.0f, optionsBgColor)
+		extrax, (menuY + headerHeight) + (infoLines * optionHeight) / 2, menuWidth, optionHeight * infoLines, 0.0f, optionsBackgroundColor)
 	);
 }
 
@@ -580,7 +580,7 @@ void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 
 	backgroundDrawCalls.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
-		menuX, y + boxHeight / 2, menuWidth, boxHeight, 0.0f, optionsBgColor));
+		menuX, y + boxHeight / 2, menuWidth, boxHeight, 0.0f, optionsBackgroundColor));
 }
 
 void Menu::drawOptionValue(std::string printVar, bool highlighted, int items) {
@@ -596,13 +596,13 @@ void Menu::drawOptionValue(std::string printVar, bool highlighted, int items) {
 				 menuX + menuWidth / 2.0f - optionRightMargin,
 				 indicatorHeight + menuY,
 				 optionTextSize, optionTextSize,
-				 highlighted ? optionsTextHlColor : optionsTextColor, 2);
+				 highlighted ? optionsTextSelectColor : optionsTextColor, 2);
 	else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption)
 		drawText(leftArrow + printVar + rightArrow, optionsFont,
 				 menuX + menuWidth / 2.0f - optionRightMargin,
 				 menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight,
 				 optionTextSize, optionTextSize,
-				 highlighted ? optionsTextHlColor : optionsTextColor, 2);
+				 highlighted ? optionsTextSelectColor : optionsTextColor, 2);
 }
 
 void Menu::changeMenu(std::string menuname) {
