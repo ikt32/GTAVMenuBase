@@ -546,11 +546,13 @@ void Menu::drawAdditionalInfoBoxTitle(std::string title) {
 
 void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines, std::string title) {
 	float extrax = menuX + menuWidth;
-
 	drawAdditionalInfoBoxTitle(title);
 
-	float subtitleY = subtitleTextureOffset + menuY + titleHeight;
-	drawRect(extrax, subtitleY, menuWidth, subtitleHeight, {0,0,0,255});
+	if (headerHeight == titleHeight + subtitleHeight) {
+		float subtitleY = subtitleTextureOffset + menuY + titleHeight;
+		drawRect(extrax, subtitleY, menuWidth, subtitleHeight, { 0,0,0,255 });
+	}
+
 
 	for (int i = 0; i < infoLines; i++) {
 		drawText(extra[i], optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, i * optionHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor);
