@@ -52,6 +52,22 @@ void Menu::Title(std::string title) {
 	headerHeight = titleHeight;
 }
 
+void Menu::Title(std::string title, float customSize) {
+	optioncount = 0;
+	totalHeight = 0.0f;
+	// This line is p much bullshit but happens to line out okay-ish.
+	float titletexty = menuY + totalHeight + titleTextOffset + titleTextOffset * 2.0f * (titleTextSize - customSize);
+	float titley = menuY + totalHeight + titleTextureOffset;
+
+	drawText(title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0);
+	backgroundDrawCalls.push_back(
+		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], 
+		menuX, titley, menuWidth, titleHeight, 0.0f, titleBackgroundColor)
+	);
+	totalHeight = titleHeight;
+	headerHeight = titleHeight;
+}
+
 void Menu::Subtitle(std::string subtitle, bool allcaps) {
 	if (allcaps)
 		subtitle = makeCaps(subtitle);
@@ -164,11 +180,34 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra,
 bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool *_highlighted,
 					  std::function<void() > onRight, std::function<void() > onLeft,
 					  std::string title, std::vector<std::string> details) {
+	Option(option, details);
+	float indicatorHeight = totalHeight - optionHeight;
+	size_t infoLines = extra.size();
 	bool highlighted = currentoption == optioncount;
 	if (_highlighted != nullptr) {
-		*_highlighted = highlighted;
+		*_highlighted = currentoption == optioncount;
 	}
-	return OptionPlus(option, extra, onRight, onLeft, title, details);
+
+	if (currentoption == optioncount) {
+		if (onLeft && leftpress) {
+			onLeft();
+			leftpress = false;
+			return false;
+		}
+		if (onRight && rightpress) {
+			onRight();
+			rightpress = false;
+			return false;
+		}
+	}
+
+	if (highlighted && ((currentoption <= maxDisplay && optioncount <= maxDisplay) ||
+		((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption))) {
+		drawAdditionalInfoBox(extra, infoLines, title);
+	}
+
+	if (optionpress && currentoption == optioncount) return true;
+	return false;
 }
 
 bool Menu::IntOption(std::string option, int &var, int min, int max, int step, std::vector<std::string> details) {

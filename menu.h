@@ -60,6 +60,7 @@ public:
 	 * Always assign a title to a submenu!
 	 */
 	void Title(std::string title);
+	void Title(std::string title, float customSize);
 
 	/*
 	 * A menu subtitle.
