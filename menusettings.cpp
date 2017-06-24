@@ -27,6 +27,10 @@ namespace NativeMenu {
 		control->ControlKeys[MenuControls::ControlType::MenuRight] = str2key(settingsMenu.GetValue("MENU", "MenuRight", "RIGHT"));
 		control->ControlKeys[MenuControls::ControlType::MenuSelect] = str2key(settingsMenu.GetValue("MENU", "MenuSelect", "RETURN"));
 		control->ControlKeys[MenuControls::ControlType::MenuCancel] = str2key(settingsMenu.GetValue("MENU", "MenuCancel", "BACKSPACE"));
+
+		control->ControllerButton1 = settingsMenu.GetLongValue("MENU", "ControllerButton1", -1);
+		control->ControllerButton2 = settingsMenu.GetLongValue("MENU", "ControllerButton2", -1);
+
 #pragma warning(push)
 #pragma warning(disable: 4244)
 		menuOpts->menuX = settingsMenu.GetDoubleValue("MENU", "MenuX", 0.2);
