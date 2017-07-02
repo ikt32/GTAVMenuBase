@@ -2,7 +2,7 @@
 
 #include "menu.h"
 
-
+#include "inc/main.h"
 #include "inc/natives.h"
 #include "inc/enums.h"
 #include "menucontrols.h"
@@ -38,21 +38,18 @@ bool Menu::CurrentMenu(std::string menuname) {
 }
 
 void Menu::Title(std::string title) {
-	optioncount = 0;
-	totalHeight = 0.0f;
-	float titletexty = menuY + totalHeight + titleTextOffset;
-	float titley = menuY + totalHeight + titleTextureOffset;
-
-	drawText(title, titleFont, menuX, titletexty, titleTextSize, titleTextSize, titleTextColor, 0);
-	backgroundDrawCalls.push_back(
-		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], 
-		menuX, titley, menuWidth, titleHeight, 0.0f, titleBackgroundColor)
-	);
-	totalHeight = titleHeight;
-	headerHeight = titleHeight;
+	Title(title, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], titleTextSize);
 }
 
 void Menu::Title(std::string title, float customSize) {
+	Title(title, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], customSize);
+}
+
+void Menu::Title(std::string title, std::string dict, std::string texture) {
+	Title(title, dict, texture, titleTextSize);
+}
+
+void Menu::Title(std::string title, std::string dict, std::string texture, float customSize) {
 	optioncount = 0;
 	totalHeight = 0.0f;
 	// This line is p much bullshit but happens to line out okay-ish.
@@ -61,9 +58,32 @@ void Menu::Title(std::string title, float customSize) {
 
 	drawText(title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0);
 	backgroundDrawCalls.push_back(
-		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], 
+		std::bind(&Menu::drawSprite, this, dict, texture,
 		menuX, titley, menuWidth, titleHeight, 0.0f, titleBackgroundColor)
 	);
+	totalHeight = titleHeight;
+	headerHeight = titleHeight;
+}
+
+void Menu::Title(std::string title, int textureHandle) {
+	Title(title, textureHandle, titleTextSize);
+}
+
+void Menu::Title(std::string title, int textureHandle, float customSize) {
+	optioncount = 0;
+	totalHeight = 0.0f;
+	// This line is p much bullshit but happens to line out okay-ish.
+	float titletexty = menuY + totalHeight + titleTextOffset + titleTextOffset * 2.0f * (titleTextSize - customSize);
+	float titley = menuY + totalHeight + titleTextureOffset;
+
+	drawText(title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0);
+	drawTexture(textureHandle, 0, -9999, 100, // handle, index, depth, time
+				menuWidth, titleHeight / GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.0f, 0.0f, // width, height, origin x, origin y
+				menuX - 0.5f * menuWidth, titley - 0.5f * titleHeight, 0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
+	//backgroundDrawCalls.push_back(
+	//	std::bind(&Menu::drawSprite, this, dict, texture,
+	//	menuX, titley, menuWidth, titleHeight, 0.0f, titleBackgroundColor)
+	//);
 	totalHeight = titleHeight;
 	headerHeight = titleHeight;
 }

@@ -61,6 +61,10 @@ public:
 	 */
 	void Title(std::string title);
 	void Title(std::string title, float customSize);
+	void Title(std::string title, std::string dict, std::string texture);
+	void Title(std::string title, std::string dict, std::string texture, float customSize);
+	void Title(std::string title, int textureHandle);
+	void Title(std::string title, int textureHandle, float customSize);
 
 	/*
 	 * A menu subtitle.
