@@ -22,6 +22,7 @@ void Menu::SetFiles(const std::string &fileName) {
 
 void Menu::ReadSettings() {
 	settings.ReadSettings(&controls, this);
+	menuX = menuX + menuWidth / 2.0f;
 }
 
 void Menu::RegisterOnMain(std::function<void()> onMain) {
@@ -56,11 +57,12 @@ void Menu::Title(std::string title, std::string dict, std::string texture, float
 	float titletexty = menuY + totalHeight + titleTextOffset + titleTextOffset * 2.0f * (titleTextSize - customSize);
 	float titley = menuY + totalHeight + titleTextureOffset;
 
-	drawText(title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0);
-	backgroundDrawCalls.push_back(
+	//drawText(title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0);
+	textDraws.push_back(
+		std::bind(&Menu::drawText, this, title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0));
+	backgroundSpriteDraws.push_back(
 		std::bind(&Menu::drawSprite, this, dict, texture,
-		menuX, titley, menuWidth, titleHeight, 0.0f, titleBackgroundColor)
-	);
+		menuX, titley, menuWidth, titleHeight, 0.0f, titleBackgroundColor));
 	totalHeight = titleHeight;
 	headerHeight = titleHeight;
 }
@@ -76,14 +78,17 @@ void Menu::Title(std::string title, int textureHandle, float customSize) {
 	float titletexty = menuY + totalHeight + titleTextOffset + titleTextOffset * 2.0f * (titleTextSize - customSize);
 	float titley = menuY + totalHeight + titleTextureOffset;
 
-	drawText(title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0);
-	drawTexture(textureHandle, 0, -9999, 100, // handle, index, depth, time
-				menuWidth, titleHeight / GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.0f, 0.0f, // width, height, origin x, origin y
-				menuX - 0.5f * menuWidth, titley - 0.5f * titleHeight, 0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
-	//backgroundDrawCalls.push_back(
-	//	std::bind(&Menu::drawSprite, this, dict, texture,
-	//	menuX, titley, menuWidth, titleHeight, 0.0f, titleBackgroundColor)
-	//);
+	textDraws.push_back(
+		std::bind(&Menu::drawText, this, title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0));
+
+	float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
+	float safeOffset = (1.0f - safeZone) * safeZone / (1625.0f/900.0f);
+
+	backgroundTextureDraws.push_back(
+		std::bind(drawTexture, textureHandle, 0, -9999, 100, // handle, index, depth, time
+		menuWidth, titleHeight / GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.0f, 0.0f, // width, height, origin x, origin y
+		((menuX + safeOffset) - 0.5f * menuWidth) , ((titley + safeOffset) - 0.5f * titleHeight) , 0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f)
+	);
 	totalHeight = titleHeight;
 	headerHeight = titleHeight;
 }
@@ -94,8 +99,15 @@ void Menu::Subtitle(std::string subtitle, bool allcaps) {
 	
 	float subtitleY = subtitleTextureOffset + menuY + totalHeight;
 	float subtitleTextY = menuY + totalHeight;
-	drawRect(menuX, subtitleY, menuWidth, subtitleHeight, { 0, 0, 0, 255 } );
-	drawText(subtitle, optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, subtitleTextY, subtitleTextSize, subtitleTextSize, titleTextColor);
+	textDraws.push_back(
+		std::bind(&Menu::drawText, this, subtitle, optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, subtitleTextY, subtitleTextSize, subtitleTextSize, titleTextColor, 1)
+	);
+
+	backgroundRectDraws.push_back(
+		std::bind(&Menu::drawRect, this, 
+		menuX, subtitleY, menuWidth, subtitleHeight, solidBlack)
+	);
+
 	totalHeight += subtitleHeight;
 	headerHeight += subtitleHeight;
 }
@@ -122,9 +134,14 @@ bool Menu::Option(std::string option, std::vector<std::string> details) {
 	}
 
 	if (visible) {
-		drawText(option, optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, optiontexty, optionTextSize, optionTextSize, highlighted ? optionsTextSelectColor : optionsTextColor);
+		textDraws.push_back(
+			std::bind(&Menu::drawText, this, 
+			option, optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, optiontexty, optionTextSize, optionTextSize, highlighted ? optionsTextSelectColor : optionsTextColor, 1
+			)
+		);
+
 		if (highlighted) {
-			highlightsDrawCalls.push_back(
+			highlightsSpriteDraws.push_back(
 				std::bind(&Menu::drawSprite, this, textureDicts[highlTextureIndex], textureNames[highlTextureIndex],
 				menuX, optiony, menuWidth, optionHeight, 0.0f, optionsBackgroundSelectColor)
 			);
@@ -146,18 +163,24 @@ bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::str
 	bool highlighted = currentoption == optioncount;
 
 	if (currentoption <= maxDisplay && optioncount <= maxDisplay) {
-		drawText(">>", optionsFont, 
-				 menuX + menuWidth / 2.0f - optionRightMargin, 
-				 indicatorHeight + menuY, 
-				 optionTextSize, optionTextSize, 
-				 highlighted ? optionsTextSelectColor : optionsTextColor, 2);
+		textDraws.push_back(
+			std::bind(&Menu::drawText, this,
+			">>", optionsFont,
+			menuX + menuWidth / 2.0f - optionRightMargin,
+			indicatorHeight + menuY,
+			optionTextSize, optionTextSize,
+			highlighted ? optionsTextSelectColor : optionsTextColor, 2
+			));
 	}
 	else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption) {
-		drawText(">>", optionsFont,
-				 menuX + menuWidth / 2.0f - optionRightMargin, 
-				 menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight,
-				 optionTextSize, optionTextSize, 
-				 highlighted ? optionsTextSelectColor : optionsTextColor, 2);
+		textDraws.push_back(
+			std::bind(&Menu::drawText, this,
+			">>", optionsFont,
+			menuX + menuWidth / 2.0f - optionRightMargin,
+			menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight,
+			optionTextSize, optionTextSize,
+			highlighted ? optionsTextSelectColor : optionsTextColor, 2
+		));
 	}
 
 	if (optionpress && currentoption == optioncount) {
@@ -289,7 +312,7 @@ bool Menu::BoolOption(std::string option, bool &var, std::vector<std::string> de
 		int resX, resY;
 		GRAPHICS::_GET_ACTIVE_SCREEN_RESOLUTION(&resX, &resY);
 		float ratio = (float)resX / (float)resY;
-		foregroundDrawCalls.push_back(
+		foregroundSpriteCalls.push_back(
 			std::bind(&Menu::drawSprite, this, "commonmenu", tickBoxTexture,
 			menuX + menuWidth/2.0f - optionRightMargin, textureY, boxSz/ratio, boxSz, 0.0f, optionColors)
 		);
@@ -308,14 +331,14 @@ bool Menu::BoolSpriteOption(std::string option, bool enabled, std::string catego
 	bool highlighted = currentoption == optioncount;
 	
 	if (currentoption <= maxDisplay && optioncount <= maxDisplay) {
-		foregroundDrawCalls.push_back(
+		foregroundSpriteCalls.push_back(
 			std::bind(&Menu::drawSprite, this, category, enabled ? spriteOn : spriteOff,
 			menuX + menuWidth/2.0f - optionRightMargin, 
 			(indicatorHeight + (menuY + 0.016f)), 
 			0.03f, 0.05f, 0.0f, highlighted ? optionsTextSelectColor : optionsTextColor));
 	}
 	else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption) {
-		foregroundDrawCalls.push_back(
+		foregroundSpriteCalls.push_back(
 			std::bind(&Menu::drawSprite, this, category, enabled ? spriteOn : spriteOff,
 			menuX + menuWidth/2.0f - optionRightMargin, 
 			menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight + 0.016f,
@@ -399,17 +422,18 @@ void Menu::EndMenu() {
 
 
 	// Footer
-	backgroundDrawCalls.push_back(
+	backgroundSpriteDraws.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
 		menuX, footerBackY, menuWidth, optionHeight, 0.0f, titleBackgroundColor)
 	);
 	
-
-	drawText(std::to_string(currentoption) + " / " + std::to_string(optioncount),
-			 optionsFont, menuX - 0.1f, footerTextY, optionTextSize, optionTextSize, titleTextColor, 2);
+	textDraws.push_back(
+		std::bind(&Menu::drawText, this, std::to_string(currentoption) + " / " + std::to_string(optioncount),
+		optionsFont, menuX - 0.1f, footerTextY, optionTextSize, optionTextSize, titleTextColor, 2)
+	);
 
 	// Options background
-	backgroundDrawCalls.push_back(
+	backgroundSpriteDraws.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex], 
 		menuX, 
 		menuY + headerHeight + maxOptionCount * optionHeight / 2,
@@ -424,7 +448,7 @@ void Menu::EndMenu() {
 
 	// Indicators
 	if (currentoption == 1) {
-		foregroundDrawCalls.push_back(
+		foregroundSpriteCalls.push_back(
 			std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
 			menuX, 
 			(footerTextY + 0.0175f),
@@ -432,7 +456,7 @@ void Menu::EndMenu() {
 		);
 	}
 	else if (currentoption == optioncount) {
-		foregroundDrawCalls.push_back(
+		foregroundSpriteCalls.push_back(
 			std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
 			menuX, 
 			(footerTextY + 0.0175f),
@@ -440,13 +464,13 @@ void Menu::EndMenu() {
 		);
 	}
 	else {
-		foregroundDrawCalls.push_back(
+		foregroundSpriteCalls.push_back(
 			std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
 			menuX, 
 			(footerTextY + 0.0125f),
 			0.02f, 0.02f, 270.0f, titleTextColor)
 		);
-		foregroundDrawCalls.push_back(
+		foregroundSpriteCalls.push_back(
 			std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
 			menuX, 
 			(footerTextY + 0.0225f),
@@ -454,12 +478,22 @@ void Menu::EndMenu() {
 		);
 	}
 
-	for (auto f : backgroundDrawCalls) { f(); }
-	for (auto f : highlightsDrawCalls) { f(); }
-	for (auto f : foregroundDrawCalls) { f(); }
-	backgroundDrawCalls.clear();
-	highlightsDrawCalls.clear();
-	foregroundDrawCalls.clear();
+	GRAPHICS::_SET_SCREEN_DRAW_POSITION(76, 84);
+	GRAPHICS::_SCREEN_DRAW_POSITION_RATIO(0, 0, 0, 0);
+	for (auto f : backgroundSpriteDraws) { f(); }
+	for (auto f : backgroundRectDraws) { f(); }
+	for (auto f : backgroundTextureDraws) { f(); }
+	for (auto f : highlightsSpriteDraws) { f(); }
+	for (auto f : foregroundSpriteCalls) { f(); }
+	for (auto f : textDraws) { f(); }
+	GRAPHICS::_SCREEN_DRAW_POSITION_END();
+
+	backgroundSpriteDraws.clear();
+	backgroundRectDraws.clear();
+	backgroundTextureDraws.clear();
+	highlightsSpriteDraws.clear();
+	foregroundSpriteCalls.clear();
+	textDraws.clear();
 	details.clear();
 
 	disableKeys();
@@ -594,9 +628,11 @@ void Menu::drawAdditionalInfoBoxTitle(std::string title) {
 	float titletexty = menuY + titleTextOffset;
 	float titley = menuY + titleTextureOffset;
 
-	drawText(title, titleFont, extrax, titletexty, titleTextSize, titleTextSize, titleTextColor, 0);
+	textDraws.push_back(
+		std::bind(&Menu::drawText, this, title, titleFont, extrax, titletexty, titleTextSize, titleTextSize, titleTextColor, 0)
+	);
 
-	backgroundDrawCalls.push_back(
+	backgroundSpriteDraws.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
 		extrax, titley, menuWidth, titleHeight, 180.0f, titleBackgroundColor)
 	);
@@ -609,15 +645,19 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 
 	if (headerHeight == titleHeight + subtitleHeight) {
 		float subtitleY = subtitleTextureOffset + menuY + titleHeight;
-		drawRect(extrax, subtitleY, menuWidth, subtitleHeight, { 0,0,0,255 });
+		backgroundRectDraws.push_back(
+			std::bind(&Menu::drawRect, this, extrax, subtitleY, menuWidth, subtitleHeight, solidBlack)
+		);
 	}
 
 
 	for (int i = 0; i < infoLines; i++) {
-		drawText(extra[i], optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, i * optionHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor);
+		textDraws.push_back(
+			std::bind(&Menu::drawText, this, 
+			extra[i], optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, i * optionHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1));
 	}
 
-	highlightsDrawCalls.push_back(
+	highlightsSpriteDraws.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
 		extrax, (menuY + headerHeight) + (infoLines * optionHeight) / 2, menuWidth, optionHeight * infoLines, 0.0f, optionsBackgroundColor)
 	);
@@ -631,15 +671,18 @@ void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 	}
 
 	for (auto i = 0; i < splitDetails.size(); i++) {
-		drawText(splitDetails[i], optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, i * detailLineHeight + y, optionTextSize, optionTextSize, optionsTextColor);
+		textDraws.push_back(
+			std::bind(&Menu::drawText, this,
+			splitDetails[i], optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, i * detailLineHeight + y, optionTextSize, optionTextSize, optionsTextColor, 1));
 	}
 
 	// The thin line
-	drawRect(menuX, y, menuWidth, optionHeight / 16.0f, { 0,0,0,255 });
+	backgroundRectDraws.push_back(std::bind(&Menu::drawRect, this,
+								  menuX, y, menuWidth, optionHeight / 16.0f, solidBlack));
 
 	float boxHeight = (splitDetails.size() * detailLineHeight) + (optionHeight - detailLineHeight);
 
-	backgroundDrawCalls.push_back(
+	backgroundSpriteDraws.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
 		menuX, y + boxHeight / 2, menuWidth, boxHeight, 0.0f, optionsBackgroundColor));
 }
@@ -652,18 +695,24 @@ void Menu::drawOptionValue(std::string printVar, bool highlighted, int items) {
 	if (items == 0) {
 		leftArrow = rightArrow = "";
 	}
-	if (currentoption <= maxDisplay && optioncount <= maxDisplay)
-		drawText(leftArrow + printVar + rightArrow, optionsFont,
-				 menuX + menuWidth / 2.0f - optionRightMargin,
-				 indicatorHeight + menuY,
-				 optionTextSize, optionTextSize,
-				 highlighted ? optionsTextSelectColor : optionsTextColor, 2);
-	else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption)
-		drawText(leftArrow + printVar + rightArrow, optionsFont,
-				 menuX + menuWidth / 2.0f - optionRightMargin,
-				 menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight,
-				 optionTextSize, optionTextSize,
-				 highlighted ? optionsTextSelectColor : optionsTextColor, 2);
+	if (currentoption <= maxDisplay && optioncount <= maxDisplay) {
+		textDraws.push_back(std::bind(&Menu::drawText, this, leftArrow + printVar + rightArrow, optionsFont,
+									  menuX + menuWidth / 2.0f - optionRightMargin,
+									  indicatorHeight + menuY,
+									  optionTextSize, optionTextSize,
+									  highlighted ? optionsTextSelectColor : optionsTextColor, 2));
+	}
+
+
+		
+	else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption) {
+		textDraws.push_back(std::bind(&Menu::drawText, this, leftArrow + printVar + rightArrow, optionsFont,
+									  menuX + menuWidth / 2.0f - optionRightMargin,
+									  menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight,
+									  optionTextSize, optionTextSize,
+									  highlighted ? optionsTextSelectColor : optionsTextColor, 2));
+	}
+
 }
 
 void Menu::changeMenu(std::string menuname) {
@@ -819,7 +868,10 @@ void Menu::processMenuNav(std::function<void()> onMain, std::function<void()> on
 		CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, controls.ControllerButton2)) {
 		if (menulevel == 0) {
 			changeMenu("mainmenu");
-			if (onMain) onMain();
+			updateScreenSize();
+			if (onMain) {
+				onMain();
+			}
 		}
 		else {
 			CloseMenu();
@@ -878,6 +930,8 @@ void Menu::processMenuNav(std::function<void()> onMain, std::function<void()> on
 }
 
 
-
-
+void Menu::updateScreenSize() {
+	aspectR = (16.0f / 9.0f)/GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+	menuWidth = menuWidthOriginal*aspectR;
+}
 }

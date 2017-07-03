@@ -214,9 +214,12 @@ private:
 	 * important.
 	 */
 	typedef std::vector<std::function<void(void)>> functionList;
-	functionList backgroundDrawCalls;
-	functionList highlightsDrawCalls;
-	functionList foregroundDrawCalls;
+	functionList backgroundSpriteDraws;		// drawSprite
+	functionList backgroundRectDraws;		// drawRect
+	functionList backgroundTextureDraws;	// drawTexture
+	functionList highlightsSpriteDraws;		// drawSprite
+	functionList foregroundSpriteCalls;		// drawSprite
+	functionList textDraws;					// drawText
 	
 	/*
 	 * Detail text also needs to know Y-coordinate to start drawing properly.
@@ -232,6 +235,7 @@ private:
 	float optionRightMargin = 0.015f;
 
 	float menuWidth = 0.225f;
+	float menuWidthOriginal = menuWidth;
 
 	float optionHeight = 0.035f;
 	float optionTextSize = 0.45f;
@@ -272,6 +276,11 @@ private:
 	int lastoption[100];
 	int menulevel = 0;
 	float headerHeight = 0.0f;
+
+	float safeX;
+	float safeY;
+	float aspectR;
+	float aspectY;
 
 	/*
 	 * Navigation-related members.
@@ -315,8 +324,7 @@ private:
 
 	float getStringWidth(std::string text);
 	std::vector<std::string> splitString(float maxWidth, std::string &details);
-
-	void drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, Color color, int justify = 1);
+	void drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, Color color, int justify);
 	void drawRect(float x, float y, float width, float height, Color color);
 	void drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, Color color);
 	void drawAdditionalInfoBoxTitle(std::string title);
@@ -334,7 +342,7 @@ private:
 	void enableKeysOnce();
 	void disableKeys();
 	void processMenuNav(std::function<void()> onMain, std::function<void()> onExit);
-
+	void updateScreenSize();
 	
 
 
