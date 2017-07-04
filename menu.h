@@ -322,7 +322,9 @@ private:
 	int highlTextureIndex = 4;
 
 	float getStringWidth(std::string text);
+	float getStringWidthv2(std::string text, float scale, int font);
 	std::vector<std::string> splitString(float maxWidth, std::string &details);
+	std::vector<std::string> splitStringv2(float maxWidth, std::string &details, float scale, int font);
 	void drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, Color color, int justify);
 	void drawRect(float x, float y, float width, float height, Color color);
 	void drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, Color color);

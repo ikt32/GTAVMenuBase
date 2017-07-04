@@ -39,7 +39,28 @@ bool Menu::CurrentMenu(std::string menuname) {
 }
 
 void Menu::Title(std::string title) {
-	Title(title, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], titleTextSize);
+	float width = getStringWidthv2(title, titleTextSize, titleFont);
+	float maxWidth = menuWidth - 2.0f*menuTextMargin;
+	int maxTries = 50;
+	int tries = 0;
+	float newSize = titleTextSize;
+	while (width > maxWidth && tries < maxTries) {
+		newSize -= 0.01f;
+		width = getStringWidthv2(title, newSize, titleFont);
+		tries++;
+	}
+	if (width > maxWidth) {
+		auto titleLines = splitStringv2(maxWidth, title, newSize, titleFont);
+		title = "";
+		for (auto line : titleLines) {
+			if (line != titleLines.back())
+				title += line + '\n';
+			else
+				title += line;
+		}
+	}
+
+	Title(title, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], newSize);
 }
 
 void Menu::Title(std::string title, float customSize) {
@@ -56,7 +77,14 @@ void Menu::Title(std::string title, std::string dict, std::string texture, float
 
 	float titletexty = menuY + totalHeight + titleTextOffset + titleTextOffset * 2.0f * (titleTextSize - customSize);
 	float titley = menuY + totalHeight + titleTextureOffset;
-
+	int newlines = 0;
+	for (auto c : title) {
+		if (c == '\n')
+			newlines++;
+	}
+	for (int i = 0; i < newlines; i++) {
+		titletexty -= titleHeight / 5.0f;
+	}
 
 	textDraws.push_back(
 		std::bind(&Menu::drawText, this, title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0));
@@ -559,6 +587,16 @@ const MenuControls &Menu::GetControls() {
 	return controls;
 }
 
+float Menu::getStringWidthv2(std::string text, float scale, int font) {
+	UI::_SET_TEXT_ENTRY_FOR_WIDTH("STRING");
+	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
+
+	UI::SET_TEXT_FONT( font);
+	UI::SET_TEXT_SCALE( scale, scale);
+
+	return UI::_GET_TEXT_SCREEN_WIDTH(true);
+}
+
 float Menu::getStringWidth(std::string text) {
 	float scale = optionTextSize;
 	if (optionsFont == 0) { // big-ass Chalet London
@@ -568,6 +606,28 @@ float Menu::getStringWidth(std::string text) {
 	UI::_SET_TEXT_ENTRY_FOR_WIDTH("STRING");
 	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
 	return UI::_GET_TEXT_SCREEN_WIDTH(optionsFont) * scale;
+}
+
+std::vector<std::string> Menu::splitStringv2(float maxWidth, std::string &details, float scale, int font) {
+	std::vector<std::string> splitLines;
+
+	std::vector<std::string> words = split(details, ' ');
+
+	std::string line;
+	for (std::string word : words) {
+		float lineWidth = getStringWidthv2(line, scale, font);
+		float wordWidth = getStringWidthv2(word, scale, font);
+		if (lineWidth + wordWidth > maxWidth) {
+			splitLines.push_back(line);
+			line.clear();
+		}
+		line += word + ' ';
+		if (word == words.back()) {
+			splitLines.push_back(line);
+		}
+	}
+
+	return splitLines;
 }
 
 std::vector<std::string> Menu::splitString(float maxWidth, std::string &details) {
