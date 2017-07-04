@@ -83,7 +83,7 @@ void Menu::Title(std::string title, int textureHandle, float customSize) {
 
 	// TODO: Find a correct calculation for safe zone offsets. This .15 hack only somewhat works.
 	float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
-	float safeOffset = (1.0f - safeZone) * safeZone / (16.22f / 9.0f);
+	float safeOffset = (1.0f - safeZone) * 0.5f;//safeZone / (16.22f / 9.0f);
 
 	drawTexture(textureHandle, 0, -9999, 60,									 // handle, index, depth, time
 		menuWidth, titleHeight / GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.5f, 0.5f, // width, height, origin x, origin y
