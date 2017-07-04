@@ -55,6 +55,7 @@ public:
 	 * Returns true when inside the submenu menuname.
 	 */
 	bool CurrentMenu(std::string menuname);
+	void fitTitle(std::string &title, float &newSize, float titleSize);
 
 	/*
 	 * Always assign a title to a submenu!

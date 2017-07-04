@@ -38,13 +38,13 @@ bool Menu::CurrentMenu(std::string menuname) {
 	return false;
 }
 
-void Menu::Title(std::string title) {
-	float width = getStringWidthv2(title, titleTextSize, titleFont);
+void Menu::fitTitle(std::string &title, float &newSize, float titleSize) {
+	float width = getStringWidthv2(title, titleSize, titleFont);
 	float maxWidth = menuWidth - 2.0f*menuTextMargin;
 	int maxTries = 50;
 	int tries = 0;
-	float newSize = titleTextSize;
-	while (width > maxWidth && tries < maxTries) {
+	newSize = titleSize;
+	while (width > maxWidth && newSize > titleTextSize * 0.5f && tries < maxTries) {
 		newSize -= 0.01f;
 		width = getStringWidthv2(title, newSize, titleFont);
 		tries++;
@@ -59,7 +59,11 @@ void Menu::Title(std::string title) {
 				title += line;
 		}
 	}
+}
 
+void Menu::Title(std::string title) {
+	float newSize;
+	fitTitle(title, newSize, titleTextSize);
 	Title(title, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], newSize);
 }
 
@@ -68,7 +72,9 @@ void Menu::Title(std::string title, float customSize) {
 }
 
 void Menu::Title(std::string title, std::string dict, std::string texture) {
-	Title(title, dict, texture, titleTextSize);
+	float newSize;
+	fitTitle(title, newSize, titleTextSize);
+	Title(title, dict, texture, newSize);
 }
 
 void Menu::Title(std::string title, std::string dict, std::string texture, float customSize) {
@@ -96,7 +102,9 @@ void Menu::Title(std::string title, std::string dict, std::string texture, float
 }
 
 void Menu::Title(std::string title, int textureHandle) {
-	Title(title, textureHandle, titleTextSize);
+	float newSize;
+	fitTitle(title, newSize, titleTextSize);
+	Title(title, textureHandle, newSize);
 }
 
 void Menu::Title(std::string title, int textureHandle, float customSize) {
