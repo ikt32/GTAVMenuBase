@@ -590,23 +590,26 @@ const MenuControls &Menu::GetControls() {
 float Menu::getStringWidthv2(std::string text, float scale, int font) {
 	UI::_SET_TEXT_ENTRY_FOR_WIDTH("STRING");
 	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
-
+	// TODO: handle Chalet London somewhere else? 
+	if (font == 0) { // big-ass Chalet London
+		scale *= 0.75f;	// stop shooting yourself in the foot ikt
+	}
 	UI::SET_TEXT_FONT( font);
 	UI::SET_TEXT_SCALE( scale, scale);
 
 	return UI::_GET_TEXT_SCREEN_WIDTH(true);
 }
 
-float Menu::getStringWidth(std::string text) {
-	float scale = optionTextSize;
-	if (optionsFont == 0) { // big-ass Chalet London
-		scale *= 0.75f;
-	}
-
-	UI::_SET_TEXT_ENTRY_FOR_WIDTH("STRING");
-	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
-	return UI::_GET_TEXT_SCREEN_WIDTH(optionsFont) * scale;
-}
+//float Menu::getStringWidth(std::string text) {
+//	float scale = optionTextSize;
+//	if (optionsFont == 0) { // big-ass Chalet London
+//		scale *= 0.75f;
+//	}
+//
+//	UI::_SET_TEXT_ENTRY_FOR_WIDTH("STRING");
+//	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
+//	return UI::_GET_TEXT_SCREEN_WIDTH(optionsFont) * scale;
+//}
 
 std::vector<std::string> Menu::splitStringv2(float maxWidth, std::string &details, float scale, int font) {
 	std::vector<std::string> splitLines;
@@ -630,27 +633,27 @@ std::vector<std::string> Menu::splitStringv2(float maxWidth, std::string &detail
 	return splitLines;
 }
 
-std::vector<std::string> Menu::splitString(float maxWidth, std::string &details) {
-	std::vector<std::string> splitLines;
-
-	std::vector<std::string> words = split(details, ' ');
-
-	std::string line;
-	for (std::string word : words) {
-		float lineWidth = getStringWidth(line);
-		float wordWidth = getStringWidth(word);
-		if (lineWidth + wordWidth > maxWidth) {
-			splitLines.push_back(line);
-			line.clear();
-		}
-		line += word + ' ';
-		if (word == words.back()) {
-			splitLines.push_back(line);
-		}
-	}
-
-	return splitLines;
-}
+//std::vector<std::string> Menu::splitString(float maxWidth, std::string &details) {
+//	std::vector<std::string> splitLines;
+//
+//	std::vector<std::string> words = split(details, ' ');
+//
+//	std::string line;
+//	for (std::string word : words) {
+//		float lineWidth = getStringWidth(line);
+//		float wordWidth = getStringWidth(word);
+//		if (lineWidth + wordWidth > maxWidth) {
+//			splitLines.push_back(line);
+//			line.clear();
+//		}
+//		line += word + ' ';
+//		if (word == words.back()) {
+//			splitLines.push_back(line);
+//		}
+//	}
+//
+//	return splitLines;
+//}
 
 void Menu::drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, Color color, int justify) {
 	// justify: 0 - center, 1 - left, 2 - right
@@ -724,7 +727,7 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 	std::vector<std::string> splitDetails;
 	for (auto detailLine : details) {
-		auto splitLines = splitString(menuWidth, detailLine);
+		auto splitLines = splitStringv2(menuWidth, detailLine, optionTextSize, optionsFont);
 		splitDetails.insert(std::end(splitDetails), std::begin(splitLines), std::end(splitLines));
 	}
 
