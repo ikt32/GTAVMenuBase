@@ -53,11 +53,11 @@ void Menu::Title(std::string title, std::string dict, std::string texture) {
 void Menu::Title(std::string title, std::string dict, std::string texture, float customSize) {
 	optioncount = 0;
 	totalHeight = 0.0f;
-	// This line is p much bullshit but happens to line out okay-ish.
+
 	float titletexty = menuY + totalHeight + titleTextOffset + titleTextOffset * 2.0f * (titleTextSize - customSize);
 	float titley = menuY + totalHeight + titleTextureOffset;
 
-	//drawText(title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0);
+
 	textDraws.push_back(
 		std::bind(&Menu::drawText, this, title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0));
 	backgroundSpriteDraws.push_back(
@@ -74,21 +74,21 @@ void Menu::Title(std::string title, int textureHandle) {
 void Menu::Title(std::string title, int textureHandle, float customSize) {
 	optioncount = 0;
 	totalHeight = 0.0f;
-	// This line is p much bullshit but happens to line out okay-ish.
+
 	float titletexty = menuY + totalHeight + titleTextOffset + titleTextOffset * 2.0f * (titleTextSize - customSize);
 	float titley = menuY + totalHeight + titleTextureOffset;
 
 	textDraws.push_back(
 		std::bind(&Menu::drawText, this, title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0));
 
+	// TODO: Find a correct calculation for safe zone offsets. This .15 hack only somewhat works.
 	float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
-	float safeOffset = (1.0f - safeZone) * safeZone / (1625.0f/900.0f);
+	float safeOffset = (1.0f - safeZone) * safeZone / (16.22f / 9.0f);
 
-	backgroundTextureDraws.push_back(
-		std::bind(drawTexture, textureHandle, 0, -9999, 100, // handle, index, depth, time
-		menuWidth, titleHeight / GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.0f, 0.0f, // width, height, origin x, origin y
-		((menuX + safeOffset) - 0.5f * menuWidth) , ((titley + safeOffset) - 0.5f * titleHeight) , 0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f)
-	);
+	drawTexture(textureHandle, 0, -9999, 60,									 // handle, index, depth, time
+		menuWidth, titleHeight / GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.5f, 0.5f, // width, height, origin x, origin y
+		menuX + safeOffset, titley + safeOffset, 0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
+	
 	totalHeight = titleHeight;
 	headerHeight = titleHeight;
 }
@@ -482,7 +482,6 @@ void Menu::EndMenu() {
 	GRAPHICS::_SCREEN_DRAW_POSITION_RATIO(0, 0, 0, 0);
 	for (auto f : backgroundSpriteDraws) { f(); }
 	for (auto f : backgroundRectDraws) { f(); }
-	for (auto f : backgroundTextureDraws) { f(); }
 	for (auto f : highlightsSpriteDraws) { f(); }
 	for (auto f : foregroundSpriteCalls) { f(); }
 	for (auto f : textDraws) { f(); }
@@ -490,7 +489,6 @@ void Menu::EndMenu() {
 
 	backgroundSpriteDraws.clear();
 	backgroundRectDraws.clear();
-	backgroundTextureDraws.clear();
 	highlightsSpriteDraws.clear();
 	foregroundSpriteCalls.clear();
 	textDraws.clear();

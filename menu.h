@@ -216,7 +216,6 @@ private:
 	typedef std::vector<std::function<void(void)>> functionList;
 	functionList backgroundSpriteDraws;		// drawSprite
 	functionList backgroundRectDraws;		// drawRect
-	functionList backgroundTextureDraws;	// drawTexture
 	functionList highlightsSpriteDraws;		// drawSprite
 	functionList foregroundSpriteCalls;		// drawSprite
 	functionList textDraws;					// drawText
