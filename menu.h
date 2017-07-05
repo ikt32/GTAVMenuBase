@@ -273,7 +273,7 @@ private:
 	// Looks like we have 100 menu levels.
 	std::array<std::string, 100> currentmenu;
 	std::string actualmenu;
-	int lastoption[100];
+	std::array<int, 100> lastoption;
 	int menulevel = 0;
 	float headerHeight = 0.0f;
 

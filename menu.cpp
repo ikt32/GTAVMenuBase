@@ -12,7 +12,9 @@
 
 namespace NativeMenu {
 
-Menu::Menu() { }
+Menu::Menu() {
+	std::fill(lastoption.begin(), lastoption.end(), 1);
+}
 
 Menu::~Menu() { }
 
@@ -789,7 +791,7 @@ void Menu::changeMenu(std::string menuname) {
 	lastoption[menulevel] = currentoption;
 	menulevel++;
 	actualmenu = menuname;
-	currentoption = 1;
+	currentoption = lastoption[menulevel];
 	menuBeep();
 	resetButtonStates();
 }
@@ -820,6 +822,7 @@ void Menu::backMenu() {
 	if (menulevel > 0) {
 		menuBeep();
 	}
+	lastoption[menulevel] = currentoption;
 	menulevel--;
 	actualmenu = currentmenu[menulevel];
 	currentoption = lastoption[menulevel];
