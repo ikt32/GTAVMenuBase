@@ -15,6 +15,7 @@
 #include "menucontrols.h"
 #include "menuutils.h"
 #include "menusettings.h"
+#include <map>
 
 namespace NativeMenu {
 class Menu {
@@ -273,7 +274,8 @@ private:
 	// Looks like we have 100 menu levels.
 	std::array<std::string, 100> currentmenu;
 	std::string actualmenu;
-	std::array<int, 100> lastoption;
+	//std::array<int, 100> lastoption;
+	std::map<std::string, int> lastoption;
 	int menulevel = 0;
 	float headerHeight = 0.0f;
 
@@ -370,6 +372,15 @@ private:
 		if (optionpress && currentoption == optioncount)
 			return true;
 		return false;
+	}
+
+	// https://stackoverflow.com/questions/2333728/stdmap-default-value
+	template <template<class, class, class...> class C, typename K, typename V, typename... Args>
+	V getWithDef(const C<K, V, Args...>& m, K const& key, const V & defval) {
+		typename C<K, V, Args...>::const_iterator it = m.find(key);
+		if (it == m.end())
+			return defval;
+		return it->second;
 	}
 };
 

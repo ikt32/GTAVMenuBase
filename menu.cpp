@@ -12,9 +12,7 @@
 
 namespace NativeMenu {
 
-Menu::Menu() {
-	std::fill(lastoption.begin(), lastoption.end(), 1);
-}
+Menu::Menu() { }
 
 Menu::~Menu() { }
 
@@ -788,10 +786,10 @@ void Menu::drawOptionValue(std::string printVar, bool highlighted, int items) {
 
 void Menu::changeMenu(std::string menuname) {
 	currentmenu[menulevel] = actualmenu;
-	lastoption[menulevel] = currentoption;
+	lastoption[actualmenu] = currentoption;
 	menulevel++;
 	actualmenu = menuname;
-	currentoption = lastoption[menulevel];
+	currentoption = getWithDef(lastoption, actualmenu, 1);
 	menuBeep();
 	resetButtonStates();
 }
@@ -822,10 +820,10 @@ void Menu::backMenu() {
 	if (menulevel > 0) {
 		menuBeep();
 	}
-	lastoption[menulevel] = currentoption;
+	lastoption[actualmenu] = currentoption;
 	menulevel--;
 	actualmenu = currentmenu[menulevel];
-	currentoption = lastoption[menulevel];
+	currentoption = getWithDef(lastoption, actualmenu, 1);
 
 }
 
