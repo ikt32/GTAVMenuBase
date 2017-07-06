@@ -692,9 +692,9 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 			sscanf_s(extra[i].c_str(), "!IMG:%dW%dH%d", &imgHandle, &imgWidth, &imgHeight);
 			float drawWidth = menuWidth - 2.0f * menuTextMargin;
 			float drawHeight = (float)imgHeight * (drawWidth / (float)imgWidth);
-			float imgXpos = menuX + menuWidth / 2.0f + menuTextMargin;
-			float imgYpos = finalHeight + (menuY + headerHeight) + menuTextMargin;
 			float imgAspect = GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+			float imgXpos = menuX + menuWidth / 2.0f + menuTextMargin;
+			float imgYpos = finalHeight + (menuY + headerHeight) + menuTextMargin * imgAspect;
 
 
 			float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
@@ -704,7 +704,7 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 						drawWidth, drawHeight, 0.0f, 0.0f,									// width, height, origin x, origin y
 						imgXpos + safeOffset, imgYpos + safeOffset, 0.0f,												// pos x, pos y, rot
 						imgAspect, 1.0f, 1.0f, 1.0f, 1.0f);		// screen correct, rgba
-			finalHeight += drawHeight * GRAPHICS::_GET_ASPECT_RATIO(FALSE) + 2.0f * menuTextMargin;
+			finalHeight += (drawHeight + 2.0f * menuTextMargin) * imgAspect;
 		}
 		else {
 			textDraws.push_back(
