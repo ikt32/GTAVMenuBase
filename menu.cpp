@@ -39,18 +39,18 @@ bool Menu::CurrentMenu(std::string menuname) {
 }
 
 void Menu::fitTitle(std::string &title, float &newSize, float titleSize) {
-	float width = getStringWidthv2(title, titleSize, titleFont);
+	float width = getStringWidth(title, titleSize, titleFont);
 	float maxWidth = menuWidth - 2.0f*menuTextMargin;
 	int maxTries = 50;
 	int tries = 0;
 	newSize = titleSize;
 	while (width > maxWidth && newSize > titleTextSize * 0.5f && tries < maxTries) {
 		newSize -= 0.01f;
-		width = getStringWidthv2(title, newSize, titleFont);
+		width = getStringWidth(title, newSize, titleFont);
 		tries++;
 	}
 	if (width > maxWidth) {
-		auto titleLines = splitStringv2(maxWidth, title, newSize, titleFont);
+		auto titleLines = splitString(maxWidth, title, newSize, titleFont);
 		title = "";
 		for (auto line : titleLines) {
 			if (line != titleLines.back())
@@ -595,39 +595,23 @@ const MenuControls &Menu::GetControls() {
 	return controls;
 }
 
-float Menu::getStringWidthv2(std::string text, float scale, int font) {
+float Menu::getStringWidth(std::string text, float scale, int font) {
 	UI::_SET_TEXT_ENTRY_FOR_WIDTH("STRING");
 	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
-	// TODO: handle Chalet London somewhere else? 
-	if (font == 0) { // big-ass Chalet London
-		scale *= 0.75f;	// stop shooting yourself in the foot ikt
-	}
 	UI::SET_TEXT_FONT( font);
 	UI::SET_TEXT_SCALE( scale, scale);
-
 	return UI::_GET_TEXT_SCREEN_WIDTH(true);
 }
 
-//float Menu::getStringWidth(std::string text) {
-//	float scale = optionTextSize;
-//	if (optionsFont == 0) { // big-ass Chalet London
-//		scale *= 0.75f;
-//	}
-//
-//	UI::_SET_TEXT_ENTRY_FOR_WIDTH("STRING");
-//	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
-//	return UI::_GET_TEXT_SCREEN_WIDTH(optionsFont) * scale;
-//}
-
-std::vector<std::string> Menu::splitStringv2(float maxWidth, std::string &details, float scale, int font) {
+std::vector<std::string> Menu::splitString(float maxWidth, std::string &details, float scale, int font) {
 	std::vector<std::string> splitLines;
 
 	std::vector<std::string> words = split(details, ' ');
 
 	std::string line;
 	for (std::string word : words) {
-		float lineWidth = getStringWidthv2(line, scale, font);
-		float wordWidth = getStringWidthv2(word, scale, font);
+		float lineWidth = getStringWidth(line, scale, font);
+		float wordWidth = getStringWidth(word, scale, font);
 		if (lineWidth + wordWidth > maxWidth) {
 			splitLines.push_back(line);
 			line.clear();
@@ -641,28 +625,6 @@ std::vector<std::string> Menu::splitStringv2(float maxWidth, std::string &detail
 	return splitLines;
 }
 
-//std::vector<std::string> Menu::splitString(float maxWidth, std::string &details) {
-//	std::vector<std::string> splitLines;
-//
-//	std::vector<std::string> words = split(details, ' ');
-//
-//	std::string line;
-//	for (std::string word : words) {
-//		float lineWidth = getStringWidth(line);
-//		float wordWidth = getStringWidth(word);
-//		if (lineWidth + wordWidth > maxWidth) {
-//			splitLines.push_back(line);
-//			line.clear();
-//		}
-//		line += word + ' ';
-//		if (word == words.back()) {
-//			splitLines.push_back(line);
-//		}
-//	}
-//
-//	return splitLines;
-//}
-
 void Menu::drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, Color color, int justify) {
 	// justify: 0 - center, 1 - left, 2 - right
 	if (justify == 2) {
@@ -671,6 +633,7 @@ void Menu::drawText(const std::string text, int font, float x, float y, float pU
 	UI::SET_TEXT_JUSTIFICATION(justify);
 
 	UI::SET_TEXT_FONT(font);
+	// TODO: Handle Chalet London elsewhere
 	if (font == 0) { // big-ass Chalet London
 		scale *= 0.75f;
 		y += 0.003f;
@@ -734,8 +697,9 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 
 void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 	std::vector<std::string> splitDetails;
+	float big_ass_Chalet_London_mult = optionsFont == 0 ? 0.75f : 1.0f;
 	for (auto detailLine : details) {
-		auto splitLines = splitStringv2(menuWidth, detailLine, optionTextSize, optionsFont);
+		auto splitLines = splitString(menuWidth, detailLine, optionTextSize * big_ass_Chalet_London_mult, optionsFont);
 		splitDetails.insert(std::end(splitDetails), std::begin(splitLines), std::end(splitLines));
 	}
 
