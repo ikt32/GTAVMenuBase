@@ -682,16 +682,41 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 		);
 	}
 
+	float finalHeight = 0;
 
 	for (int i = 0; i < infoLines; i++) {
-		textDraws.push_back(
-			std::bind(&Menu::drawText, this, 
-			extra[i], optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, i * optionHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1));
+		if (!extra[i].compare(0, ImagePrefix.size(), ImagePrefix)) {
+			int imgHandle;
+			int imgWidth; 
+			int imgHeight;
+			sscanf_s(extra[i].c_str(), "!IMG:%dW%dH%d", &imgHandle, &imgWidth, &imgHeight);
+			float drawWidth = menuWidth - 2.0f * menuTextMargin;
+			float drawHeight = (float)imgHeight * (drawWidth / (float)imgWidth);
+			float imgXpos = menuX + menuWidth / 2.0f + menuTextMargin;
+			float imgYpos = finalHeight + (menuY + headerHeight) + menuTextMargin;
+			float imgAspect = GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+
+
+			float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
+			float safeOffset = (1.0f - safeZone) * 0.5f;
+
+			drawTexture(imgHandle, 0, -9999, 60,											// handle, index, depth, time
+						drawWidth, drawHeight, 0.0f, 0.0f,									// width, height, origin x, origin y
+						imgXpos + safeOffset, imgYpos + safeOffset, 0.0f,												// pos x, pos y, rot
+						imgAspect, 1.0f, 1.0f, 1.0f, 1.0f);		// screen correct, rgba
+			finalHeight += drawHeight * GRAPHICS::_GET_ASPECT_RATIO(FALSE) + 2.0f * menuTextMargin;
+		}
+		else {
+			textDraws.push_back(
+				std::bind(&Menu::drawText, this,
+				extra[i], optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1));
+			finalHeight += optionHeight;
+		}
 	}
 
-	highlightsSpriteDraws.push_back(
+	backgroundSpriteDraws.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
-		extrax, (menuY + headerHeight) + (infoLines * optionHeight) / 2, menuWidth, optionHeight * infoLines, 0.0f, optionsBackgroundColor)
+		extrax, (menuY + headerHeight) + (finalHeight) / 2, menuWidth, finalHeight, 0.0f, optionsBackgroundColor)
 	);
 }
 

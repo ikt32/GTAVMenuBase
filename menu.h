@@ -93,6 +93,7 @@ public:
 	 * Shows text with extra's specifyable in the detail pane.
 	 * Function pointers can be passed and are called on right, left press.
 	 * Custom pane title can be specified.
+	 * Extra draws image if a line is "!IMG:<file path>W<height>H<width>".
 	 * Returns true on accept.
 	 */
 	bool OptionPlus(std::string option, std::vector<std::string> &extra,
@@ -179,6 +180,8 @@ public:
 	void CloseMenu();
 
 	const MenuControls &GetControls();
+
+	const std::string ImagePrefix = "!IMG:";
 
 	// TODO: Refactor into Menu.Settings or provide accessors (r/w).
 	/*
