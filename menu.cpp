@@ -10,6 +10,19 @@
 #include "Util/Versions.h"
 #include <locale>
 
+// TODO: Fixes:
+//		- Reduce code duplication (titles, OptionPlus title)
+//		- OptionPlus title scaling/chopping
+//		- OptionPlus line chopping
+//		- Handle long menu names
+//		- Handle Chalet London scaling
+//		- Check FloatArray refactoring possibilities
+
+// TODO: Improvements:
+//		- Mouse support
+//		- Badges?
+//		- Support longer lists by removing radar
+
 namespace NativeMenu {
 
 Menu::Menu() { }
@@ -117,9 +130,8 @@ void Menu::Title(std::string title, int textureHandle, float customSize) {
 	textDraws.push_back(
 		std::bind(&Menu::drawText, this, title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0));
 
-	// TODO: Find a correct calculation for safe zone offsets. This .15 hack only somewhat works.
 	float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
-	float safeOffset = (1.0f - safeZone) * 0.5f;//safeZone / (16.22f / 9.0f);
+	float safeOffset = (1.0f - safeZone) * 0.5f;
 
 	drawTexture(textureHandle, 0, -9999, 60,									 // handle, index, depth, time
 		menuWidth, titleHeight / GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.5f, 0.5f, // width, height, origin x, origin y
@@ -398,8 +410,6 @@ bool Menu::IntArray(std::string option, std::vector<int> display, int &iterator,
 	return processOptionItemControls(iterator, min, max, 1);
 }
 
-// TODO: Refactor first part since Arrays are similar?
-// TODO: Refactor second part since FloatOption is similar?
 bool Menu::FloatArray(std::string option, std::vector<float> display, int &iterator, std::vector<std::string> details) {
 	Option(option, details);
 	bool highlighted = currentoption == optioncount;
@@ -689,7 +699,8 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 			int imgHandle;
 			int imgWidth; 
 			int imgHeight;
-			sscanf_s(extra[i].c_str(), "!IMG:%dW%dH%d", &imgHandle, &imgWidth, &imgHeight);
+			std::string scanFormat = ImagePrefix + "%dW%dH%d";
+			sscanf_s(extra[i].c_str(), scanFormat.c_str(), &imgHandle, &imgWidth, &imgHeight);
 			float drawWidth = menuWidth - 2.0f * menuTextMargin;
 			float drawHeight = (float)imgHeight * (drawWidth / (float)imgWidth);
 			float imgAspect = GRAPHICS::_GET_ASPECT_RATIO(FALSE);
