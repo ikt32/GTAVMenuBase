@@ -7,7 +7,6 @@
 #include "inc/enums.h"
 #include "menucontrols.h"
 #include "menuutils.h"
-#include "Util/Versions.h"
 #include <locale>
 
 // TODO: Fixes:
@@ -839,16 +838,18 @@ void Menu::resetButtonStates() {
 	downpress = false;
 }
 
+// G_VER_1_0_877_1_NOSTEAM = 27
+
 void Menu::disableKeysOnce() {
 	CAM::SET_CINEMATIC_BUTTON_ACTIVE(0);
-	if (getGameVersion() > G_VER_1_0_877_1_NOSTEAM) {
+	if (getGameVersion() > 27) {
 		*getGlobalPtr(0x42FF + 0x82) = 1;
 	}
 }
 
 void Menu::enableKeysOnce() {
 	CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
-	if (getGameVersion() > G_VER_1_0_877_1_NOSTEAM) {
+	if (getGameVersion() > 27) {
 		*getGlobalPtr(0x42FF + 0x82) = 0;
 	}
 }
