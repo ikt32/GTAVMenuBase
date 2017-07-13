@@ -699,7 +699,15 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 			int imgWidth; 
 			int imgHeight;
 			std::string scanFormat = ImagePrefix + "%dW%dH%d";
-			sscanf_s(extra[i].c_str(), scanFormat.c_str(), &imgHandle, &imgWidth, &imgHeight);
+			int nParams = sscanf_s(extra[i].c_str(), scanFormat.c_str(), &imgHandle, &imgWidth, &imgHeight);
+			if (nParams != 3) {
+				std::string errTxt = "Format error: " + extra[i];
+				textDraws.push_back(
+					std::bind(&Menu::drawText, this,
+					errTxt, optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1));
+				finalHeight += optionHeight;
+				continue;
+			}
 			float drawWidth = menuWidth - 2.0f * menuTextMargin;
 			float drawHeight = (float)imgHeight * (drawWidth / (float)imgWidth);
 			float imgAspect = GRAPHICS::_GET_ASPECT_RATIO(FALSE);
