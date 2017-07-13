@@ -18,6 +18,11 @@ namespace NativeMenu {
 		int A;
 	};
 
+	struct Sprite {
+		std::string Dictionary;
+		std::string Name;
+	};
+
 	const Color solidWhite = { 255,	255, 255, 255 };
 	const Color solidBlack = { 0, 0, 0, 255 };
 

@@ -74,6 +74,13 @@ public:
 	void Subtitle(std::string subtitle, bool allcaps = true);
 
 	/*
+	 * Optional: Specify a different background texture for the footer.
+	 * If not used, solid black is used by default.
+	 */
+	void Footer(Color color);
+	void Footer(std::string dict, std::string texture);
+
+	/*
 	 * Normal option.
 	 * Shows nothing special.
 	 * Returns true on accept.
@@ -202,6 +209,12 @@ public:
 	int optionsFont = 0;
 
 private:
+	enum class FooterType {
+		Default,
+		Color,
+		Sprite
+	};
+
 	MenuControls controls;
 	MenuSettings settings;
 
@@ -281,6 +294,11 @@ private:
 	std::map<std::string, int> lastoption;
 	int menulevel = 0;
 	float headerHeight = 0.0f;
+	
+	FooterType footerType;
+	Color footerColor = { 0, 0, 0, 191 };
+	Sprite footerSprite;
+	int footerTextureHandle;
 
 	float safeX;
 	float safeY;

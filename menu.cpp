@@ -109,6 +109,7 @@ void Menu::Title(std::string title, std::string dict, std::string texture, float
 	backgroundSpriteDraws.push_back(
 		std::bind(&Menu::drawSprite, this, dict, texture,
 		menuX, titley, menuWidth, titleHeight, 0.0f, titleBackgroundColor));
+
 	totalHeight = titleHeight;
 	headerHeight = titleHeight;
 }
@@ -125,6 +126,14 @@ void Menu::Title(std::string title, int textureHandle, float customSize) {
 
 	float titletexty = menuY + totalHeight + titleTextOffset + titleTextOffset * 2.0f * (titleTextSize - customSize);
 	float titley = menuY + totalHeight + titleTextureOffset;
+	int newlines = 0;
+	for (auto c : title) {
+		if (c == '\n')
+			newlines++;
+	}
+	for (int i = 0; i < newlines; i++) {
+		titletexty -= titleHeight / 5.0f;
+	}
 
 	textDraws.push_back(
 		std::bind(&Menu::drawText, this, title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0));
@@ -132,10 +141,12 @@ void Menu::Title(std::string title, int textureHandle, float customSize) {
 	float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
 	float safeOffset = (1.0f - safeZone) * 0.5f;
 
+	// We don't worry about depth since SHV draws these on top of the game anyway
 	drawTexture(textureHandle, 0, -9999, 60,									 // handle, index, depth, time
 		menuWidth, titleHeight / GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.5f, 0.5f, // width, height, origin x, origin y
 		menuX + safeOffset, titley + safeOffset, 0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
 	
+
 	totalHeight = titleHeight;
 	headerHeight = titleHeight;
 }
@@ -157,6 +168,17 @@ void Menu::Subtitle(std::string subtitle, bool allcaps) {
 
 	totalHeight += subtitleHeight;
 	headerHeight += subtitleHeight;
+}
+
+void Menu::Footer(Color color) {
+	footerType = FooterType::Color;
+	footerColor = color;
+}
+
+void Menu::Footer(std::string dict, std::string texture) {
+	footerType = FooterType::Sprite;
+	footerSprite.Dictionary = dict;
+	footerSprite.Name = texture;
 }
 
 bool Menu::Option(std::string option, std::vector<std::string> details) {
@@ -465,12 +487,29 @@ void Menu::EndMenu() {
 	}
 	footerBackY = footerTextY + optionTextureOffset;
 
-
-	// Footer
-	backgroundSpriteDraws.push_back(
-		std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
-		menuX, footerBackY, menuWidth, optionHeight, 0.0f, titleBackgroundColor)
-	);
+	switch (footerType) {
+		case FooterType::Color: {
+			backgroundRectDraws.push_back(
+				std::bind(&Menu::drawRect, this,
+				menuX, footerBackY, menuWidth, optionHeight, footerColor)
+			);
+			break;
+		}
+		case FooterType::Sprite: {
+			backgroundSpriteDraws.push_back(
+				std::bind(&Menu::drawSprite, this, footerSprite.Dictionary, footerSprite.Name,
+				menuX, footerBackY, menuWidth, optionHeight, 0.0f, titleBackgroundColor)
+			);
+			break;
+		}
+		default: {
+			backgroundRectDraws.push_back(
+				std::bind(&Menu::drawRect, this,
+				menuX, footerBackY, menuWidth, optionHeight, solidBlack)
+			);
+			break;
+		}
+	}
 	
 	textDraws.push_back(
 		std::bind(&Menu::drawText, this, std::to_string(currentoption) + " / " + std::to_string(optioncount),
@@ -538,7 +577,7 @@ void Menu::EndMenu() {
 	foregroundSpriteCalls.clear();
 	textDraws.clear();
 	details.clear();
-
+	footerType = FooterType::Default;
 	disableKeys();
 
 	if (currentoption > optioncount) currentoption = optioncount;
