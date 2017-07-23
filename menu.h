@@ -56,7 +56,6 @@ public:
 	 * Returns true when inside the submenu menuname.
 	 */
 	bool CurrentMenu(std::string menuname);
-	void fitTitle(std::string &title, float &newSize, float titleSize);
 
 	/*
 	 * Always assign a title to a submenu!
@@ -65,11 +64,17 @@ public:
 	void Title(std::string title, float customSize);
 	void Title(std::string title, std::string dict, std::string texture);
 	void Title(std::string title, std::string dict, std::string texture, float customSize);
+
+	/*
+	 * Custom title textures have a resolution of 512x128, but any other
+	 * resolution with the same aspect ratio should work (4:1)
+	 */
 	void Title(std::string title, int textureHandle);
 	void Title(std::string title, int textureHandle, float customSize);
 
 	/*
-	 * A menu subtitle.
+	 * A menu subtitle. This is optional. If added, this must be added directly
+	 * below the title, before any options are specified.
 	 */
 	void Subtitle(std::string subtitle, bool allcaps = true);
 
@@ -172,30 +177,38 @@ public:
 
 	/*
 	 * Draws the menu backgrounds and processes menu navigation key inputs.
+	 * Must be called at the end of the menu processing block.
 	 */
 	void EndMenu();
 
 	/*
-	 * Use at the beginning of the menu update loop!
+	 * Must be used at the beginning of the menu update loop!
 	 * Checks input keys and processes them for navigation in the menu with MenuControls
 	 */
 	void CheckKeys();
 
 	/*
-	 * Closes the menu and calls onExit
+	 * Closes the menu and calls onExit.
 	 */
 	void CloseMenu();
 
+	/*
+	 * Returns the filled in menu controls. This can be used for display or 
+	 * input verification purposes.
+	 */
 	const MenuControls &GetControls();
 
+	/*
+	 * Image prefix string for if you want to show an image in an OptionPlus.
+	 */
 	const std::string ImagePrefix = "!IMG:";
 
 	// TODO: Refactor into Menu.Settings or provide accessors (r/w).
 	/*
 	 * These should be filled in by MenuSettings.ReadSettings().
 	 */
-	float menuX = 0.165f;
-	float menuY = 0.050f;
+	float menuX = 0.000;
+	float menuY = 0.000f;
 	
 	Color titleTextColor = solidWhite;
 	Color titleBackgroundColor = solidWhite;
@@ -287,11 +300,10 @@ private:
 	bool rightpress = false;
 	bool uppress = false;
 	bool downpress = false;
-	// Looks like we have 100 menu levels.
-	std::array<std::string, 100> currentmenu;
+	std::array<std::string, 100> currentmenu; 	// Looks like we have 100 menu levels.
 	std::string actualmenu;
 	//std::array<int, 100> lastoption;
-	std::map<std::string, int> lastoption;
+	std::map<std::string, int> lastoption; // lastoption is now per unique submenu
 	int menulevel = 0;
 	float headerHeight = 0.0f;
 	
@@ -325,6 +337,9 @@ private:
 
 	/*
 	 * Background textures!
+	 * This is... deprecated.
+	 * TODO: Remove and just use one default.
+	 * DONE: Allow user to specify custom texture.
 	 */
 	const std::vector<std::string> textureNames = {
 		"",
@@ -345,6 +360,9 @@ private:
 	int backgTextureIndex = 3;
 	int highlTextureIndex = 4;
 
+	/*
+	 * Functions! Should be self-explanatory.
+	 */
 	float getStringWidth(std::string text, float scale, int font);
 	std::vector<std::string> splitString(float maxWidth, std::string &details, float scale, int font);
 	void drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, Color color, int justify);
@@ -366,8 +384,7 @@ private:
 	void disableKeys();
 	void processMenuNav(std::function<void()> onMain, std::function<void()> onExit);
 	void updateScreenSize();
-	
-
+	void fitTitle(std::string &title, float &newSize, float titleSize);
 
 	template <typename T>
 	bool processOptionItemControls(T &var, T min, T max, T step) {
