@@ -11,11 +11,11 @@
 #include <functional>
 #include <array>
 #include <sstream>
+#include <unordered_map>
 
 #include "menucontrols.h"
 #include "menuutils.h"
 #include "menusettings.h"
-#include <map>
 
 namespace NativeMenu {
 class Menu {
@@ -222,6 +222,7 @@ public:
 	int optionsFont = 0;
 
 private:
+	static const unsigned maxMenus = 255;
 	enum class FooterType {
 		Default,
 		Color,
@@ -300,10 +301,10 @@ private:
 	bool rightpress = false;
 	bool uppress = false;
 	bool downpress = false;
-	std::array<std::string, 100> currentmenu; 	// Looks like we have 100 menu levels.
+	std::array<std::string, maxMenus> currentmenu;
 	std::string actualmenu;
 	//std::array<int, 100> lastoption;
-	std::map<std::string, int> lastoption; // lastoption is now per unique submenu
+	std::unordered_map<std::string, int> lastoption; // lastoption is now per unique submenu
 	int menulevel = 0;
 	float headerHeight = 0.0f;
 	
