@@ -308,15 +308,11 @@ private:
 	int menulevel = 0;
 	float headerHeight = 0.0f;
 	
-	FooterType footerType;
+	FooterType footerType = FooterType::Default;
 	Color footerColor = { 0, 0, 0, 191 };
 	Sprite footerSprite;
-	int footerTextureHandle;
 
-	float safeX;
-	float safeY;
-	float aspectR;
-	float aspectY;
+	float aspectR = 16.0f / 9.0f;
 
 	/*
 	 * Navigation-related members.

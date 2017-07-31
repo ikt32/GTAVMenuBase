@@ -264,7 +264,6 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra,
 					  std::function<void() > onRight, std::function<void() > onLeft, 
 					  std::string title, std::vector<std::string> details) {
 	Option(option, details);
-	float indicatorHeight = totalHeight - optionHeight;
 	size_t infoLines = extra.size();
 	bool highlighted = currentoption == optioncount;
 	if (currentoption == optioncount) {
@@ -293,7 +292,6 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool 
 					  std::function<void() > onRight, std::function<void() > onLeft,
 					  std::string title, std::vector<std::string> details) {
 	Option(option, details);
-	float indicatorHeight = totalHeight - optionHeight;
 	size_t infoLines = extra.size();
 	bool highlighted = currentoption == optioncount;
 	if (_highlighted != nullptr) {
