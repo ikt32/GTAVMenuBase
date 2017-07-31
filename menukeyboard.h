@@ -29,6 +29,8 @@ namespace NativeMenu {
 		// CTRL/SHIFT already have their left and right variants mapped
 		//keymap["SHIFT"] = VK_SHIFT;
 		//keymap["CTRL"] = VK_CONTROL;
+		{ "XB1" , VK_XBUTTON1 },
+		{ "XB2" , VK_XBUTTON2 },
 		{ "LMB" , VK_LBUTTON },
 		{ "RMB" , VK_RBUTTON },
 		{ "CANCEL" , VK_CANCEL },
