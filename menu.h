@@ -105,12 +105,22 @@ public:
 	 * Shows text with extra's specifyable in the detail pane.
 	 * Function pointers can be passed and are called on right, left press.
 	 * Custom pane title can be specified.
-	 * Extra draws image if a line is "!IMG:<file handle>W<height>H<width>".
+	 * Extra draws external image if a line is "!IMG:<file handle>W<height>H<width>".
+	 * Extra draws sprite if a line is "!SPR:D<dict>N<name>W<height>H<width>".
+	 * Extra can be left empty.
+	 * "highlighted" indicates the highlight status of the option. It can be a nullptr.
 	 * Returns true on accept.
 	 */
 	bool OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted = nullptr, 
 					std::function<void()> onRight = nullptr, std::function<void()> onLeft = nullptr ,
 					std::string title = "Info", std::vector<std::string> details = {});
+
+	/*
+	 * Can be used to draw the OptionPlus extras separately. Useful when generating
+	 * the extra text is costful or if no other things are needed. Running this when
+	 * OptionPlus is highlighted can improve performance.
+	 */
+	void OptionPlusPlus(std::vector<std::string> &extra, std::string title = "Info");
 
 	/*
 	 * Option that changes an int value with optional custom-sized steps.
@@ -194,6 +204,7 @@ public:
 	 * Image prefix string for if you want to show an image in an OptionPlus.
 	 */
 	const std::string ImagePrefix = "!IMG:";
+	const std::string SpritePrefix = "!SPR:";
 
 	// TODO: Refactor into Menu.Settings or provide accessors (r/w).
 	/*

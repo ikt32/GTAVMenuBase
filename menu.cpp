@@ -267,7 +267,7 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool 
 	size_t infoLines = extra.size();
 	bool highlighted = currentoption == optioncount;
 	if (_highlighted != nullptr) {
-		*_highlighted = currentoption == optioncount;
+		*_highlighted = highlighted;
 	}
 
 	if (currentoption == optioncount) {
@@ -283,13 +283,18 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool 
 		}
 	}
 
-	if (highlighted && ((currentoption <= maxDisplay && optioncount <= maxDisplay) ||
+	if (highlighted && infoLines > 0 && 
+		((currentoption <= maxDisplay && optioncount <= maxDisplay) ||
 		((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption))) {
 		drawAdditionalInfoBox(extra, infoLines, title);
 	}
 
 	if (optionpress && currentoption == optioncount) return true;
 	return false;
+}
+
+void Menu::OptionPlusPlus(std::vector<std::string> &extra, std::string title) {
+	drawAdditionalInfoBox(extra, extra.size(), title);
 }
 
 bool Menu::IntOption(std::string option, int &var, int min, int max, int step, std::vector<std::string> details) {
@@ -668,8 +673,12 @@ void Menu::drawRect(float x, float y, float width, float height, Color color) {
 }
 
 void Menu::drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, Color color) {
-	if (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(CharAdapter(textureDict))) GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(CharAdapter(textureDict), false);
-	else GRAPHICS::DRAW_SPRITE(CharAdapter(textureDict), CharAdapter(textureName), x, y, width, height, rotation, color.R, color.G, color.B, color.A);
+	if (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(CharAdapter(textureDict))) {
+		GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(CharAdapter(textureDict), false);
+	}
+	else {
+		GRAPHICS::DRAW_SPRITE(CharAdapter(textureDict), CharAdapter(textureName), x, y, width, height, rotation, color.R, color.G, color.B, color.A);
+	}
 }
 
 void Menu::drawAdditionalInfoBoxTitle(std::string title) {
@@ -727,11 +736,39 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLin
 			float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
 			float safeOffset = (1.0f - safeZone) * 0.5f;
 
-			drawTexture(imgHandle, 0, -9999, 60,											// handle, index, depth, time
-						drawWidth, drawHeight, 0.0f, 0.0f,									// width, height, origin x, origin y
-						imgXpos + safeOffset, imgYpos + safeOffset, 0.0f,												// pos x, pos y, rot
-						imgAspect, 1.0f, 1.0f, 1.0f, 1.0f);		// screen correct, rgba
+			drawTexture(imgHandle, 0, -9999, 60,							// handle, index, depth, time
+						drawWidth, drawHeight, 0.0f, 0.0f,					// width, height, origin x, origin y
+						imgXpos + safeOffset, imgYpos + safeOffset, 0.0f,	// pos x, pos y, rot
+						imgAspect, 1.0f, 1.0f, 1.0f, 1.0f);					// screen correct, rgba
 			finalHeight += (drawHeight + 2.0f * menuTextMargin) * imgAspect;
+		}
+		else if (!extra[i].compare(0, SpritePrefix.size(), SpritePrefix)) {
+			const unsigned max_sz = 128;
+			char dict[max_sz];
+			char name[max_sz];
+			int imgWidth;
+			int imgHeight;
+			std::string scanFormat = SpritePrefix + "%s %s W%dH%d";
+			int nParams = sscanf_s(extra[i].c_str(), scanFormat.c_str(), dict, max_sz, name, max_sz, &imgWidth, &imgHeight);
+			if (nParams != 4) {
+				std::string errTxt = "Format error: " + extra[i];
+				textDraws.push_back(
+					std::bind(&Menu::drawText, this,
+					errTxt, optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1));
+				finalHeight += optionHeight;
+				continue;
+			}
+			float drawWidth = menuWidth - 2.0f * menuTextMargin;
+			float drawHeight = (float)imgHeight * (drawWidth / (float)imgWidth) * GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+			float imgXpos = menuX + menuWidth / 2.0f + drawWidth / 2.0f + menuTextMargin;
+			float imgYpos = finalHeight + drawHeight/2.0f + (menuY + headerHeight) + menuTextMargin;
+			
+			foregroundSpriteCalls.push_back(
+				std::bind(&Menu::drawSprite, this, std::string(dict), std::string(name),
+				imgXpos, imgYpos, drawWidth, drawHeight, 0.0f, titleTextColor)
+			);
+			
+			finalHeight += (drawHeight + 2.0f * menuTextMargin);
 		}
 		else {
 			textDraws.push_back(
