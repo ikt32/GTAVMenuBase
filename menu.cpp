@@ -260,34 +260,6 @@ bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::str
 	return false;
 }
 
-bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra,
-					  std::function<void() > onRight, std::function<void() > onLeft, 
-					  std::string title, std::vector<std::string> details) {
-	Option(option, details);
-	size_t infoLines = extra.size();
-	bool highlighted = currentoption == optioncount;
-	if (currentoption == optioncount) {
-		if (onLeft && leftpress) {
-			onLeft();
-			leftpress = false;
-			return false;
-		}
-		if (onRight && rightpress) {
-			onRight();
-			rightpress = false;
-			return false;
-		}
-	}
-
-	if (highlighted && ((currentoption <= maxDisplay && optioncount <= maxDisplay) ||
-		((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption))) {
-		drawAdditionalInfoBox(extra, infoLines, title);
-	}
-
-	if (optionpress && currentoption == optioncount) return true;
-	return false;
-}
-
 bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool *_highlighted,
 					  std::function<void() > onRight, std::function<void() > onLeft,
 					  std::string title, std::vector<std::string> details) {
