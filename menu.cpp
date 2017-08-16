@@ -620,7 +620,7 @@ const MenuControls &Menu::GetControls() {
 
 float Menu::getStringWidth(std::string text, float scale, int font) {
 	UI::_SET_TEXT_ENTRY_FOR_WIDTH("STRING");
-	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
+	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char *)text.c_str());
 	UI::SET_TEXT_FONT( font);
 	UI::SET_TEXT_SCALE( scale, scale);
 	return UI::_GET_TEXT_SCREEN_WIDTH(true);
@@ -664,7 +664,7 @@ void Menu::drawText(const std::string text, int font, float x, float y, float pU
 	UI::SET_TEXT_SCALE(0.0f, scale);
 	UI::SET_TEXT_COLOUR(color.R, color.G, color.B, color.A);
 	UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
+	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char *)text.c_str());
 	UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y);
 }
 
@@ -673,11 +673,11 @@ void Menu::drawRect(float x, float y, float width, float height, Color color) {
 }
 
 void Menu::drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, Color color) {
-	if (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(CharAdapter(textureDict))) {
-		GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(CharAdapter(textureDict), false);
+	if (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED((char *)textureDict.c_str())) {
+		GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT((char *)textureDict.c_str(), false);
 	}
 	else {
-		GRAPHICS::DRAW_SPRITE(CharAdapter(textureDict), CharAdapter(textureName), x, y, width, height, rotation, color.R, color.G, color.B, color.A);
+		GRAPHICS::DRAW_SPRITE((char *)textureDict.c_str(), (char *)textureName.c_str(), x, y, width, height, rotation, color.R, color.G, color.B, color.A);
 	}
 }
 
