@@ -537,7 +537,7 @@ void Menu::EndMenu() {
 		);
 	}
 
-	GRAPHICS::_SET_SCREEN_DRAW_POSITION(76, 84);
+	GRAPHICS::_SCREEN_DRAW_POSITION_BEGIN(76, 84);
 	GRAPHICS::_SCREEN_DRAW_POSITION_RATIO(0, 0, 0, 0);
 	for (auto f : backgroundSpriteDraws) { f(); }
 	for (auto f : backgroundRectDraws) { f(); }
@@ -619,11 +619,11 @@ const MenuControls &Menu::GetControls() {
 }
 
 float Menu::getStringWidth(std::string text, float scale, int font) {
-	UI::_SET_TEXT_ENTRY_FOR_WIDTH("STRING");
+	UI::_BEGIN_TEXT_COMMAND_WIDTH("STRING");
 	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char *)text.c_str());
 	UI::SET_TEXT_FONT( font);
 	UI::SET_TEXT_SCALE( scale, scale);
-	return UI::_GET_TEXT_SCREEN_WIDTH(true);
+	return UI::_END_TEXT_COMMAND_GET_WIDTH(true);
 }
 
 std::vector<std::string> Menu::splitString(float maxWidth, std::string &details, float scale, int font) {
