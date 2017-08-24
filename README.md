@@ -93,7 +93,7 @@ To match the interaction menu, previously a Y of 0.1 was used. This should now b
 
 The X-position stays the same. This means X = 0.0 puts half the menu off-screen, since the center is taken as menu X-position.
 
-Since [commit 6848cfc](https://github.com/E66666666/GTAVMenuBase/commit/6848cfc6a355590a3230839de2c110505630544b), the position is moved to the top left. This makes `(0.0f, 0.0f)` sit flush with the safe zone.
+Since [commit 173a499](https://github.com/E66666666/GTAVMenuBase/commit/173a499c7b77242aeafd58d610a6bfa209571588), the position is moved to the top left. This makes `(0.0f, 0.0f)` sit flush with the safe zone.
 
 ### Methods
 OptionPlus had had some changes. As of [commit 3b37182](https://github.com/E66666666/GTAVMenuBase/commit/3b37182181e73c28439838b6107eae53a2844e03), the selected bool pointer is required again.
