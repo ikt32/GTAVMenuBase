@@ -43,92 +43,9 @@ git
 
 ## Usage
 
-A menu example:
+Check [GTAVMenuExample's implementation](https://github.com/E66666666/GTAVMenuExample/blob/master/GTAVMenuExample/script.cpp) to see the source code.
 
-```c++
-/*
- * update_menu() should be called each tick.
- */
-void update_menu() {
-	/*
-	 * Each tick, the controls are checked. If the key is hit to open
-	 * or close the menu, the binded functions are called.
-	 * This function has to be called for navigation to work.
-	 */
-	menu.CheckKeys();
-
-	/*
-	 *  You can define a menu like this. 
-	 *  The main menu should always be called "mainmenu".
-	 */ 
-	if (menu.CurrentMenu("mainmenu")) {
-		// The title is NOT optional.
-		menu.Title("Menu example");
-
-		// This is a normal option. It'll return true when "select" is presed.
-		if (menu.Option("Click me!", { "This will log something to " + Paths::GetModuleNameWithoutExtension() + ".log" })) {
-			showNotification("Check the logfile!");
-			logger.Write("\"Click me!\" was selected!");
-		}
-
-		// This will open a submenu with the name "submenu"
-		menu.MenuOption("Look, a submenu!", "submenu", { "This submenu demonstrates a few settings."});
-
-		// Showing static information is also possible if a string vector only contains one element.
-		int nothing = 0;
-		menu.StringArray("Version", { DISPLAY_VERSION }, nothing, 
-						 { "Thanks for checking out this menu!", "-ikt",  eGameVersionToString(getGameVersion())});
-	}
-
-	// Any submenus can have any titles. They should only need to match
-	// the name used to call them.
-	if (menu.CurrentMenu("submenu")) {
-		menu.Title("I'm a submenu!");
-
-		menu.BoolOption("Here's a checkbox", checkBoxStatus, { std::string("Boolean is ") + (checkBoxStatus ? "checked" : "not checked") + "." });
-		menu.IntOption("Ints!", someInt, -100, 100, intStep, { "Stepsize can be changed!" });
-		menu.IntOption("Int step size", intStep, 1, 100, 1, { "Stepsize can be changed!" });
-		menu.FloatOption("Floats?", someFloat, -100.0f, 100.0f, floatSteps[stepChoice], { "Try holding left/right, things should speed up." });
-		menu.FloatArray("Float step size", floatSteps, stepChoice, { "Something something magic!" });
-		menu.StringArray("String arrays", strings, stringsPos, { "You can also show different strings" });
-
-		menu.Option("Description info",
-		{ "You can put arbitarily long texts in the description. "
-		"Word wrapping magic should work! "
-		"That's why this subtext is so big ;)",
-		"Newlines",
-		"like so."});
-
-		// Some extra information can be shown on the right of the the menu.
-		// You do need to manage newlines yourself.
-		std::vector<std::string> extraInfo = {
-			"There's also some additional info",
-			"You can put descriptions or info here",
-			"Each string is a new line",
-			"The box expands by itself"
-		};
-		menu.OptionPlus("Look to the right!", extraInfo, std::bind(onLeft), std::bind(onRight), "Something", 
-		{"You do need to manage the line splitting yourself, as it's meant for short pieces of info."});
-	}
-
-	// Finally, draw all textures.
-	menu.EndMenu();
-}
-
-void main() {
-	menu.SetFiles(settingsMenuFile);
-	menu.RegisterOnMain(std::bind(onMain));
-	menu.RegisterOnExit(std::bind(onExit));
-
-	while (true) {
-		update_game();
-		update_menu();
-		WAIT(0);
-	}
-}
-```
-
-In which `update_menu()` is in the main update loop This should be called every tick.
+`update_menu()` is the main update loop. This should be called every tick.
 
 Required methods inside `update_menu()`:
 * `CheckKeys`
@@ -167,12 +84,21 @@ vector is automatically split up so it fits nicely within the detail pane. A new
 forced by adding more string items to the vector. For normal use a vector with a simple string
 should be enough.
 
-## Positioning
-Since [#PR 3](https://github.com/E66666666/GTAVMenuBase/commit/1e67e104453e5d401e6c171aadf8b6b86ae99efd), the Y-positioning of the menu changed. Previously Y = 0.0 used to put the title rectangle half off-screen. Now Y = 0.0 puts the title rectangle flush with the screen.
+## Changes
+
+### Positioning
+Since [PR #2](https://github.com/E66666666/GTAVMenuBase/commit/1e67e104453e5d401e6c171aadf8b6b86ae99efd), the Y-positioning of the menu changed. Previously Y = 0.0 used to put the title rectangle half off-screen. Now Y = 0.0 puts the title rectangle flush with the screen.
 
 To match the interaction menu, previously a Y of 0.1 was used. This should now be 0.05.
 
 The X-position stays the same. This means X = 0.0 puts half the menu off-screen, since the center is taken as menu X-position.
+
+Since [commit 6848cfc](https://github.com/E66666666/GTAVMenuBase/commit/6848cfc6a355590a3230839de2c110505630544b), the position is moved to the top left. This makes `(0.0f, 0.0f)` sit flush with the safe zone.
+
+### Methods
+OptionPlus had had some changes. As of [commit 3b37182](https://github.com/E66666666/GTAVMenuBase/commit/3b37182181e73c28439838b6107eae53a2844e03), the selected bool pointer is required again.
+
+Since [commit ec9477b](https://github.com/E66666666/GTAVMenuBase/commit/ec9477b0b203efc2fcc83e7dcce33045d2198917), the automatic uppercase menu subtitle argument is gone.
 
 ## Remarks
 If you're also not using [ScriptHookVDotNet](https://github.com/crosire/scripthookvdotnet) with [NativeUI](https://github.com/Guad/NativeUI) and just want something less painful than the mess that happens in the ScriptHookV Simple Trainer example, I hope this is of some use for you.
