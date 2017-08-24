@@ -56,5 +56,5 @@ namespace NativeMenu {
 
 	std::vector<std::string> split(const std::string &s, char delim);
 
-	std::string makeCaps(std::string input);
+	//std::string makeCaps(std::string input);
 }

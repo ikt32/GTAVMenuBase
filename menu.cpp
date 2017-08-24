@@ -151,10 +151,7 @@ void Menu::Title(std::string title, int textureHandle, float customSize) {
 	headerHeight = titleHeight;
 }
 
-void Menu::Subtitle(std::string subtitle, bool allcaps) {
-	if (allcaps)
-		subtitle = makeCaps(subtitle);
-	
+void Menu::Subtitle(std::string subtitle) {	
 	float subtitleY = subtitleTextureOffset + menuY + totalHeight;
 	float subtitleTextY = menuY + totalHeight;
 	textDraws.push_back(

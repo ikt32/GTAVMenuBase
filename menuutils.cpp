@@ -28,11 +28,16 @@ namespace NativeMenu {
 		return elems;
 	}
 
-std::string makeCaps(std::string input) {
+	/*std::string makeCaps(std::string input) {
 		std::locale loc;
 		std::stringstream caps;
-		for (std::string::size_type i = 0; i < input.length(); ++i)
+		for (std::string::size_type i = 0; i < input.length(); ++i) {
+			if (i > 0 && i < input.length() - 1 && input[i - 1] == '~' && input[i + 1] == '~') {
+				caps << input[i];
+				continue;
+			}
 			caps << std::toupper(input[i], loc);
+		}
 		return caps.str();
-	}
+	}*/
 }

@@ -76,7 +76,7 @@ public:
 	 * A menu subtitle. This is optional. If added, this must be added directly
 	 * below the title, before any options are specified.
 	 */
-	void Subtitle(std::string subtitle, bool allcaps = true);
+	void Subtitle(std::string subtitle);
 
 	/*
 	 * Optional: Specify a different background texture for the footer.
