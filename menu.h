@@ -369,7 +369,7 @@ private:
 	void drawRect(float x, float y, float width, float height, Color color);
 	void drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, Color color);
 	void drawAdditionalInfoBoxTitle(std::string title);
-	void drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines, std::string title = "Info");
+	void drawAdditionalInfoBox(std::vector<std::string> &extra, std::string title = "Info");
 	void drawMenuDetails(std::vector<std::string> details, float y);
 	void drawOptionValue(std::string printVar, bool highlighted, int max = 0);
 
