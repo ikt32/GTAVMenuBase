@@ -1,10 +1,5 @@
 #pragma once
 
-/*
- * Menu system that was originally from sudomod, but with a bunch of
- * changes to make working with it easier.
- */
-
 #include <string>
 #include <windows.h>
 #include <vector>

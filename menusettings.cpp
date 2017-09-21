@@ -33,8 +33,8 @@ namespace NativeMenu {
 
 #pragma warning(push)
 #pragma warning(disable: 4244)
-		menuOpts->menuX = settingsMenu.GetDoubleValue("MENU", "MenuX", 0.2);
-		menuOpts->menuY = settingsMenu.GetDoubleValue("MENU", "MenuY", 0.125);
+		menuOpts->menuX = settingsMenu.GetDoubleValue("MENU", "MenuX", 0.0);
+		menuOpts->menuY = settingsMenu.GetDoubleValue("MENU", "MenuY", 0.0);
 #pragma warning(pop)
 
 		// Title Text

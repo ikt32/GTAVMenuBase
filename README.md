@@ -1,6 +1,6 @@
 # GTA V Menu   
 
-This menu base was taken from SudoMod base once, but I changed things here and there and now I want to use it in multiple projects, so here's a repo. Full credits to the original authors!
+This is intended as a simple menu for SHV/C++ mods that mimics the looks of the game's menus.
 
 ![Comparison](MenuCompare.png)
 
@@ -86,16 +86,8 @@ should be enough.
 
 ## Changes
 
-### Positioning
-Since [PR #2](https://github.com/E66666666/GTAVMenuBase/commit/1e67e104453e5d401e6c171aadf8b6b86ae99efd), the Y-positioning of the menu changed. Previously Y = 0.0 used to put the title rectangle half off-screen. Now Y = 0.0 puts the title rectangle flush with the screen.
-
-To match the interaction menu, previously a Y of 0.1 was used. This should now be 0.05.
-
-The X-position stays the same. This means X = 0.0 puts half the menu off-screen, since the center is taken as menu X-position.
-
 Since [commit 173a499](https://github.com/E66666666/GTAVMenuBase/commit/173a499c7b77242aeafd58d610a6bfa209571588), the position is moved to the top left. This makes `(0.0f, 0.0f)` sit flush with the safe zone.
 
-### Methods
 OptionPlus had had some changes. As of [commit 3b37182](https://github.com/E66666666/GTAVMenuBase/commit/3b37182181e73c28439838b6107eae53a2844e03), the selected bool pointer is required again.
 
 Since [commit ec9477b](https://github.com/E66666666/GTAVMenuBase/commit/ec9477b0b203efc2fcc83e7dcce33045d2198917), the automatic uppercase menu subtitle argument is gone.
@@ -107,3 +99,9 @@ This thing started out as something I needed for [VStancer](https://github.com/E
 where unknown modder on GTA5-Mods linked me the SudoMod menu sources. 
 
 Good luck modding! 
+
+## Credits
+  * DireDan for the [original implementation for sudomod](https://www.unknowncheats.me/forum/grand-theft-auto-v/200692-originbase-sudomod-1-37-a.html)
+  * Sudomod authors
+  * NativeUI authors
+  * Unknown Modder
