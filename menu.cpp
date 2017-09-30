@@ -604,6 +604,16 @@ void Menu::CheckKeys() {
 
 }
 
+void Menu::OpenMenu() {
+	if (menulevel == 0) {
+		changeMenu("mainmenu");
+		updateScreenSize();
+		if (onMain) {
+			onMain();
+		}
+	}
+}
+
 void Menu::CloseMenu() {
 	while (menulevel > 0) {
 		backMenu();
@@ -999,11 +1009,7 @@ void Menu::processMenuNav(std::function<void()> onMain, std::function<void()> on
 		CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, controls.ControllerButton1) &&
 		CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, controls.ControllerButton2)) {
 		if (menulevel == 0) {
-			changeMenu("mainmenu");
-			updateScreenSize();
-			if (onMain) {
-				onMain();
-			}
+			OpenMenu();
 		}
 		else {
 			CloseMenu();
@@ -1066,4 +1072,5 @@ void Menu::updateScreenSize() {
 	aspectR = (16.0f / 9.0f)/GRAPHICS::_GET_ASPECT_RATIO(FALSE);
 	menuWidth = menuWidthOriginal*aspectR;
 }
+
 }

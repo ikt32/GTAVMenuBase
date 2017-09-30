@@ -185,6 +185,13 @@ public:
 	void CheckKeys();
 
 	/*
+	 * Opens the menu programmatically and calls onMain.
+	 * Does nothing if the menu is already open.
+	 */
+	void OpenMenu();
+
+
+	/*
 	 * Closes the menu and calls onExit.
 	 */
 	void CloseMenu();
