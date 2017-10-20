@@ -929,70 +929,23 @@ void Menu::disableKeys() {
 	disableKeysOnce();
 
 	UI::HIDE_HELP_TEXT_THIS_FRAME();
-	UI::HIDE_HUD_COMPONENT_THIS_FRAME(10);
-	UI::HIDE_HUD_COMPONENT_THIS_FRAME(6);
-	UI::HIDE_HUD_COMPONENT_THIS_FRAME(7);
-	UI::HIDE_HUD_COMPONENT_THIS_FRAME(9);
-	UI::HIDE_HUD_COMPONENT_THIS_FRAME(8);
+    UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentVehicleName);
+    UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentAreaName);
+    UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentUnused);
+    UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentStreetName);
+    UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentHelpText);
 
-	for (int i = 0; i <= 2; i++) {
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlNextCamera, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleCinCam, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlCinematicSlowMo, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlPhone, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterMichael, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterFranklin, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterTrevor, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectCharacterMultiplayer, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlCharacterWheel, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMeleeAttackLight, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMeleeAttackHeavy, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMeleeAttackAlternate, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMap, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMultiplayerInfo, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlMapPointOfInterest, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlRadioWheelLeftRight, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleNextRadio, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehiclePrevRadio, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlRadioWheelUpDown, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleNextRadioTrack, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehiclePrevRadioTrack, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleRadioWheel, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleDuck, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleSelectNextWeapon, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleSelectPrevWeapon, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleAttack, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleAttack2, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleExit, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectWeapon, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlWeaponWheelNext, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlWeaponWheelPrev, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlNextWeapon, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlPrevWeapon, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectWeapon, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlContext, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlContextSecondary, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSelectWeapon, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleHeadlight, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleRoof, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleHorn, true);
-
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehicleAim, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlVehiclePassengerAim, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlFrontendSocialClub, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlFrontendSocialClubSecondary, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlReplayStartStopRecording, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlInteractionMenu, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(i, ControlSaveReplayClip, true);
-	}
+    // sjaak327
+    // http://gtaforums.com/topic/796908-simple-trainer-for-gtav/?view=findpost&p=1069587144
+    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlPhone, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlTalk, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleHeadlight, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleCinCam, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleRadioWheel, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlMeleeAttackLight, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlMeleeAttackHeavy, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlMeleeAttackAlternate, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlMeleeBlock, true);
 }
 
 void Menu::processMenuNav(std::function<void()> onMain, std::function<void()> onExit) {
