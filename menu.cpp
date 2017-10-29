@@ -625,6 +625,10 @@ const MenuControls &Menu::GetControls() {
 	return controls;
 }
 
+bool Menu::IsThisOpen() {
+    return menulevel > 0;
+}
+
 float Menu::getStringWidth(std::string text, float scale, int font) {
 	UI::_BEGIN_TEXT_COMMAND_WIDTH("STRING");
 	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char *)text.c_str());

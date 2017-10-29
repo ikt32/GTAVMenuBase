@@ -202,7 +202,12 @@ public:
 	 */
 	const MenuControls &GetControls();
 
-	/*
+    /*
+	 * Returns true if this instance of the menu is open
+	 */
+	bool IsThisOpen();
+
+    /*
 	 * Image prefix string for if you want to show an image in an OptionPlus.
 	 */
 	const std::string ImagePrefix = "!IMG:";
