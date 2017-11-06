@@ -213,13 +213,13 @@ public:
 	const std::string ImagePrefix = "!IMG:";
 	const std::string SpritePrefix = "!SPR:";
 
-	// TODO: Refactor into Menu.Settings or provide accessors (r/w).
 	/*
 	 * These should be filled in by MenuSettings.ReadSettings().
 	 */
-	float menuX = 0.000;
+	float menuX = 0.000f;
 	float menuY = 0.000f;
-	
+    std::string cheatString = "";
+
 	Color titleTextColor = solidWhite;
 	Color titleBackgroundColor = solidWhite;
 	int titleFont = 1;

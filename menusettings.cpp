@@ -31,6 +31,8 @@ namespace NativeMenu {
 		control->ControllerButton1 = settingsMenu.GetLongValue("MENU", "ControllerButton1", -1);
 		control->ControllerButton2 = settingsMenu.GetLongValue("MENU", "ControllerButton2", -1);
 
+        menuOpts->cheatString = settingsMenu.GetValue("MENU", "CheatString", "");
+
 #pragma warning(push)
 #pragma warning(disable: 4244)
 		menuOpts->menuX = settingsMenu.GetDoubleValue("MENU", "MenuX", 0.0);

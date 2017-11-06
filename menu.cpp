@@ -557,6 +557,11 @@ void Menu::EndMenu() {
 }
 
 void Menu::CheckKeys() {
+    if (cheatString != "") {
+        if (GAMEPLAY::_HAS_CHEAT_STRING_JUST_BEEN_ENTERED(GAMEPLAY::GET_HASH_KEY((char*)cheatString.c_str()))) {
+            OpenMenu();
+        }
+    }
 	controls.Update();
 	optionpress = false;
 
