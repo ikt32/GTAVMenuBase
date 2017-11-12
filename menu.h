@@ -86,6 +86,7 @@ public:
 	 * Returns true on accept.
 	 */
 	bool Option(std::string option, std::vector<std::string> details = {});
+    bool Option(std::string option, Color highlight, std::vector<std::string> details = {});
 
 	/*
 	 * Submenu option.

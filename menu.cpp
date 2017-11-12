@@ -179,48 +179,64 @@ void Menu::Footer(std::string dict, std::string texture) {
 }
 
 bool Menu::Option(std::string option, std::vector<std::string> details) {
-	optioncount++;
+    return Option(option, optionsBackgroundSelectColor, details);
+}
 
-	bool highlighted = currentoption == optioncount;
-	
+bool Menu::Option(std::string option, Color highlight, std::vector<std::string> details) {
+    optioncount++;
 
-	bool visible = false;
-	float optiony;
-	float optiontexty;
+    bool highlighted = currentoption == optioncount;
 
-	if (currentoption <= maxDisplay && optioncount <= maxDisplay) {
-		visible = true;
-		optiontexty = menuY + totalHeight;
-		optiony = optiontexty + optionTextureOffset;
-	}
-	else if (optioncount > currentoption - maxDisplay && optioncount <= currentoption) {
-		visible = true;
-		optiontexty = menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight;
-		optiony = optiontexty + optionTextureOffset;
-	}
 
-	if (visible) {
-		textDraws.push_back(
-			std::bind(&Menu::drawText, this, 
-			option, optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, optiontexty, optionTextSize, optionTextSize, highlighted ? optionsTextSelectColor : optionsTextColor, 1
-			)
-		);
+    bool visible = false;
+    float optiony;
+    float optiontexty;
 
-		if (highlighted) {
-			highlightsSpriteDraws.push_back(
-				std::bind(&Menu::drawSprite, this, textureDicts[highlTextureIndex], textureNames[highlTextureIndex],
-				menuX, optiony, menuWidth, optionHeight, 0.0f, optionsBackgroundSelectColor)
-			);
-			
-			if (details.size() > 0) {
-				this->details = details;
-			}
-		}
-	}
-	
-	totalHeight += optionHeight;
-	if (optionpress && currentoption == optioncount) return true;
-	return false;
+    if (currentoption <= maxDisplay && optioncount <= maxDisplay) {
+        visible = true;
+        optiontexty = menuY + totalHeight;
+        optiony = optiontexty + optionTextureOffset;
+    }
+    else if (optioncount > currentoption - maxDisplay && optioncount <= currentoption) {
+        visible = true;
+        optiontexty = menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight;
+        optiony = optiontexty + optionTextureOffset;
+    }
+
+    if (visible) {
+        const float big_ass_Chalet_London_mult = optionsFont == 0 ? 0.75f : 1.0f;
+        bool appendDots = false;
+        while (getStringWidth(option, optionTextSize * big_ass_Chalet_London_mult, optionsFont) > (menuWidth - 2.0f*menuTextMargin)) {
+            option.pop_back();
+            appendDots = true;
+        }
+        if (appendDots) {
+            option.pop_back();
+            option.pop_back();
+            option.pop_back();
+            option += "...";
+        }
+        textDraws.push_back(
+            std::bind(&Menu::drawText, this,
+                option, optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, optiontexty, optionTextSize, optionTextSize, highlighted ? optionsTextSelectColor : optionsTextColor, 1
+            )
+        );
+
+        if (highlighted) {
+            highlightsSpriteDraws.push_back(
+                std::bind(&Menu::drawSprite, this, textureDicts[highlTextureIndex], textureNames[highlTextureIndex],
+                    menuX, optiony, menuWidth, optionHeight, 0.0f, highlight)
+            );
+
+            if (details.size() > 0) {
+                this->details = details;
+            }
+        }
+    }
+
+    totalHeight += optionHeight;
+    if (optionpress && currentoption == optioncount) return true;
+    return false;
 }
 
 bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::string> details) {
@@ -788,7 +804,7 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, std::string ti
 		}
 		else {
 			std::vector<std::string> splitExtra;
-			float big_ass_Chalet_London_mult = optionsFont == 0 ? 0.75f : 1.0f;
+            const float big_ass_Chalet_London_mult = optionsFont == 0 ? 0.75f : 1.0f;
 			auto splitLines = splitString(menuWidth, extra[i], optionTextSize * big_ass_Chalet_London_mult, optionsFont);
 			splitExtra.insert(std::end(splitExtra), std::begin(splitLines), std::end(splitLines));
 
@@ -812,7 +828,7 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, std::string ti
 
 void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 	std::vector<std::string> splitDetails;
-	float big_ass_Chalet_London_mult = optionsFont == 0 ? 0.75f : 1.0f;
+    const float big_ass_Chalet_London_mult = optionsFont == 0 ? 0.75f : 1.0f;
 	for (auto detailLine : details) {
 		auto splitLines = splitString(menuWidth, detailLine, optionTextSize * big_ass_Chalet_London_mult, optionsFont);
 		splitDetails.insert(std::end(splitDetails), std::begin(splitLines), std::end(splitLines));
