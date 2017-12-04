@@ -141,10 +141,18 @@ void Menu::Title(std::string title, int textureHandle, float customSize) {
 	float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
 	float safeOffset = (1.0f - safeZone) * 0.5f;
 
+    float titleX = menuX;
+    float ar = GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+
+    // game allows max 16/9 ratio for UI elements
+    if (ar > 16.0f / 9.0f) {
+        titleX += (ar - 16.0f / 9.0f) / (2.0f * ar);
+    }
+
 	// We don't worry about depth since SHV draws these on top of the game anyway
 	drawTexture(textureHandle, 0, -9999, 60,									 // handle, index, depth, time
 		menuWidth, titleHeight / GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.5f, 0.5f, // width, height, origin x, origin y
-		menuX + safeOffset, titley + safeOffset, 0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
+		titleX + safeOffset, titley + safeOffset, 0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
 	
 
 	totalHeight = titleHeight;
@@ -760,19 +768,24 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, std::string ti
 			}
 			float drawWidth = menuWidth - 2.0f * menuTextMargin;
 			float drawHeight = (float)imgHeight * (drawWidth / (float)imgWidth);
-			float imgAspect = GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-			float imgXpos = menuX + menuWidth / 2.0f + menuTextMargin;
-			float imgYpos = finalHeight + (menuY + headerHeight) + menuTextMargin * imgAspect;
+			float imgXpos = (menuX + menuWidth / 2.0f + menuTextMargin);
+			float imgYpos = finalHeight + (menuY + headerHeight) + menuTextMargin;
 
+            float ar = GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+            
+            // game allows max 16/9 ratio for UI elements
+            if (ar > 16.0f / 9.0f) {
+                imgXpos += (ar - 16.0f / 9.0f) / (2.0f * ar);
+            }
 
 			float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
 			float safeOffset = (1.0f - safeZone) * 0.5f;
 
-			drawTexture(imgHandle, 0, -9999, 60,							// handle, index, depth, time
-						drawWidth, drawHeight, 0.0f, 0.0f,					// width, height, origin x, origin y
-						imgXpos + safeOffset, imgYpos + safeOffset, 0.0f,	// pos x, pos y, rot
-						imgAspect, 1.0f, 1.0f, 1.0f, 1.0f);					// screen correct, rgba
-			finalHeight += (drawHeight + 2.0f * menuTextMargin) * imgAspect;
+            drawTexture(imgHandle, 0, -9999, 60,                    // handle, index, depth, time
+                drawWidth, drawHeight, 0.0f, 0.0f,                  // width, height, origin x, origin y
+                imgXpos + safeOffset, imgYpos + safeOffset, 0.0f,   // pos x, pos y, rot
+                ar, 1.0f, 1.0f, 1.0f, 1.0f);                        // screen correct, rgba
+            finalHeight += drawHeight * ar + 2.0f * menuTextMargin;
 		}
 		else if (!extra[i].compare(0, SpritePrefix.size(), SpritePrefix)) {
 			const unsigned max_sz = 128;
