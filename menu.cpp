@@ -140,21 +140,36 @@ void Menu::Title(std::string title, int textureHandle, float customSize) {
 
 	float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
 	float safeOffset = (1.0f - safeZone) * 0.5f;
+    float safeOffsetX = safeOffset;
 
     float titleX = menuX;
     float ar = GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float ar_true = GRAPHICS::_GET_ASPECT_RATIO(TRUE);
 
     // game allows max 16/9 ratio for UI elements
     if (ar > 16.0f / 9.0f) {
         titleX += (ar - 16.0f / 9.0f) / (2.0f * ar);
     }
 
+    float drawWidth = menuWidth;
+    // handle multi-monitor setups
+    if (ar_true > ar) {
+        if (ar > 16.0f / 9.0f) {
+            titleX -= (ar - 16.0f / 9.0f) / (2.0f * ar);
+        }
+
+        titleX /= ar_true / ar;
+        titleX += ar / ar_true;
+
+        drawWidth *= ar / ar_true;
+        safeOffsetX *= ar / ar_true;
+    }
+
 	// We don't worry about depth since SHV draws these on top of the game anyway
 	drawTexture(textureHandle, 0, -9999, 60,									 // handle, index, depth, time
-		menuWidth, titleHeight / GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.5f, 0.5f, // width, height, origin x, origin y
-		titleX + safeOffset, titley + safeOffset, 0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
+        drawWidth, titleHeight / GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.5f, 0.5f, // width, height, origin x, origin y
+		titleX + safeOffsetX, titley + safeOffset, 0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
 	
-
 	totalHeight = titleHeight;
 	headerHeight = titleHeight;
 }
@@ -781,19 +796,35 @@ void Menu::drawOptionPlusImage(std::string &extra, float &finalHeight) {
     float imgXpos = (menuX + menuWidth / 2.0f + menuTextMargin);
     float imgYpos = finalHeight + (menuY + headerHeight) + menuTextMargin;
 
+    float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
+    float safeOffset = (1.0f - safeZone) * 0.5f;
+    float safeOffsetX = safeOffset;
+
     float ar = GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-            
+
     // game allows max 16/9 ratio for UI elements
     if (ar > 16.0f / 9.0f) {
         imgXpos += (ar - 16.0f / 9.0f) / (2.0f * ar);
     }
 
-    float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
-    float safeOffset = (1.0f - safeZone) * 0.5f;
+
+    // handle multi-monitor setups
+    float ar_true = GRAPHICS::_GET_ASPECT_RATIO(TRUE);
+    if (ar_true > ar) {
+        if (ar > 16.0f / 9.0f) {
+            imgXpos -= (ar - 16.0f / 9.0f) / (2.0f * ar);
+        }
+
+        imgXpos /= ar_true / ar;
+        imgXpos += ar/ar_true;
+
+        drawWidth *= ar / ar_true;
+        safeOffsetX *= ar / ar_true;
+    }
 
     drawTexture(imgHandle, 0, -9999, 60,                            // handle, index, depth, time
                 drawWidth, drawHeight, 0.0f, 0.0f,                  // width, height, origin x, origin y
-                imgXpos + safeOffset, imgYpos + safeOffset, 0.0f,   // pos x, pos y, rot
+                imgXpos + safeOffsetX, imgYpos + safeOffset, 0.0f,   // pos x, pos y, rot
                 ar, 1.0f, 1.0f, 1.0f, 1.0f);                        // screen correct, rgba
     finalHeight += drawHeight * ar + 2.0f * menuTextMargin;
 }
