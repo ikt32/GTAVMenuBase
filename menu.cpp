@@ -8,19 +8,19 @@
 #include "menucontrols.h"
 #include "menuutils.h"
 #include <locale>
+#include "Scaleform.h"
+#include "InstructionalButton.h"
 
 // TODO: Fixes:
-//		- Reduce code duplication (titles, OptionPlus title)
-//		- OptionPlus title scaling/chopping
-//		- OptionPlus line chopping
-//		- Handle long menu names
-//		- Handle Chalet London scaling
-//		- Check FloatArray refactoring possibilities
+//      - Reduce code duplication (titles, OptionPlus title)
+//      - Handle Chalet London scaling
 
 // TODO: Improvements:
-//		- Mouse support
-//		- Badges?
-//		- Support longer lists by removing radar
+//      - Mouse support
+//      - Badges?
+
+// TODO: Never:
+//      - Re-write to OO
 
 namespace NativeMenu {
 
@@ -574,6 +574,27 @@ void Menu::EndMenu() {
 	textDraws.clear();
 	details.clear();
 	footerType = FooterType::Default;
+
+    std::vector<InstructionalButton> instructionalButtons;
+    Scaleform instructionalButtonsScaleform("instructional_buttons");
+
+    instructionalButtonsScaleform.CallFunction("CLEAR_ALL");
+    instructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", { 0 });
+    instructionalButtonsScaleform.CallFunction("CREATE_CONTAINER");
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 0, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneSelect, 0)), std::string(UI::_GET_LABEL_TEXT("HUD_INPUT2")) });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 1, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneCancel, 0)), std::string(UI::_GET_LABEL_TEXT("HUD_INPUT3")) });
+    
+    //int count = 2;
+    //for (auto button : instructionalButtons) {
+    //    if (button.ItemBind == null || MenuItems[CurrentSelection] == button.ItemBind) {
+    //        instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { count, button.GetButtonId(), button.Text });
+    //        count++;
+    //    }
+    //}
+
+    instructionalButtonsScaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", std::vector<std::any>{ -1 });
+    instructionalButtonsScaleform.Render2D();
+
 	disableKeys();
 
 	if (currentoption > optioncount) currentoption = optioncount;
@@ -591,8 +612,8 @@ void Menu::CheckKeys() {
 
 	if (GetTickCount() - delay > menuTime ||
 		controls.IsKeyJustPressed(MenuControls::MenuKey) ||
-		controls.IsKeyJustPressed(MenuControls::MenuSelect) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendAccept) ||
-		controls.IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendCancel) ||
+		controls.IsKeyJustPressed(MenuControls::MenuSelect) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneSelect) ||
+		controls.IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneCancel) ||
 		controls.IsKeyJustPressed(MenuControls::MenuUp) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendUp) ||
 		controls.IsKeyJustPressed(MenuControls::MenuDown) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendDown) ||
 		controls.IsKeyJustPressed(MenuControls::MenuLeft) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneLeft) ||
@@ -608,8 +629,8 @@ void Menu::CheckKeys() {
 		controls.IsKeyJustReleased(MenuControls::MenuDown) || controls.IsKeyJustPressed(MenuControls::MenuDown) ||
 		controls.IsKeyJustReleased(MenuControls::MenuLeft) || controls.IsKeyJustPressed(MenuControls::MenuLeft) ||
 		controls.IsKeyJustReleased(MenuControls::MenuRight) || controls.IsKeyJustPressed(MenuControls::MenuRight) ||
-		CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendAccept) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendAccept) ||
-		CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendCancel) ||
+		CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneSelect) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlPhoneSelect) ||
+		CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneCancel) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlPhoneCancel) ||
 		CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendUp) ||
 		CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendDown) ||
 		CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlPhoneLeft) ||
@@ -722,13 +743,16 @@ void Menu::drawSprite(std::string textureDict, std::string textureName, float x,
 }
 
 void Menu::drawAdditionalInfoBoxTitle(std::string title) {
+    float newSize;
+    fitTitle(title, newSize, titleTextSize);
+
 	float extrax = menuX + menuWidth;
 
 	float titletexty = menuY + titleTextOffset;
 	float titley = menuY + titleTextureOffset;
 
 	textDraws.push_back(
-		std::bind(&Menu::drawText, this, title, titleFont, extrax, titletexty, titleTextSize, titleTextSize, titleTextColor, 0)
+		std::bind(&Menu::drawText, this, title, titleFont, extrax, titletexty, newSize, newSize, titleTextColor, 0)
 	);
 
 	backgroundSpriteDraws.push_back(
