@@ -307,7 +307,7 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool 
 	if (highlighted && infoLines > 0 && 
 		((currentoption <= maxDisplay && optioncount <= maxDisplay) ||
 		((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption))) {
-		drawAdditionalInfoBox(extra, title);
+		drawOptionPlusExtras(extra, title);
 	}
 
 	if (optionpress && currentoption == optioncount) return true;
@@ -315,7 +315,7 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool 
 }
 
 void Menu::OptionPlusPlus(std::vector<std::string> &extra, std::string title) {
-	drawAdditionalInfoBox(extra, title);
+	drawOptionPlusExtras(extra, title);
 }
 
 bool Menu::IntOption(std::string option, int &var, int min, int max, int step, std::vector<std::string> details) {
@@ -742,7 +742,7 @@ void Menu::drawSprite(std::string textureDict, std::string textureName, float x,
 	}
 }
 
-void Menu::drawAdditionalInfoBoxTitle(std::string title) {
+void Menu::drawOptionPlusTitle(std::string title) {
     float newSize;
     fitTitle(title, newSize, titleTextSize);
 
@@ -762,9 +762,91 @@ void Menu::drawAdditionalInfoBoxTitle(std::string title) {
 	
 }
 
-void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, std::string title) {
+void Menu::drawOptionPlusImage(std::string &extra, float &finalHeight) {
+    int imgHandle;
+    int imgWidth; 
+    int imgHeight;
+    std::string scanFormat = ImagePrefix + "%dW%dH%d";
+    int nParams = sscanf_s(extra.c_str(), scanFormat.c_str(), &imgHandle, &imgWidth, &imgHeight);
+    if (nParams != 3) {
+        std::string errTxt = "Format error: " + extra;
+        textDraws.push_back(
+            std::bind(&Menu::drawText, this,
+                      errTxt, optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1));
+        finalHeight += optionHeight;
+        return;
+    }
+    float drawWidth = menuWidth - 2.0f * menuTextMargin;
+    float drawHeight = (float)imgHeight * (drawWidth / (float)imgWidth);
+    float imgXpos = (menuX + menuWidth / 2.0f + menuTextMargin);
+    float imgYpos = finalHeight + (menuY + headerHeight) + menuTextMargin;
+
+    float ar = GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+            
+    // game allows max 16/9 ratio for UI elements
+    if (ar > 16.0f / 9.0f) {
+        imgXpos += (ar - 16.0f / 9.0f) / (2.0f * ar);
+    }
+
+    float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
+    float safeOffset = (1.0f - safeZone) * 0.5f;
+
+    drawTexture(imgHandle, 0, -9999, 60,                            // handle, index, depth, time
+                drawWidth, drawHeight, 0.0f, 0.0f,                  // width, height, origin x, origin y
+                imgXpos + safeOffset, imgYpos + safeOffset, 0.0f,   // pos x, pos y, rot
+                ar, 1.0f, 1.0f, 1.0f, 1.0f);                        // screen correct, rgba
+    finalHeight += drawHeight * ar + 2.0f * menuTextMargin;
+}
+
+void Menu::drawOptionPlusSprite(std::string &extra, float &finalHeight) {
+    const unsigned max_sz = 128;
+    char dict[max_sz];
+    char name[max_sz];
+    int imgWidth;
+    int imgHeight;
+    std::string scanFormat = SpritePrefix + "%s %s W%dH%d";
+    int nParams = sscanf_s(extra.c_str(), scanFormat.c_str(), dict, max_sz, name, max_sz, &imgWidth, &imgHeight);
+    if (nParams != 4) {
+        std::string errTxt = "Format error: " + extra;
+        textDraws.push_back(
+            std::bind(&Menu::drawText, this,
+                      errTxt, optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1));
+        finalHeight += optionHeight;
+        return;
+    }
+    float drawWidth = menuWidth - 2.0f * menuTextMargin;
+    float drawHeight = (float)imgHeight * (drawWidth / (float)imgWidth) * GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float imgXpos = menuX + menuWidth / 2.0f + drawWidth / 2.0f + menuTextMargin;
+    float imgYpos = finalHeight + drawHeight/2.0f + (menuY + headerHeight) + menuTextMargin;
+			
+    foregroundSpriteCalls.push_back(
+        std::bind(&Menu::drawSprite, this, std::string(dict), std::string(name),
+                  imgXpos, imgYpos, drawWidth, drawHeight, 0.0f, titleTextColor)
+    );
+			
+    finalHeight += drawHeight + 2.0f * menuTextMargin;
+}
+
+void Menu::drawOptionPlusText(std::string &extra, float &finalHeight) {
+    std::vector<std::string> splitExtra;
+    const float big_ass_Chalet_London_mult = optionsFont == 0 ? 0.75f : 1.0f;
+    auto splitLines = splitString(menuWidth, extra, optionTextSize * big_ass_Chalet_London_mult, optionsFont);
+    splitExtra.insert(std::end(splitExtra), std::begin(splitLines), std::end(splitLines));
+
+    for (auto line = 0; line < splitExtra.size(); line++) {
+        textDraws.push_back(
+            std::bind(&Menu::drawText, this,
+                      splitExtra[line], optionsFont, 
+                      menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight) + line * optionHeight, 
+                      optionTextSize, optionTextSize, 
+                      optionsTextColor, 1));
+    }
+    finalHeight += splitExtra.size() * optionHeight;
+}
+
+void Menu::drawOptionPlusExtras(std::vector<std::string> &extras, std::string title) {
 	float extrax = menuX + menuWidth;
-	drawAdditionalInfoBoxTitle(title);
+	drawOptionPlusTitle(title);
 
 	if (headerHeight == titleHeight + subtitleHeight) {
 		float subtitleY = subtitleTextureOffset + menuY + titleHeight;
@@ -775,91 +857,21 @@ void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, std::string ti
 
 	float finalHeight = 0;
 
-	for (int i = 0; i < extra.size(); i++) {
-		if (!extra[i].compare(0, ImagePrefix.size(), ImagePrefix)) {
-			int imgHandle;
-			int imgWidth; 
-			int imgHeight;
-			std::string scanFormat = ImagePrefix + "%dW%dH%d";
-			int nParams = sscanf_s(extra[i].c_str(), scanFormat.c_str(), &imgHandle, &imgWidth, &imgHeight);
-			if (nParams != 3) {
-				std::string errTxt = "Format error: " + extra[i];
-				textDraws.push_back(
-					std::bind(&Menu::drawText, this,
-					errTxt, optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1));
-				finalHeight += optionHeight;
-				continue;
-			}
-			float drawWidth = menuWidth - 2.0f * menuTextMargin;
-			float drawHeight = (float)imgHeight * (drawWidth / (float)imgWidth);
-			float imgXpos = (menuX + menuWidth / 2.0f + menuTextMargin);
-			float imgYpos = finalHeight + (menuY + headerHeight) + menuTextMargin;
-
-            float ar = GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-            
-            // game allows max 16/9 ratio for UI elements
-            if (ar > 16.0f / 9.0f) {
-                imgXpos += (ar - 16.0f / 9.0f) / (2.0f * ar);
-            }
-
-			float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
-			float safeOffset = (1.0f - safeZone) * 0.5f;
-
-            drawTexture(imgHandle, 0, -9999, 60,                    // handle, index, depth, time
-                drawWidth, drawHeight, 0.0f, 0.0f,                  // width, height, origin x, origin y
-                imgXpos + safeOffset, imgYpos + safeOffset, 0.0f,   // pos x, pos y, rot
-                ar, 1.0f, 1.0f, 1.0f, 1.0f);                        // screen correct, rgba
-            finalHeight += drawHeight * ar + 2.0f * menuTextMargin;
+	for (auto extra : extras) {
+		if (extra.compare(0, ImagePrefix.size(), ImagePrefix) == 0) {
+            drawOptionPlusImage(extra, finalHeight);
 		}
-		else if (!extra[i].compare(0, SpritePrefix.size(), SpritePrefix)) {
-			const unsigned max_sz = 128;
-			char dict[max_sz];
-			char name[max_sz];
-			int imgWidth;
-			int imgHeight;
-			std::string scanFormat = SpritePrefix + "%s %s W%dH%d";
-			int nParams = sscanf_s(extra[i].c_str(), scanFormat.c_str(), dict, max_sz, name, max_sz, &imgWidth, &imgHeight);
-			if (nParams != 4) {
-				std::string errTxt = "Format error: " + extra[i];
-				textDraws.push_back(
-					std::bind(&Menu::drawText, this,
-					errTxt, optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1));
-				finalHeight += optionHeight;
-				continue;
-			}
-			float drawWidth = menuWidth - 2.0f * menuTextMargin;
-			float drawHeight = (float)imgHeight * (drawWidth / (float)imgWidth) * GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-			float imgXpos = menuX + menuWidth / 2.0f + drawWidth / 2.0f + menuTextMargin;
-			float imgYpos = finalHeight + drawHeight/2.0f + (menuY + headerHeight) + menuTextMargin;
-			
-			foregroundSpriteCalls.push_back(
-				std::bind(&Menu::drawSprite, this, std::string(dict), std::string(name),
-				imgXpos, imgYpos, drawWidth, drawHeight, 0.0f, titleTextColor)
-			);
-			
-			finalHeight += (drawHeight + 2.0f * menuTextMargin);
+		else if (extra.compare(0, SpritePrefix.size(), SpritePrefix) == 0) {
+			drawOptionPlusSprite(extra, finalHeight);
 		}
 		else {
-			std::vector<std::string> splitExtra;
-            const float big_ass_Chalet_London_mult = optionsFont == 0 ? 0.75f : 1.0f;
-			auto splitLines = splitString(menuWidth, extra[i], optionTextSize * big_ass_Chalet_London_mult, optionsFont);
-			splitExtra.insert(std::end(splitExtra), std::begin(splitLines), std::end(splitLines));
-
-			for (auto line = 0; line < splitExtra.size(); line++) {
-				textDraws.push_back(
-					std::bind(&Menu::drawText, this,
-						splitExtra[line], optionsFont, 
-						menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight) + line * optionHeight, 
-						optionTextSize, optionTextSize, 
-						optionsTextColor, 1));
-			}
-			finalHeight += splitExtra.size() * optionHeight;
+			drawOptionPlusText(extra, finalHeight);
 		}
 	}
 
 	backgroundSpriteDraws.push_back(
 		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
-		extrax, (menuY + headerHeight) + (finalHeight) / 2, menuWidth, finalHeight, 0.0f, optionsBackgroundColor)
+		extrax, menuY + headerHeight + finalHeight / 2.0f, menuWidth, finalHeight, 0.0f, optionsBackgroundColor)
 	);
 }
 

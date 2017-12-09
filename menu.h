@@ -376,8 +376,11 @@ private:
 	void drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, Color color, int justify);
 	void drawRect(float x, float y, float width, float height, Color color);
 	void drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, Color color);
-	void drawAdditionalInfoBoxTitle(std::string title);
-	void drawAdditionalInfoBox(std::vector<std::string> &extra, std::string title = "Info");
+	void drawOptionPlusTitle(std::string title);
+    void drawOptionPlusImage(std::string &extra, float &finalHeight);
+    void drawOptionPlusSprite(std::string &extra, float &finalHeight);
+    void drawOptionPlusText(std::string &extra, float &finalHeight);
+    void drawOptionPlusExtras(std::vector<std::string> &extra, std::string title = "Info");
 	void drawMenuDetails(std::vector<std::string> details, float y);
 	void drawOptionValue(std::string printVar, bool highlighted, int max = 0);
 
