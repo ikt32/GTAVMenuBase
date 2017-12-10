@@ -86,17 +86,20 @@ should be enough.
 
 ## Changes
 
-Since [commit 173a499](https://github.com/E66666666/GTAVMenuBase/commit/173a499c7b77242aeafd58d610a6bfa209571588), the position is moved to the top left. This makes `(0.0f, 0.0f)` sit flush with the safe zone.
+* [commit 173a499](https://github.com/E66666666/GTAVMenuBase/commit/173a499c7b77242aeafd58d610a6bfa209571588) moves the menu to the top left. This makes `(0.0f, 0.0f)` sit flush with the safe zone
+* [commit 3b37182](https://github.com/E66666666/GTAVMenuBase/commit/3b37182181e73c28439838b6107eae53a2844e03) restores the selected bool pointer requirement in OptionPlus
+* [commit ec9477b](https://github.com/E66666666/GTAVMenuBase/commit/ec9477b0b203efc2fcc83e7dcce33045d2198917) removes the automatic uppercase menu subtitle argument
+* [commit d7a1e72](https://github.com/E66666666/GTAVMenuBase/commit/d7a1e72756919c2499a7f7446e40bd6083c2e928) updates to C++17  for `std::any` (changed to `std::variant` in [commit a61461d](https://github.com/E66666666/GTAVMenuBase/commit/a61461d0e0506469507b6d09b7a0faff253b9d26))
 
-OptionPlus had had some changes. As of [commit 3b37182](https://github.com/E66666666/GTAVMenuBase/commit/3b37182181e73c28439838b6107eae53a2844e03), the selected bool pointer is required again.
+## Questions/Suggestions/Discussion
 
-Since [commit ec9477b](https://github.com/E66666666/GTAVMenuBase/commit/ec9477b0b203efc2fcc83e7dcce33045d2198917), the automatic uppercase menu subtitle argument is gone.
+Feel free to use the issues, or post in the [thread on the GTA5-Mods forums](https://forums.gta5-mods.com/topic/12090/tool-wip-c-shv-lightweight-menu-library).
 
 ## Remarks
 If you're also not using [ScriptHookVDotNet](https://github.com/crosire/scripthookvdotnet) with [NativeUI](https://github.com/Guad/NativeUI) and just want something less painful than the mess that happens in the ScriptHookV Simple Trainer example, I hope this is of some use for you.
 
 This thing started out as something I needed for [VStancer](https://github.com/E66666666/GTAVStancer) 
-where unknown modder on GTA5-Mods linked me the SudoMod menu sources. 
+where Unknown Modder on GTA5-Mods linked me the SudoMod menu sources. 
 
 Good luck modding! 
 
