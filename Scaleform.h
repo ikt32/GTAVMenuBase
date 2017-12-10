@@ -30,7 +30,7 @@ public:
         }
     }
 
-    bool Handle() {
+    int Handle() {
         return m_handle;
     }
 
