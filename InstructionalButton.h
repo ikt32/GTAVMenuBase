@@ -2,7 +2,8 @@
 class InstructionalButton
 {
 public:
-    InstructionalButton();
-    ~InstructionalButton();
+    InstructionalButton() { }
+
+    ~InstructionalButton() { }
 };
 

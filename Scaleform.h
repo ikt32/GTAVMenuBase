@@ -3,7 +3,7 @@
 #include <string>
 #include "inc/natives.h"
 #include <vector>
-#include <any>
+#include <variant>
 
 class ScaleformArgumentTXD {
 public:
@@ -19,6 +19,7 @@ private:
 
 class Scaleform
 {
+    using ScaleArg = std::variant<std::string, int, float, double, bool, ScaleformArgumentTXD>;
 public:
     Scaleform(std::string scaleformID) {
         m_handle = GRAPHICS::REQUEST_SCALEFORM_MOVIE((char *)scaleformID.c_str());
@@ -41,32 +42,31 @@ public:
         return GRAPHICS::HAS_SCALEFORM_MOVIE_LOADED(m_handle);
     }
 
-    void CallFunction(std::string function, std::vector<std::any> args = std::vector<std::any>{}) {
+    void CallFunction(std::string function, std::vector<ScaleArg> args = {}) {
         GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION(m_handle, (char *)function.c_str());
         for (auto arg : args) {
-            if (!arg.has_value()) continue;
-            if (arg.type() == typeid(std::string)) {
+            if (std::holds_alternative<std::string>(arg)) {
                 GRAPHICS::BEGIN_TEXT_COMMAND_SCALEFORM_STRING("STRING");
-                UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char *)std::any_cast<std::string>(arg).c_str());
+                UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char *)std::get<std::string>(arg).c_str());
                 GRAPHICS::END_TEXT_COMMAND_SCALEFORM_STRING();
             }
-            else if (arg.type() == typeid(int)) {
-                GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_INT(std::any_cast<int>(arg));
+            else if (std::holds_alternative<int>(arg)) {
+                GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_INT(std::get<int>(arg));
             }
-            else if (arg.type() == typeid(float)) {
-                GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_FLOAT(std::any_cast<float>(arg));
+            else if (std::holds_alternative<float>(arg)) {
+                GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_FLOAT(std::get<float>(arg));
 
             }
-            else if (arg.type() == typeid(double)) {
-                GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_FLOAT((float)std::any_cast<double>(arg));
+            else if (std::holds_alternative<double>(arg)) {
+                GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_FLOAT((float)std::get<double>(arg));
 
             }
-            else if (arg.type() == typeid(bool)) {
-                GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_BOOL(std::any_cast<bool>(arg));
+            else if (std::holds_alternative<bool>(arg)) {
+                GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_BOOL(std::get<bool>(arg));
 
             }
-            else if (arg.type() == typeid(ScaleformArgumentTXD)) {
-                GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_STRING((char *)std::any_cast<ScaleformArgumentTXD>(arg).Txd().c_str());
+            else if (std::holds_alternative<ScaleformArgumentTXD>(arg)) {
+                GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_STRING((char *)std::get<ScaleformArgumentTXD>(arg).Txd().c_str());
             }
             else {
                 

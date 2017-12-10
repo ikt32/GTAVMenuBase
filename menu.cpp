@@ -598,7 +598,9 @@ void Menu::EndMenu() {
     instructionalButtonsScaleform.CallFunction("CREATE_CONTAINER");
     instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 0, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneSelect, 0)), std::string(UI::_GET_LABEL_TEXT("HUD_INPUT2")) });
     instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 1, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneCancel, 0)), std::string(UI::_GET_LABEL_TEXT("HUD_INPUT3")) });
-    
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 2, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneUp, 0)), std::string("Up") });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 3, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneDown, 0)), std::string("Down") });
+
     //int count = 2;
     //for (auto button : instructionalButtons) {
     //    if (button.ItemBind == null || MenuItems[CurrentSelection] == button.ItemBind) {
@@ -607,7 +609,7 @@ void Menu::EndMenu() {
     //    }
     //}
 
-    instructionalButtonsScaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", std::vector<std::any>{ -1 });
+    instructionalButtonsScaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", { -1 });
     instructionalButtonsScaleform.Render2D();
 
 	disableKeys();
