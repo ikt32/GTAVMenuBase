@@ -1053,6 +1053,7 @@ void Menu::disableKeys() {
     CONTROLS::DISABLE_CONTROL_ACTION(0, ControlMeleeAttackHeavy, true);
     CONTROLS::DISABLE_CONTROL_ACTION(0, ControlMeleeAttackAlternate, true);
     CONTROLS::DISABLE_CONTROL_ACTION(0, ControlMeleeBlock, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlHUDSpecial, true);
 }
 
 void Menu::processMenuNav(std::function<void()> onMain, std::function<void()> onExit) {
