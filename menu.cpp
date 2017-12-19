@@ -2,15 +2,15 @@
 
 #include "menu.h"
 
+#include <locale>
+#include <map>
+
 #include "inc/main.h"
 #include "inc/natives.h"
 #include "inc/enums.h"
 #include "menucontrols.h"
 #include "menuutils.h"
-#include <locale>
 #include "Scaleform.h"
-#include "InstructionalButton.h"
-#include <map>
 
 // TODO: Fixes:
 //      - Reduce code duplication (titles, OptionPlus title)
@@ -482,97 +482,125 @@ bool Menu::StringArray(std::string option, std::vector<std::string>display, int 
 	return processOptionItemControls(iterator, min, max, 1);
 }
 
+void Menu::drawInstructionalButtons() {
+    //std::vector<InstructionalButton> instructionalButtons;
+    Scaleform instructionalButtonsScaleform("instructional_buttons");
+
+    instructionalButtonsScaleform.CallFunction("CLEAR_ALL");
+    instructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", { 0 });
+    instructionalButtonsScaleform.CallFunction("CREATE_CONTAINER");
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 0, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneSelect, 0)), std::string(UI::_GET_LABEL_TEXT("HUD_INPUT2")) });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 1, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneCancel, 0)), std::string(UI::_GET_LABEL_TEXT("HUD_INPUT3")) });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 2, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneUp, 0)), std::string("Next option") });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 3, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneDown, 0)), std::string("Previous option") });
+
+    //int count = 2;
+    //for (auto button : instructionalButtons) {
+    //    if (button.ItemBind == null || MenuItems[CurrentSelection] == button.ItemBind) {
+    //        instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { count, button.GetButtonId(), button.Text });
+    //        count++;
+    //    }
+    //}
+
+    instructionalButtonsScaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", { -1 });
+    instructionalButtonsScaleform.Render2D();
+}
+
+void Menu::drawMenuDetails() {
+    int maxOptionCount = optioncount >  maxDisplay ?  maxDisplay : optioncount;
+
+    float footerTextY;
+    float footerBackY;
+
+    if (optioncount > maxDisplay) {
+        footerTextY = maxDisplay * optionHeight + menuY + headerHeight;
+    }
+    else {
+        footerTextY = totalHeight + menuY;
+    }
+    footerBackY = footerTextY + optionTextureOffset;
+
+    switch (footerType) {
+        case FooterType::Color: {
+            backgroundRectDraws.push_back(
+                std::bind(&Menu::drawRect, this,
+                          menuX, footerBackY, menuWidth, optionHeight, footerColor)
+            );
+            break;
+        }
+        case FooterType::Sprite: {
+            backgroundSpriteDraws.push_back(
+                std::bind(&Menu::drawSprite, this, footerSprite.Dictionary, footerSprite.Name,
+                          menuX, footerBackY, menuWidth, optionHeight, 0.0f, titleBackgroundColor)
+            );
+            break;
+        }
+        default: {
+            backgroundRectDraws.push_back(
+                std::bind(&Menu::drawRect, this,
+                          menuX, footerBackY, menuWidth, optionHeight, solidBlack)
+            );
+            break;
+        }
+    }
+	
+    textDraws.push_back(
+        std::bind(&Menu::drawText, this, std::to_string(currentoption) + " / " + std::to_string(optioncount),
+                  optionsFont, menuX - 0.1f, footerTextY, optionTextSize, optionTextSize, titleTextColor, 2)
+    );
+
+    // Options background
+    backgroundSpriteDraws.push_back(
+        std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex], 
+                  menuX, 
+                  menuY + headerHeight + maxOptionCount * optionHeight / 2,
+                  menuWidth, 
+                  optionHeight * maxOptionCount, 0.0f, optionsBackgroundColor)
+    );
+
+    // Menu detail box
+    if (details.size() > 0) {
+        drawMenuDetails(details, footerBackY + optionHeight / 1.5f);
+    }
+
+    // Indicators
+    if (currentoption == 1) {
+        foregroundSpriteCalls.push_back(
+            std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
+                      menuX, 
+                      (footerTextY + 0.0175f),
+                      0.02f, 0.02f, 90.0f, titleTextColor)
+        );
+    }
+    else if (currentoption == optioncount) {
+        foregroundSpriteCalls.push_back(
+            std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
+                      menuX, 
+                      (footerTextY + 0.0175f),
+                      0.02f, 0.02f, 270.0f, titleTextColor)
+        );
+    }
+    else {
+        foregroundSpriteCalls.push_back(
+            std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
+                      menuX, 
+                      (footerTextY + 0.0125f),
+                      0.02f, 0.02f, 270.0f, titleTextColor)
+        );
+        foregroundSpriteCalls.push_back(
+            std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
+                      menuX, 
+                      (footerTextY + 0.0225f),
+                      0.02f, 0.02f, 90.0f, titleTextColor)
+        );
+    }
+}
+
 void Menu::EndMenu() {
 	if (menulevel < 1)
 		return;
 
-	int maxOptionCount = optioncount >  maxDisplay ?  maxDisplay : optioncount;
-
-	float footerTextY;
-	float footerBackY;
-
-	if (optioncount > maxDisplay) {
-		footerTextY = maxDisplay * optionHeight + menuY + headerHeight;
-	}
-	else {
-		footerTextY = totalHeight + menuY;
-	}
-	footerBackY = footerTextY + optionTextureOffset;
-
-	switch (footerType) {
-		case FooterType::Color: {
-			backgroundRectDraws.push_back(
-				std::bind(&Menu::drawRect, this,
-				menuX, footerBackY, menuWidth, optionHeight, footerColor)
-			);
-			break;
-		}
-		case FooterType::Sprite: {
-			backgroundSpriteDraws.push_back(
-				std::bind(&Menu::drawSprite, this, footerSprite.Dictionary, footerSprite.Name,
-				menuX, footerBackY, menuWidth, optionHeight, 0.0f, titleBackgroundColor)
-			);
-			break;
-		}
-		default: {
-			backgroundRectDraws.push_back(
-				std::bind(&Menu::drawRect, this,
-				menuX, footerBackY, menuWidth, optionHeight, solidBlack)
-			);
-			break;
-		}
-	}
-	
-	textDraws.push_back(
-		std::bind(&Menu::drawText, this, std::to_string(currentoption) + " / " + std::to_string(optioncount),
-		optionsFont, menuX - 0.1f, footerTextY, optionTextSize, optionTextSize, titleTextColor, 2)
-	);
-
-	// Options background
-	backgroundSpriteDraws.push_back(
-		std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex], 
-		menuX, 
-		menuY + headerHeight + maxOptionCount * optionHeight / 2,
-		menuWidth, 
-		optionHeight * maxOptionCount, 0.0f, optionsBackgroundColor)
-	);
-
-	// Menu detail box
-	if (details.size() > 0) {
-		drawMenuDetails(details, footerBackY + optionHeight / 1.5f);
-	}
-
-	// Indicators
-	if (currentoption == 1) {
-		foregroundSpriteCalls.push_back(
-			std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
-			menuX, 
-			(footerTextY + 0.0175f),
-			0.02f, 0.02f, 90.0f, titleTextColor)
-		);
-	}
-	else if (currentoption == optioncount) {
-		foregroundSpriteCalls.push_back(
-			std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
-			menuX, 
-			(footerTextY + 0.0175f),
-			0.02f, 0.02f, 270.0f, titleTextColor)
-		);
-	}
-	else {
-		foregroundSpriteCalls.push_back(
-			std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
-			menuX, 
-			(footerTextY + 0.0125f),
-			0.02f, 0.02f, 270.0f, titleTextColor)
-		);
-		foregroundSpriteCalls.push_back(
-			std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
-			menuX, 
-			(footerTextY + 0.0225f),
-			0.02f, 0.02f, 90.0f, titleTextColor)
-		);
-	}
+    drawMenuDetails();
 
 	GRAPHICS::_SCREEN_DRAW_POSITION_BEGIN(76, 84);
 	GRAPHICS::_SCREEN_DRAW_POSITION_RATIO(0, 0, 0, 0);
@@ -591,32 +619,9 @@ void Menu::EndMenu() {
 	details.clear();
 	footerType = FooterType::Default;
 
-    std::vector<InstructionalButton> instructionalButtons;
-    Scaleform instructionalButtonsScaleform("instructional_buttons");
-
-    instructionalButtonsScaleform.CallFunction("CLEAR_ALL");
-    instructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", { 0 });
-    instructionalButtonsScaleform.CallFunction("CREATE_CONTAINER");
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 0, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneSelect, 0)), std::string(UI::_GET_LABEL_TEXT("HUD_INPUT2")) });
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 1, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneCancel, 0)), std::string(UI::_GET_LABEL_TEXT("HUD_INPUT3")) });
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 2, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneUp, 0)), std::string("Up") });
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 3, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneDown, 0)), std::string("Down") });
-
-    //int count = 2;
-    //for (auto button : instructionalButtons) {
-    //    if (button.ItemBind == null || MenuItems[CurrentSelection] == button.ItemBind) {
-    //        instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { count, button.GetButtonId(), button.Text });
-    //        count++;
-    //    }
-    //}
-
-    instructionalButtonsScaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", { -1 });
-    instructionalButtonsScaleform.Render2D();
-
-	disableKeys();
-
-	if (currentoption > optioncount) currentoption = optioncount;
-	if (currentoption < 1) currentoption = 1;
+    hideHUDComponents();
+    disableKeys();
+    drawInstructionalButtons();
 }
 
 void Menu::CheckKeys() {
@@ -679,6 +684,8 @@ void Menu::OpenMenu() {
 		if (onMain) {
 			onMain();
 		}
+        //instructionalButtonsScaleform.Request("instructional_buttons");
+        //while (!instructionalButtonsScaleform.IsLoaded()) WAIT(0);
 	}
 }
 
@@ -1017,55 +1024,47 @@ void Menu::resetButtonStates() {
 	downpress = false;
 }
 
-const std::map<int, int, std::greater<int>> recordGlobals {
-    { 0, 0 },
-    { 10, 0x42CA + 0x09 },
-    { 14, 0x42DE + 0x09 },
-    { 26, 0x42FF + 0x09 },
-    { 28, 0x42FF + 0x82 },
-    { 38, 0 }
-};
-
-// Don't mind me!
-const int recordGlobal = recordGlobals.lower_bound(getGameVersion())->second;
-
 void Menu::disableKeysOnce() {
-	CAM::SET_CINEMATIC_BUTTON_ACTIVE(0);
+    const int recordGlobal = recordGlobals.lower_bound(getGameVersion())->second;
+    CAM::SET_CINEMATIC_BUTTON_ACTIVE(0);
     if (recordGlobal != 0) {
         *getGlobalPtr(recordGlobal) = 1;
     }
 }
 
 void Menu::enableKeysOnce() {
-	CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
+    const int recordGlobal = recordGlobals.lower_bound(getGameVersion())->second;
+    CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
     if (recordGlobal != 0) {
         *getGlobalPtr(recordGlobal) = 0;
     }
 }
 
-void Menu::disableKeys() {
-	disableKeysOnce();
-
-	UI::HIDE_HELP_TEXT_THIS_FRAME();
+void Menu::hideHUDComponents() {
+    UI::HIDE_HELP_TEXT_THIS_FRAME();
     UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentVehicleName);
     UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentAreaName);
     UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentUnused);
     UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentStreetName);
     UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentHelpText);
+}
+
+void Menu::disableKeys() {
+	disableKeysOnce();
 
     // sjaak327
     // http://gtaforums.com/topic/796908-simple-trainer-for-gtav/?view=findpost&p=1069587144
-    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlPhone, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlTalk, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleHeadlight, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleCinCam, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleRadioWheel, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlMeleeAttackLight, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlMeleeAttackHeavy, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlMeleeAttackAlternate, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlMeleeBlock, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlHUDSpecial, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(0, ControlCharacterWheel, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlPhone, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlTalk, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleHeadlight, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleCinCam, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleRadioWheel, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackLight, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackHeavy, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackAlternate, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeBlock, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlHUDSpecial, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlCharacterWheel, true);
 }
 
 void Menu::processMenuNav(std::function<void()> onMain, std::function<void()> onExit) {

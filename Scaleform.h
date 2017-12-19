@@ -24,6 +24,7 @@ public:
     Scaleform(std::string scaleformID) {
         m_handle = GRAPHICS::REQUEST_SCALEFORM_MOVIE((char *)scaleformID.c_str());
     }
+
     ~Scaleform() {
         if (IsLoaded()) {
             GRAPHICS::SET_SCALEFORM_MOVIE_AS_NO_LONGER_NEEDED(&m_handle);
@@ -47,7 +48,7 @@ public:
         for (auto arg : args) {
             if (std::holds_alternative<std::string>(arg)) {
                 GRAPHICS::BEGIN_TEXT_COMMAND_SCALEFORM_STRING("STRING");
-                UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char *)std::get<std::string>(arg).c_str());
+                UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)std::get<std::string>(arg).c_str());
                 GRAPHICS::END_TEXT_COMMAND_SCALEFORM_STRING();
             }
             else if (std::holds_alternative<int>(arg)) {
@@ -69,7 +70,6 @@ public:
                 GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_STRING((char *)std::get<ScaleformArgumentTXD>(arg).Txd().c_str());
             }
             else {
-                
             }
         }
         GRAPHICS::_POP_SCALEFORM_MOVIE_FUNCTION();

@@ -5,12 +5,13 @@
 #include <vector>
 #include <functional>
 #include <array>
-#include <sstream>
 #include <unordered_map>
+#include <map>
 
 #include "menucontrols.h"
 #include "menuutils.h"
 #include "menusettings.h"
+#include "Scaleform.h"
 
 namespace NativeMenu {
 class Menu {
@@ -172,8 +173,10 @@ public:
 	 * Returns true on accept, left and right.
 	 */
 	bool StringArray(std::string option, std::vector<std::string> display, int &iterator, std::vector<std::string> details = {});
+    void drawInstructionalButtons();
+    void drawMenuDetails();
 
-	/*
+    /*
 	 * Draws the menu backgrounds and processes menu navigation key inputs.
 	 * Must be called at the end of the menu processing block.
 	 */
@@ -368,6 +371,15 @@ private:
 	int backgTextureIndex = 3;
 	int highlTextureIndex = 4;
 
+    const std::map<int, int, std::greater<int>> recordGlobals{
+        { 0, 0 },
+        { 10, 0x42CA + 0x09 },
+        { 14, 0x42DE + 0x09 },
+        { 26, 0x42FF + 0x09 },
+        { 28, 0x42FF + 0x82 },
+        { 38, 0 }
+    };
+
 	/*
 	 * Functions! Should be self-explanatory.
 	 */
@@ -392,7 +404,8 @@ private:
 	void resetButtonStates();
 	void disableKeysOnce();
 	void enableKeysOnce();
-	void disableKeys();
+    void hideHUDComponents();
+    void disableKeys();
 	void processMenuNav(std::function<void()> onMain, std::function<void()> onExit);
 	void updateScreenSize();
 	void fitTitle(std::string &title, float &newSize, float titleSize);
