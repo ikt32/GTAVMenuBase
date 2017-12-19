@@ -10,6 +10,7 @@
 #include <locale>
 #include "Scaleform.h"
 #include "InstructionalButton.h"
+#include <map>
 
 // TODO: Fixes:
 //      - Reduce code duplication (titles, OptionPlus title)
@@ -1016,20 +1017,30 @@ void Menu::resetButtonStates() {
 	downpress = false;
 }
 
-// G_VER_1_0_877_1_NOSTEAM = 27
+const std::map<int, int, std::greater<int>> recordGlobals {
+    { 0, 0 },
+    { 10, 0x42CA + 0x09 },
+    { 14, 0x42DE + 0x09 },
+    { 26, 0x42FF + 0x09 },
+    { 28, 0x42FF + 0x82 },
+    { 38, 0 }
+};
+
+// Don't mind me!
+const int recordGlobal = recordGlobals.lower_bound(getGameVersion())->second;
 
 void Menu::disableKeysOnce() {
 	CAM::SET_CINEMATIC_BUTTON_ACTIVE(0);
-	if (getGameVersion() > 27) {
-		*getGlobalPtr(0x42FF + 0x82) = 1;
-	}
+    if (recordGlobal != 0) {
+        *getGlobalPtr(recordGlobal) = 1;
+    }
 }
 
 void Menu::enableKeysOnce() {
 	CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
-	if (getGameVersion() > 27) {
-		*getGlobalPtr(0x42FF + 0x82) = 0;
-	}
+    if (recordGlobal != 0) {
+        *getGlobalPtr(recordGlobal) = 0;
+    }
 }
 
 void Menu::disableKeys() {
