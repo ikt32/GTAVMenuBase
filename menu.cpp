@@ -259,8 +259,7 @@ bool Menu::Option(std::string option, Color highlight, std::vector<std::string> 
     }
 
     totalHeight += optionHeight;
-    if (optionpress && currentoption == optioncount) return true;
-    return false;
+    return optionpress && currentoption == optioncount;
 }
 
 bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::string> details) {
@@ -326,8 +325,7 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool 
 		drawOptionPlusExtras(extra, title);
 	}
 
-	if (optionpress && currentoption == optioncount) return true;
-	return false;
+	return optionpress && currentoption == optioncount;
 }
 
 void Menu::OptionPlusPlus(std::vector<std::string> &extra, std::string title) {
@@ -426,8 +424,7 @@ bool Menu::BoolSpriteOption(std::string option, bool enabled, std::string catego
 			0.03f, 0.05f, 0.0f, highlighted ? optionsTextSelectColor : optionsTextColor));
 	}
 
-	if (optionpress && currentoption == optioncount) return true;
-	return false;
+	return optionpress && currentoption == optioncount;
 }
 
 bool Menu::IntArray(std::string option, std::vector<int> display, int &iterator, std::vector<std::string> details) {
@@ -437,7 +434,7 @@ bool Menu::IntArray(std::string option, std::vector<int> display, int &iterator,
 	bool highlighted = currentoption == optioncount;
 	
 	int min = 0;
-	int max = static_cast<int>(display.size());
+	int max = static_cast<int>(display.size()) - 1;
 	
 	drawOptionValue(printVar, highlighted, max);
 	return processOptionItemControls(iterator, min, max, 1);
