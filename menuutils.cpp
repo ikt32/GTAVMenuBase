@@ -1,5 +1,16 @@
 #include "menuutils.h"
 #include <locale>
+#include <sstream>
+
+template<typename Out>
+void split(const std::string &s, char delim, Out result) {
+    std::stringstream ss;
+    ss.str(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        *(result++) = item;
+    }
+}
 
 namespace NativeMenu {
 	unsigned numZeroes(unsigned number) {
@@ -24,20 +35,7 @@ namespace NativeMenu {
 
 	std::vector<std::string> split(const std::string &s, char delim) {
 		std::vector<std::string> elems;
-		split(s, delim, std::back_inserter(elems));
+		::split(s, delim, std::back_inserter(elems));
 		return elems;
 	}
-
-	/*std::string makeCaps(std::string input) {
-		std::locale loc;
-		std::stringstream caps;
-		for (std::string::size_type i = 0; i < input.length(); ++i) {
-			if (i > 0 && i < input.length() - 1 && input[i - 1] == '~' && input[i + 1] == '~') {
-				caps << input[i];
-				continue;
-			}
-			caps << std::toupper(input[i], loc);
-		}
-		return caps.str();
-	}*/
 }
