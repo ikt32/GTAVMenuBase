@@ -715,18 +715,18 @@ std::vector<std::string> Menu::splitString(float maxWidth, std::string &details,
 	std::vector<std::string> words = split(details, ' ');
 
 	std::string line;
-	for (std::string word : words) {
-		float lineWidth = getStringWidth(line, scale, font);
-		float wordWidth = getStringWidth(word, scale, font);
-		if (lineWidth + wordWidth > maxWidth) {
-			splitLines.push_back(line);
-			line.clear();
-		}
-		line += word + ' ';
-		if (word == words.back()) {
-			splitLines.push_back(line);
-		}
-	}
+    for (auto it = words.begin(); it != words.end(); ++it) {
+        float lineWidth = getStringWidth(line, scale, font);
+        float wordWidth = getStringWidth(*it, scale, font);
+        if (lineWidth + wordWidth > maxWidth) {
+            splitLines.push_back(line);
+            line.clear();
+        }
+        line += *it + ' ';
+        if (std::next(it) == words.end()) {
+            splitLines.push_back(line);
+        }
+    }
 
 	return splitLines;
 }
