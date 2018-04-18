@@ -273,7 +273,7 @@ bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::str
 			"2", 3,
 			menuX + menuWidth / 2.0f - optionRightMargin,
 			indicatorHeight + menuY,
-			optionTextSize * 0.75, optionTextSize * 0.75,
+			optionTextSize * 0.75f, optionTextSize * 0.75f,
 			highlighted ? optionsTextSelectColor : optionsTextColor, 2
 			));
 	}
@@ -283,7 +283,7 @@ bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::str
 			"2", 3,
 			menuX + menuWidth / 2.0f - optionRightMargin,
 			menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight,
-            optionTextSize * 0.75, optionTextSize * 0.75,
+            optionTextSize * 0.75f, optionTextSize * 0.75f,
 			highlighted ? optionsTextSelectColor : optionsTextColor, 2
 		));
 	}
