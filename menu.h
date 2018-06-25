@@ -11,7 +11,6 @@
 #include "menucontrols.h"
 #include "menuutils.h"
 #include "menusettings.h"
-#include "Scaleform.h"
 
 namespace NativeMenu {
 class Menu {

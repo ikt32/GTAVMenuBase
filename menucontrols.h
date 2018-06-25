@@ -1,5 +1,5 @@
 #pragma once
-#include "inc/enums.h"
+#include <inc/enums.h>
 
 namespace NativeMenu {
 

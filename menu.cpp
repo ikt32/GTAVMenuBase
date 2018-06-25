@@ -5,9 +5,9 @@
 #include <locale>
 #include <map>
 
-#include "inc/main.h"
-#include "inc/natives.h"
-#include "inc/enums.h"
+#include <inc/main.h>
+#include <inc/natives.h>
+#include <inc/enums.h>
 #include "menucontrols.h"
 #include "menuutils.h"
 #include "Scaleform.h"

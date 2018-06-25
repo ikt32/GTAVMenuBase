@@ -1,12 +1,11 @@
 #include "menucontrols.h"
+
+#include <inc/enums.h>
+#include <inc/natives.h>
+
 #include "menukeyboard.h"
-#include "inc/enums.h"
-#include "inc/natives.h"
 
 namespace NativeMenu {
-
-
-
 	long long milliseconds_now() { // static
 		LARGE_INTEGER s_frequency; // static
 		BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency); // static

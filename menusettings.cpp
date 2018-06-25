@@ -1,6 +1,8 @@
 #include "menusettings.h"
+
+#include <thirdparty/simpleini/SimpleIni.h>
+
 #include "menucontrols.h"
-#include "thirdparty/simpleini/SimpleIni.h"
 #include "menukeyboard.h"
 #include "menu.h"
 

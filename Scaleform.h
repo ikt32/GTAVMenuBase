@@ -1,9 +1,9 @@
 // From ScriptHookVDotNet v3
 #pragma once
 #include <string>
-#include "inc/natives.h"
 #include <vector>
 #include <variant>
+#include <inc/natives.h>
 
 class ScaleformArgumentTXD {
 public:
