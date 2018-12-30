@@ -870,16 +870,16 @@ void Menu::drawOptionPlusText(std::string &extra, float &finalHeight) {
     const float big_ass_Chalet_London_mult = optionsFont == 0 ? 0.75f : 1.0f;
     auto splitLines = splitString(menuWidth, extra, optionTextSize * big_ass_Chalet_London_mult, optionsFont);
     splitExtra.insert(std::end(splitExtra), std::begin(splitLines), std::end(splitLines));
-
+    float heightModifier = 0.8f;
     for (auto line = 0; line < splitExtra.size(); line++) {
         textDraws.push_back(
             std::bind(&Menu::drawText, this,
                       splitExtra[line], optionsFont, 
-                      menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight) + line * optionHeight, 
+                      menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight) + line * optionHeight * heightModifier,
                       optionTextSize, optionTextSize, 
                       optionsTextColor, 1));
     }
-    finalHeight += splitExtra.size() * optionHeight;
+    finalHeight += splitExtra.size() * optionHeight * heightModifier;
 }
 
 void Menu::drawOptionPlusExtras(const std::vector<std::string>& extras, std::string title) {
