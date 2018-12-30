@@ -4,6 +4,7 @@
 
 #include <locale>
 #include <map>
+#include <utility>
 
 #include <inc/main.h>
 #include <inc/natives.h>
@@ -39,16 +40,15 @@ void Menu::ReadSettings() {
 }
 
 void Menu::RegisterOnMain(std::function<void()> onMain) {
-	this->onMain = onMain;
+	this->onMain = std::move(onMain);
 }
 
 void Menu::RegisterOnExit(std::function<void()> onExit) {
-	this->onExit = onExit;
+	this->onExit = std::move(onExit);
 }
 
-bool Menu::CurrentMenu(std::string menuname) {
-	if (menuname == actualmenu) return true;
-	return false;
+bool Menu::CurrentMenu(const std::string& menuname) {
+    return menuname == actualmenu;
 }
 
 void Menu::fitTitle(std::string &title, float &newSize, float titleSize) {
@@ -81,13 +81,13 @@ void Menu::Title(std::string title) {
 }
 
 void Menu::Title(std::string title, float customSize) {
-	Title(title, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], customSize);
+	Title(std::move(title), textureDicts[titleTextureIndex], textureNames[titleTextureIndex], customSize);
 }
 
 void Menu::Title(std::string title, std::string dict, std::string texture) {
 	float newSize;
 	fitTitle(title, newSize, titleTextSize);
-	Title(title, dict, texture, newSize);
+	Title(title, std::move(dict), std::move(texture), newSize);
 }
 
 void Menu::Title(std::string title, std::string dict, std::string texture, float customSize) {
@@ -198,15 +198,15 @@ void Menu::Footer(Color color) {
 
 void Menu::Footer(std::string dict, std::string texture) {
 	footerType = FooterType::Sprite;
-	footerSprite.Dictionary = dict;
-	footerSprite.Name = texture;
+	footerSprite.Dictionary = std::move(dict);
+	footerSprite.Name = std::move(texture);
 }
 
 bool Menu::Option(std::string option, std::vector<std::string> details) {
-    return Option(option, optionsBackgroundSelectColor, details);
+    return Option(std::move(option), optionsBackgroundSelectColor, std::move(details));
 }
 
-bool Menu::Option(std::string option, Color highlight, std::vector<std::string> details) {
+bool Menu::Option(std::string option, Color highlight, const std::vector<std::string>& details) {
     optioncount++;
 
     bool highlighted = currentoption == optioncount;
@@ -252,7 +252,7 @@ bool Menu::Option(std::string option, Color highlight, std::vector<std::string> 
                     menuX, optiony, menuWidth, optionHeight, 0.0f, highlight)
             );
 
-            if (details.size() > 0) {
+            if (!details.empty()) {
                 this->details = details;
             }
         }
@@ -263,7 +263,7 @@ bool Menu::Option(std::string option, Color highlight, std::vector<std::string> 
 }
 
 bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::string> details) {
-	Option(option, details);
+	Option(std::move(option), std::move(details));
 	float indicatorHeight = totalHeight - optionHeight; // why the hell was this menu designed like *this*?
 	bool highlighted = currentoption == optioncount;
 
@@ -290,16 +290,16 @@ bool Menu::MenuOption(std::string option, std::string menu, std::vector<std::str
 
 	if (optionpress && currentoption == optioncount) {
 		optionpress = false;
-		changeMenu(menu);
+		changeMenu(std::move(menu));
 		return true;
 	}
 	return false;
 }
 
-bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool *_highlighted,
-					  std::function<void() > onRight, std::function<void() > onLeft,
-					  std::string title, std::vector<std::string> details) {
-	Option(option, details);
+bool Menu::OptionPlus(std::string option, const std::vector<std::string>& extra, bool *_highlighted,
+                      const std::function<void() >& onRight, const std::function<void() >& onLeft,
+                      std::string title, std::vector<std::string> details) {
+	Option(std::move(option), std::move(details));
 	size_t infoLines = extra.size();
 	bool highlighted = currentoption == optioncount;
 	if (_highlighted != nullptr) {
@@ -322,20 +322,20 @@ bool Menu::OptionPlus(std::string option, std::vector<std::string> &extra, bool 
 	if (highlighted && infoLines > 0 && 
 		((currentoption <= maxDisplay && optioncount <= maxDisplay) ||
 		((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption))) {
-		drawOptionPlusExtras(extra, title);
+		drawOptionPlusExtras(extra, std::move(title));
 	}
 
 	return optionpress && currentoption == optioncount;
 }
 
-void Menu::OptionPlusPlus(std::vector<std::string> &extra, std::string title) {
-	drawOptionPlusExtras(extra, title);
+void Menu::OptionPlusPlus(const std::vector<std::string>& extra, std::string title) {
+	drawOptionPlusExtras(extra, std::move(title));
 }
 
 bool Menu::IntOption(std::string option, int &var, int min, int max, int step, std::vector<std::string> details) {
 	std::string printVar = std::to_string(var);
 
-	Option(option, details);
+	Option(std::move(option), std::move(details));
 	bool highlighted = currentoption == optioncount;
 
 	drawOptionValue(printVar, highlighted, max - min);
@@ -352,7 +352,7 @@ bool Menu::FloatOption(std::string option, float &var, float min, float max, flo
 	std::string printVar = buf;
 	int items = min != max ? 1 : 0;
 
-	Option(option, details);
+	Option(std::move(option), std::move(details));
 	bool highlighted = currentoption == optioncount;
 	
 	drawOptionValue(printVar, highlighted, items);
@@ -360,7 +360,7 @@ bool Menu::FloatOption(std::string option, float &var, float min, float max, flo
 }
 
 bool Menu::BoolOption(std::string option, bool &var, std::vector<std::string> details) {
-	Option(option, details);
+	Option(std::move(option), std::move(details));
 	float indicatorHeight = totalHeight - optionHeight;
 	bool highlighted = currentoption == optioncount;
 	
@@ -405,7 +405,7 @@ bool Menu::BoolOption(std::string option, bool &var, std::vector<std::string> de
 }
 
 bool Menu::BoolSpriteOption(std::string option, bool enabled, std::string category, std::string spriteOn, std::string spriteOff, std::vector<std::string> details) {
-	Option(option, details);
+	Option(std::move(option), std::move(details));
 	float indicatorHeight = totalHeight - optionHeight;
 	bool highlighted = currentoption == optioncount;
 	
@@ -430,7 +430,7 @@ bool Menu::BoolSpriteOption(std::string option, bool enabled, std::string catego
 bool Menu::IntArray(std::string option, std::vector<int> display, int &iterator, std::vector<std::string> details) {
 	std::string printVar = std::to_string(display[iterator]);
 	
-	Option(option, details);
+	Option(std::move(option), std::move(details));
 	bool highlighted = currentoption == optioncount;
 	
 	int min = 0;
@@ -441,7 +441,7 @@ bool Menu::IntArray(std::string option, std::vector<int> display, int &iterator,
 }
 
 bool Menu::FloatArray(std::string option, std::vector<float> display, int &iterator, std::vector<std::string> details) {
-	Option(option, details);
+	Option(std::move(option), std::move(details));
 	bool highlighted = currentoption == optioncount;
 	int min = 0;
 	int max = static_cast<int>(display.size()) - 1;
@@ -464,7 +464,7 @@ bool Menu::FloatArray(std::string option, std::vector<float> display, int &itera
 }
 
 bool Menu::StringArray(std::string option, std::vector<std::string>display, int &iterator, std::vector<std::string> details) {
-	Option(option, details);
+	Option(std::move(option), std::move(details));
 	bool highlighted = currentoption == optioncount; 
 	int min = 0;
 	int max = static_cast<int>(display.size()) - 1;
@@ -701,7 +701,7 @@ bool Menu::IsThisOpen() {
     return menulevel > 0;
 }
 
-float Menu::getStringWidth(std::string text, float scale, int font) {
+float Menu::getStringWidth(const std::string& text, float scale, int font) {
 	UI::_BEGIN_TEXT_COMMAND_WIDTH("STRING");
 	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char *)text.c_str());
 	UI::SET_TEXT_FONT( font);
@@ -731,7 +731,7 @@ std::vector<std::string> Menu::splitString(float maxWidth, std::string &details,
 	return splitLines;
 }
 
-void Menu::drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, Color color, int justify) {
+void Menu::drawText(const std::string& text, int font, float x, float y, float pUnknown, float scale, Color color, int justify) {
 	// justify: 0 - center, 1 - left, 2 - right
 	if (justify == 2) {
 		UI::SET_TEXT_WRAP(menuX - menuWidth / 2, menuX + menuWidth / 2 - optionRightMargin / 2.0f);
@@ -755,7 +755,7 @@ void Menu::drawRect(float x, float y, float width, float height, Color color) {
 	GRAPHICS::DRAW_RECT(x, y, width, height, color.R, color.G, color.B, color.A);
 }
 
-void Menu::drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, Color color) {
+void Menu::drawSprite(const std::string& textureDict, const std::string& textureName, float x, float y, float width, float height, float rotation, Color color) {
 	if (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED((char *)textureDict.c_str())) {
 		GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT((char *)textureDict.c_str(), false);
 	}
@@ -882,9 +882,9 @@ void Menu::drawOptionPlusText(std::string &extra, float &finalHeight) {
     finalHeight += splitExtra.size() * optionHeight;
 }
 
-void Menu::drawOptionPlusExtras(std::vector<std::string> &extras, std::string title) {
+void Menu::drawOptionPlusExtras(const std::vector<std::string>& extras, std::string title) {
 	float extrax = menuX + menuWidth;
-	drawOptionPlusTitle(title);
+	drawOptionPlusTitle(std::move(title));
 
 	if (headerHeight == titleHeight + subtitleHeight) {
 		float subtitleY = subtitleTextureOffset + menuY + titleHeight;
@@ -938,7 +938,7 @@ void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
 		menuX, y + boxHeight / 2, menuWidth, boxHeight, 0.0f, optionsBackgroundColor));
 }
 
-void Menu::drawOptionValue(std::string printVar, bool highlighted, int items) {
+void Menu::drawOptionValue(const std::string& printVar, bool highlighted, int items) {
 	float indicatorHeight = totalHeight - optionHeight;
 
 	std::string leftArrow = "< ";
@@ -970,7 +970,7 @@ void Menu::changeMenu(std::string menuname) {
 	currentmenu[menulevel] = actualmenu;
 	lastoption[actualmenu] = currentoption;
 	menulevel++;
-	actualmenu = menuname;
+	actualmenu = std::move(menuname);
 	currentoption = getWithDef(lastoption, actualmenu, 1);
 	menuBeep();
 	resetButtonStates();
@@ -1064,7 +1064,7 @@ void Menu::disableKeys() {
     CONTROLS::DISABLE_CONTROL_ACTION(2, ControlCharacterWheel, true);
 }
 
-void Menu::processMenuNav(std::function<void()> onMain, std::function<void()> onExit) {
+void Menu::processMenuNav(const std::function<void()>& onMain, const std::function<void()>& onExit) {
 	if (controls.IsKeyJustPressed(MenuControls::MenuSelect) ||
 		controls.IsKeyJustPressed(MenuControls::MenuCancel) ||
 		controls.IsKeyJustPressed(MenuControls::MenuUp) ||

@@ -50,7 +50,7 @@ public:
 	 * Otherwise menuname is a submenu name.
 	 * Returns true when inside the submenu menuname.
 	 */
-	bool CurrentMenu(std::string menuname);
+	bool CurrentMenu(const std::string& menuname);
 
 	/*
 	 * Always assign a title to a submenu!
@@ -86,7 +86,7 @@ public:
 	 * Returns true on accept.
 	 */
 	bool Option(std::string option, std::vector<std::string> details = {});
-    bool Option(std::string option, Color highlight, std::vector<std::string> details = {});
+    bool Option(std::string option, Color highlight, const std::vector<std::string>& details = {});
 
 	/*
 	 * Submenu option.
@@ -107,16 +107,16 @@ public:
 	 * "highlighted" indicates the highlight status of the option. It can be a nullptr.
 	 * Returns true on accept.
 	 */
-	bool OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted = nullptr, 
-					std::function<void()> onRight = nullptr, std::function<void()> onLeft = nullptr ,
-					std::string title = "Info", std::vector<std::string> details = {});
+	bool OptionPlus(std::string option, const std::vector<std::string>& extra, bool *highlighted = nullptr,
+	                const std::function<void()>& onRight = nullptr, const std::function<void()>& onLeft = nullptr,
+	                std::string title = "Info", std::vector<std::string> details = {});
 
 	/*
 	 * Can be used to draw the OptionPlus extras separately. Useful when generating
 	 * the extra text is costful or if no other things are needed. Running this when
 	 * OptionPlus is highlighted can improve performance.
 	 */
-	void OptionPlusPlus(std::vector<std::string> &extra, std::string title = "Info");
+	void OptionPlusPlus(const std::vector<std::string>& extra, std::string title = "Info");
 
 	/*
 	 * Option that changes an int value with optional custom-sized steps.
@@ -383,18 +383,18 @@ private:
 	/*
 	 * Functions! Should be self-explanatory.
 	 */
-	float getStringWidth(std::string text, float scale, int font);
+	float getStringWidth(const std::string& text, float scale, int font);
 	std::vector<std::string> splitString(float maxWidth, std::string &details, float scale, int font);
-	void drawText(const std::string text, int font, float x, float y, float pUnknown, float scale, Color color, int justify);
+	void drawText(const std::string& text, int font, float x, float y, float pUnknown, float scale, Color color, int justify);
 	void drawRect(float x, float y, float width, float height, Color color);
-	void drawSprite(std::string textureDict, std::string textureName, float x, float y, float width, float height, float rotation, Color color);
+	void drawSprite(const std::string& textureDict, const std::string& textureName, float x, float y, float width, float height, float rotation, Color color);
 	void drawOptionPlusTitle(std::string title);
     void drawOptionPlusImage(std::string &extra, float &finalHeight);
     void drawOptionPlusSprite(std::string &extra, float &finalHeight);
     void drawOptionPlusText(std::string &extra, float &finalHeight);
-    void drawOptionPlusExtras(std::vector<std::string> &extra, std::string title = "Info");
+    void drawOptionPlusExtras(const std::vector<std::string>& extra, std::string title = "Info");
 	void drawMenuDetails(std::vector<std::string> details, float y);
-	void drawOptionValue(std::string printVar, bool highlighted, int max = 0);
+	void drawOptionValue(const std::string& printVar, bool highlighted, int max = 0);
 
 	void changeMenu(std::string menuname);
 	void nextOption();
@@ -406,7 +406,7 @@ private:
 	void enableKeysOnce();
     void hideHUDComponents();
     void disableKeys();
-	void processMenuNav(std::function<void()> onMain, std::function<void()> onExit);
+	void processMenuNav(const std::function<void()>& onMain, const std::function<void()>& onExit);
 	void updateScreenSize();
 	void fitTitle(std::string &title, float &newSize, float titleSize);
 
