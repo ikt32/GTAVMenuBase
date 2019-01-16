@@ -17,41 +17,41 @@ namespace NativeMenu {
 		return GetTickCount64();
 	}
 
-	MenuControls::MenuControls() {
-		std::fill(controlPrev, std::end(controlPrev), false);
-		std::fill(controlCurr, std::end(controlCurr), false);
-		std::fill(ControlKeys, std::end(ControlKeys), -1);
-	}
+	MenuControls::MenuControls()
+    : ControlKeys{}
+    , controlCurr{}
+    , controlPrev{}
+    , pressTime{}
+    , releaseTime{}
+    , nControlCurr{}
+    , nControlPrev{}
+    , nPressTime{}
+    , nReleaseTime{}{
+    std::fill(controlPrev, std::end(controlPrev), false);
+    std::fill(controlCurr, std::end(controlCurr), false);
+    std::fill(ControlKeys, std::end(ControlKeys), -1);
+}
 
-	MenuControls::~MenuControls() { }
+MenuControls::~MenuControls() = default;
 
-	bool MenuControls::IsKeyPressed(ControlType control) {
+bool MenuControls::IsKeyPressed(ControlType control) {
 		return IsKeyDown(ControlKeys[control]);
 	}
 
 	bool MenuControls::IsKeyJustPressed(ControlType control) {
-		if (controlCurr[control] && !controlPrev[control]) {
-			return true;
-		}
-		return false;
+	    return controlCurr[control] && !controlPrev[control];
 	}
 
 	bool MenuControls::IsKeyJustReleased(ControlType control) {
-		if (!controlCurr[control] && controlPrev[control]) {
-			return true;
-		}
-		return false;
+	    return !controlCurr[control] && controlPrev[control];
 	}
 
-	bool MenuControls::IsKeyDownFor(ControlType control, int millis) {
+	bool MenuControls::IsKeyDownFor(ControlType control, unsigned long long millis) {
 		if (IsKeyJustPressed(control)) {
 			pressTime[control] = milliseconds_now();
 		}
 
-		if (IsKeyPressed(control) && (milliseconds_now() - pressTime[control]) >= millis) {
-			return true;
-		}
-		return false;
+	    return IsKeyPressed(control) && (milliseconds_now() - pressTime[control]) >= millis;
 	}
 
 	void MenuControls::Update() {
@@ -60,20 +60,18 @@ namespace NativeMenu {
 			controlCurr[i] = IsKeyDown(ControlKeys[i]);
 		}
 		// Size of eControl
-		for (int i = 0; i < eControlSize; i++) {
+		for (unsigned i = 0; i < eControlSize; ++i) {
 			nControlPrev[i] = nControlCurr[i];
 			nControlCurr[i] = CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, i) != 0;
 		}
 	}
 
-	bool MenuControls::IsControlDownFor(eControl control, int millis) {
+	bool MenuControls::IsControlDownFor(eControl control, unsigned long long millis) {
 		if (CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, control)) {
 			nPressTime[control] = milliseconds_now();
 		}
 
-		if (CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, control) && (milliseconds_now() - nPressTime[control]) >= millis) {
-			return true;
-		}
-		return false;
+	    return CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, control) &&
+            (milliseconds_now() - nPressTime[control]) >= millis;
 	}
 }

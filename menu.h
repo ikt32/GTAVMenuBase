@@ -85,7 +85,7 @@ public:
 	 * Shows nothing special.
 	 * Returns true on accept.
 	 */
-	bool Option(std::string option, std::vector<std::string> details = {});
+	bool Option(std::string option, const std::vector<std::string>& details = {});
     bool Option(std::string option, Color highlight, const std::vector<std::string>& details = {});
 
 	/*
@@ -94,7 +94,7 @@ public:
 	 * Switches menu on action.
 	 * Returns true on accept.
 	 */
-	bool MenuOption(std::string option, std::string menu, std::vector<std::string> details = {});
+	bool MenuOption(std::string option, std::string menu, const std::vector<std::string>& details = {});
 
 	/*
 	 * Option that shows an extra pane to the right.
@@ -109,7 +109,7 @@ public:
 	 */
 	bool OptionPlus(std::string option, const std::vector<std::string>& extra, bool *highlighted = nullptr,
 	                const std::function<void()>& onRight = nullptr, const std::function<void()>& onLeft = nullptr,
-	                std::string title = "Info", std::vector<std::string> details = {});
+	                std::string title = "Info", const std::vector<std::string>& details = {});
 
 	/*
 	 * Can be used to draw the OptionPlus extras separately. Useful when generating
@@ -123,28 +123,31 @@ public:
 	 * Shows option with the value inside < > brackets.
 	 * Returns true on accept, left and right.
 	 */
-	bool IntOption(		std::string option, int &var,	int min,	int max,	int step = 1,		std::vector<std::string> details = {});
+	bool IntOption(		std::string option, int &var,	int min,	int max,	int step = 1, const std::vector<std::string>&
+	               		    details = {});
 
 	/*
 	 * Option that changes a float value with optional custom-sized steps.
 	 * Shows option with the value inside < > brackets.
 	 * Returns true on accept, left and right.
 	 */
-	bool FloatOption(	std::string option, float &var, float min,	float max,	float step = 0.1f,	std::vector<std::string> details = {});
+	bool FloatOption(	std::string option, float &var, float min,	float max,	float step = 0.1f, const std::vector<std::string>
+	                 	& details = {});
 
 	/*
 	 * Option that toggles a boolean.
 	 * Shows option with a checkbox, which is checked when the passed var is "true".
 	 * Returns true on accept.
 	 */
-	bool BoolOption(std::string option, bool &var, std::vector<std::string> details = {});
+	bool BoolOption(std::string option, bool &var, const std::vector<std::string>& details = {});
 
 	/*
 	 * Option that displays a boolean with a specifyable texture.
 	 * Shows option with a checkbox, which is checked when the passed var is "true".
 	 * Returns true on accept.
 	 */
-	bool BoolSpriteOption(std::string option, bool var, std::string category, std::string spriteOn, std::string spriteOff, std::vector<std::string> details = {});
+	bool BoolSpriteOption(std::string option, bool enabled, std::string category, std::string spriteOn, 
+                          std::string spriteOff, const std::vector<std::string>& details = {});
 
 	/*
 	 * Option that shows a scrollable list of supplied ints.
@@ -153,7 +156,7 @@ public:
 	 * On left or right press, iterator's value is incremented or decremented.
 	 * Returns true on accept, left and right.
 	 */
-	bool IntArray(std::string option, std::vector<int> display, int &iterator, std::vector<std::string> details = {});
+	bool IntArray(std::string option, std::vector<int> display, int &iterator, const std::vector<std::string>& details = {});
 
 	/*
 	 * Option that shows a scrollable list of supplied floats.
@@ -162,7 +165,8 @@ public:
 	 * On left or right press, iterator's value is incremented or decremented.
 	 * Returns true on accept, left and right.
 	 */
-	bool FloatArray(std::string option, std::vector<float> display, int &iterator, std::vector<std::string> details = {});
+	bool FloatArray(std::string option, std::vector<float> display, int &iterator, 
+                    const std::vector<std::string>& details = {});
 	
 	/*
 	 * Option that shows a scrollable list of supplied strings.
@@ -171,7 +175,8 @@ public:
 	 * On left or right press, iterator's value is incremented or decremented.
 	 * Returns true on accept, left and right.
 	 */
-	bool StringArray(std::string option, std::vector<std::string> display, int &iterator, std::vector<std::string> details = {});
+	bool StringArray(std::string option, std::vector<std::string> display, int &iterator, 
+                     const std::vector<std::string>& details = {});
     void drawInstructionalButtons();
     void drawMenuDetails();
 
@@ -406,7 +411,7 @@ private:
 	void enableKeysOnce();
     void hideHUDComponents();
     void disableKeys();
-	void processMenuNav(const std::function<void()>& onMain, const std::function<void()>& onExit);
+	void processMenuNav();
 	void updateScreenSize();
 	void fitTitle(std::string &title, float &newSize, float titleSize);
 

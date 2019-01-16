@@ -28,9 +28,9 @@ namespace NativeMenu {
 		bool IsKeyPressed(ControlType control);
 		bool IsKeyJustPressed(ControlType control);
 		bool IsKeyJustReleased(ControlType control);
-		bool IsKeyDownFor(ControlType control, int millis);
+		bool IsKeyDownFor(ControlType control, unsigned long long millis);
 		void Update();
-		bool IsControlDownFor(eControl control, int millis);
+		bool IsControlDownFor(eControl control, unsigned long long millis);
 		static const int controlSize = SIZEOF_ControlType;
 		int ControlKeys[controlSize];
 		int ControllerButton1 = -1;
