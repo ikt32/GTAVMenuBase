@@ -221,6 +221,9 @@ public:
 	const std::string ImagePrefix = "!IMG:";
 	const std::string SpritePrefix = "!SPR:";
 
+    // For smooth scrolling
+    float oldSmoothY = 0.0f;
+
 	/*
 	 * These should be filled in by MenuSettings.ReadSettings().
 	 */
@@ -239,6 +242,8 @@ public:
 	Color optionsBackgroundSelectColor = solidWhite;
 	int optionsFont = 0;
 
+    bool useSmoothScroll = false;
+    float smoothFactor = 0.00001f;
 private:
 	static const unsigned maxMenus = 255;
 	enum class FooterType {

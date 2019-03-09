@@ -254,9 +254,16 @@ bool Menu::Option(std::string option, Color highlight, const std::vector<std::st
         );
 
         if (highlighted) {
+            float highlightY = optiony;
+            if (useSmoothScroll) {
+                highlightY = lerp(oldSmoothY,
+                    optiony,
+                    1.0f - pow(smoothFactor, GAMEPLAY::GET_FRAME_TIME()));
+                oldSmoothY = highlightY;
+            }
             highlightsSpriteDraws.push_back(
                 std::bind(&Menu::drawSprite, this, textureDicts[highlTextureIndex], textureNames[highlTextureIndex],
-                    menuX, optiony, menuWidth, optionHeight, 0.0f, highlight)
+                    menuX, highlightY, menuWidth, optionHeight, 0.0f, highlight)
             );
 
             if (!details.empty()) {

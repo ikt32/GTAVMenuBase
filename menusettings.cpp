@@ -39,6 +39,8 @@ namespace NativeMenu {
 #pragma warning(disable: 4244)
 		menuOpts->menuX = settingsMenu.GetDoubleValue("MENU", "MenuX", 0.0);
 		menuOpts->menuY = settingsMenu.GetDoubleValue("MENU", "MenuY", 0.0);
+        menuOpts->useSmoothScroll = settingsMenu.GetBoolValue("Navigation", "Smooth Scrolling", false);
+        menuOpts->smoothFactor = settingsMenu.GetDoubleValue("Navigation", "Smooth Factor", 0.00001); 
 #pragma warning(pop)
 
 		// Title Text

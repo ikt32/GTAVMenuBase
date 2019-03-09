@@ -38,4 +38,8 @@ namespace NativeMenu {
 		::split(s, delim, std::back_inserter(elems));
 		return elems;
 	}
+
+float lerp(float a, float b, float f) {
+    return a + f * (b - a);
+}
 }
