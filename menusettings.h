@@ -8,13 +8,13 @@ class Menu;
 class MenuSettings
 {
 public:
-	MenuSettings();
-	~MenuSettings();
-	void ReadSettings(MenuControls *control, Menu *menuOpts);
-	void SaveSettings();
-	void SetFiles(const std::string &menu);
+    MenuSettings();
+    ~MenuSettings();
+    void ReadSettings(MenuControls *control, Menu *menuOpts);
+    void SaveSettings();
+    void SetFiles(const std::string &menu);
 
 private:
-	std::string settingsMenuFile;
+    std::string settingsMenuFile;
 };
 }
