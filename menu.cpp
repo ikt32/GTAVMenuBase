@@ -230,7 +230,8 @@ bool Menu::Option(std::string option, Color highlight, const std::vector<std::st
     }
     else if (optioncount > currentoption - maxDisplay && optioncount <= currentoption) {
         visible = true;
-        optiontexty = menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight;
+        optiontexty = menuY + headerHeight + 
+            (optioncount - (currentoption - maxDisplay + 1)) * optionHeight;
         optiony = optiontexty + optionTextureOffset;
     }
 
@@ -247,11 +248,13 @@ bool Menu::Option(std::string option, Color highlight, const std::vector<std::st
             option.pop_back();
             option += "...";
         }
-        textDraws.push_back(
-            std::bind(&Menu::drawText, this,
-                option, optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, optiontexty, optionTextSize, optionTextSize, highlighted ? optionsTextSelectColor : optionsTextColor, 1
-            )
-        );
+        textDraws.push_back([=]() {
+            drawText(option, optionsFont, 
+				(menuX - menuWidth / 2.0f) + menuTextMargin, 
+				optiontexty, 
+				optionTextSize, optionTextSize, 
+				highlighted ? optionsTextSelectColor : optionsTextColor, 1);
+        });
 
         if (highlighted) {
             float highlightY = optiony;
@@ -487,7 +490,7 @@ bool Menu::StringArray(std::string option, std::vector<std::string>display, int 
 	int max = static_cast<int>(display.size()) - 1;
 
 	if (iterator > static_cast<int>(display.size()) || iterator < 0) {
-		drawOptionValue("error", highlighted, max);
+		drawOptionValue("error (" + std::to_string(iterator) + ")", highlighted, max);
 		return false;
 	}
 
@@ -1002,13 +1005,15 @@ void Menu::changeMenu(std::string menuname) {
 	lastoption[actualmenu] = currentoption;
 	menulevel++;
 	actualmenu = std::move(menuname);
-	currentoption = getWithDef(lastoption, actualmenu, 1);
+    previousoption = currentoption;
+    currentoption = getWithDef(lastoption, actualmenu, 1);
 	menuBeep();
 	resetButtonStates();
 }
 
 void Menu::nextOption() {
-	if (currentoption < optioncount)
+    previousoption = currentoption;
+    if (currentoption < optioncount)
 		currentoption++;
 	else
 		currentoption = 1;
@@ -1019,7 +1024,8 @@ void Menu::nextOption() {
 }
 
 void Menu::previousOption() {
-	if (currentoption > 1)
+    previousoption = currentoption;
+    if (currentoption > 1)
 		currentoption--;
 	else
 		currentoption = optioncount;
@@ -1036,7 +1042,8 @@ void Menu::backMenu() {
 	lastoption[actualmenu] = currentoption;
 	menulevel--;
 	actualmenu = currentmenu[menulevel];
-	currentoption = getWithDef(lastoption, actualmenu, 1);
+    previousoption = currentoption;
+    currentoption = getWithDef(lastoption, actualmenu, 1);
 
 }
 
@@ -1056,7 +1063,9 @@ void Menu::disableKeysOnce() {
     const int recordGlobal = recordGlobals.lower_bound(getGameVersion())->second;
     CAM::SET_CINEMATIC_BUTTON_ACTIVE(0);
     if (recordGlobal != 0) {
-        *getGlobalPtr(recordGlobal) = 1;
+		auto* ptr = getGlobalPtr(recordGlobal);
+		if (ptr)
+			*ptr = 1;
     }
 }
 
@@ -1064,8 +1073,10 @@ void Menu::enableKeysOnce() {
     const int recordGlobal = recordGlobals.lower_bound(getGameVersion())->second;
     CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
     if (recordGlobal != 0) {
-        *getGlobalPtr(recordGlobal) = 0;
-    }
+		auto* ptr = getGlobalPtr(recordGlobal);
+		if (ptr)
+			* ptr = 0;
+	}
 }
 
 void Menu::hideHUDComponents() {

@@ -317,8 +317,9 @@ private:
 	 * Members for menu state.
 	 */
 	float totalHeight = 0.0f;
-	int optioncount = 0;
-	int currentoption = 0;
+	int optioncount = 0; // option position
+	int currentoption = 0; // current option index
+	int previousoption = 0;
 	bool optionpress = false;
 	bool leftpress = false;
 	bool rightpress = false;
@@ -389,6 +390,7 @@ private:
         { 38, 0x430A + 0x82 },
         { 42, 0x4336 + 0x82 },
         { 46, 0x434C + 0x82 },
+        { 50, 0x4378 + 0x82 },
     };
 
 	/*
