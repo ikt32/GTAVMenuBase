@@ -244,6 +244,8 @@ public:
 
     bool useSmoothScroll = false;
     float smoothFactor = 0.00001f;
+    int recordGlobalOverride = -1;
+
 private:
     static const unsigned maxMenus = 255;
     enum class FooterType {
@@ -415,8 +417,7 @@ private:
     void backMenu();
     void menuBeep();
     void resetButtonStates();
-    void disableKeysOnce();
-    void enableKeysOnce();
+    void enableKeysOnce(bool enable);
     void hideHUDComponents();
     void disableKeys();
     void processMenuNav();

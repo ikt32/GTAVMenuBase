@@ -5,7 +5,8 @@
 #include "menucontrols.h"
 #include "menukeyboard.h"
 #include "menu.h"
-
+#pragma warning(push)
+#pragma warning(disable: 4244)
 namespace NativeMenu {
 
 
@@ -35,13 +36,11 @@ namespace NativeMenu {
 
         menuOpts->cheatString = settingsMenu.GetValue("MENU", "CheatString", "");
 
-#pragma warning(push)
-#pragma warning(disable: 4244)
         menuOpts->menuX = settingsMenu.GetDoubleValue("MENU", "MenuX", 0.0);
         menuOpts->menuY = settingsMenu.GetDoubleValue("MENU", "MenuY", 0.0);
+        menuOpts->recordGlobalOverride = settingsMenu.GetLongValue("MENU", "RecordGlobalOverride", -1);
         menuOpts->useSmoothScroll = settingsMenu.GetBoolValue("Navigation", "Smooth Scrolling", false);
         menuOpts->smoothFactor = settingsMenu.GetDoubleValue("Navigation", "Smooth Factor", 0.00001); 
-#pragma warning(pop)
 
         // Title Text
         menuOpts->titleTextColor.R =   settingsMenu.GetLongValue("Title Text",   "Red"    , 255);
@@ -76,3 +75,4 @@ namespace NativeMenu {
         // Make an issue or do a PR or something when you want to have this implemented...
     }
 }
+#pragma warning(pop)

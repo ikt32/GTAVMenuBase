@@ -1059,23 +1059,16 @@ void Menu::resetButtonStates() {
     downpress = false;
 }
 
-void Menu::disableKeysOnce() {
-    const int recordGlobal = recordGlobals.lower_bound(getGameVersion())->second;
-    CAM::SET_CINEMATIC_BUTTON_ACTIVE(0);
-    if (recordGlobal != 0) {
-        auto* ptr = getGlobalPtr(recordGlobal);
-        if (ptr)
-            *ptr = 1;
+void Menu::enableKeysOnce(bool enable) {
+    int recordGlobal = recordGlobals.lower_bound(getGameVersion())->second;
+    if (recordGlobalOverride != -1) {
+        recordGlobal = recordGlobalOverride;
     }
-}
-
-void Menu::enableKeysOnce() {
-    const int recordGlobal = recordGlobals.lower_bound(getGameVersion())->second;
-    CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
+    CAM::SET_CINEMATIC_BUTTON_ACTIVE(enable);
     if (recordGlobal != 0) {
         auto* ptr = getGlobalPtr(recordGlobal);
         if (ptr)
-            * ptr = 0;
+            *ptr = !enable;
     }
 }
 
@@ -1089,7 +1082,7 @@ void Menu::hideHUDComponents() {
 }
 
 void Menu::disableKeys() {
-    disableKeysOnce();
+    enableKeysOnce(false);
 
     // sjaak327
     // http://gtaforums.com/topic/796908-simple-trainer-for-gtav/?view=findpost&p=1069587144
@@ -1124,7 +1117,7 @@ void Menu::processMenuNav() {
         }
         else {
             CloseMenu();
-            enableKeysOnce();
+            enableKeysOnce(true);
             if (onExit) {
                 onExit();
             }
@@ -1135,7 +1128,7 @@ void Menu::processMenuNav() {
     if (controls.IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel)) {
         if (menulevel > 0) {
             if (menulevel == 1) {
-                enableKeysOnce();
+                enableKeysOnce(true);
                 if (onExit) {
                     onExit();
                 }
