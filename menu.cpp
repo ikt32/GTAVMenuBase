@@ -25,11 +25,6 @@
 //      - Re-write to OO
 
 namespace NativeMenu {
-
-Menu::Menu() = default;
-
-Menu::~Menu() = default;
-
 void Menu::SetFiles(const std::string &fileName) {
     settings.SetFiles(fileName);
 }
@@ -77,30 +72,32 @@ void Menu::fitTitle(std::string &title, float &newSize, float titleSize) {
     }
 }
 
-void Menu::Title(std::string title) {
+void Menu::Title(const std::string& title) {
     float newSize;
-    fitTitle(title, newSize, titleTextSize);
-    Title(title, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], newSize);
+    std::string newTitle = title;
+    fitTitle(newTitle, newSize, titleTextSize);
+    Title(newTitle, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], newSize);
 }
 
-void Menu::Title(std::string title, float customSize) {
-    Title(std::move(title), textureDicts[titleTextureIndex], textureNames[titleTextureIndex], customSize);
+void Menu::Title(const std::string& title, float customSize) {
+    Title(title, textureDicts[titleTextureIndex], textureNames[titleTextureIndex], customSize);
 }
 
-void Menu::Title(std::string title, std::string dict, std::string texture) {
+void Menu::Title(const std::string& title, const std::string& dict, const std::string& texture) {
     float newSize;
-    fitTitle(title, newSize, titleTextSize);
-    Title(title, std::move(dict), std::move(texture), newSize);
+    std::string newTitle = title;
+    fitTitle(newTitle, newSize, titleTextSize);
+    Title(newTitle, dict, texture, newSize);
 }
 
-void Menu::Title(std::string title, std::string dict, std::string texture, float customSize) {
+void Menu::Title(const std::string& title, const std::string& dict, const std::string& texture, float customSize) {
     optioncount = 0;
     totalHeight = 0.0f;
 
     float titletexty = menuY + totalHeight + titleTextOffset + titleTextOffset * 2.0f * (titleTextSize - customSize);
     float titley = menuY + totalHeight + titleTextureOffset;
     unsigned newlines = 0;
-    for (auto c : title) {
+    for (const auto& c : title) {
         if (c == '\n')
             newlines++;
     }
@@ -108,30 +105,30 @@ void Menu::Title(std::string title, std::string dict, std::string texture, float
         titletexty -= titleHeight / 5.0f;
     }
 
-    textDraws.push_back(
-        std::bind(&Menu::drawText, this, title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0));
+    textDraws.push_back([=]() { drawText(title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0); });
     backgroundSpriteDraws.push_back(
-        std::bind(&Menu::drawSprite, this, dict, texture,
-        menuX, titley, menuWidth, titleHeight, 0.0f, titleBackgroundColor));
+        [=]() { drawSprite(dict, texture,
+            menuX, titley, menuWidth, titleHeight, 0.0f, titleBackgroundColor); });
 
     totalHeight = titleHeight;
     headerHeight = titleHeight;
 }
 
-void Menu::Title(std::string title, int textureHandle) {
+void Menu::Title(const std::string& title, int textureHandle) {
     float newSize;
-    fitTitle(title, newSize, titleTextSize);
-    Title(title, textureHandle, newSize);
+    std::string newTitle = title;
+    fitTitle(newTitle, newSize, titleTextSize);
+    Title(newTitle, textureHandle, newSize);
 }
 
-void Menu::Title(std::string title, int textureHandle, float customSize) {
+void Menu::Title(const std::string& title, int textureHandle, float customSize) {
     optioncount = 0;
     totalHeight = 0.0f;
 
     float titletexty = menuY + totalHeight + titleTextOffset + titleTextOffset * 2.0f * (titleTextSize - customSize);
     float titley = menuY + totalHeight + titleTextureOffset;
     unsigned newlines = 0;
-    for (auto c : title) {
+    for (const auto& c : title) {
         if (c == '\n')
             newlines++;
     }
@@ -140,7 +137,7 @@ void Menu::Title(std::string title, int textureHandle, float customSize) {
     }
 
     textDraws.push_back(
-        std::bind(&Menu::drawText, this, title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0));
+        [=]() { drawText(title, titleFont, menuX, titletexty, customSize, customSize, titleTextColor, 0); });
 
     float safeZone = GRAPHICS::GET_SAFE_ZONE_SIZE();
     float safeOffset = (1.0f - safeZone) * 0.5f;
@@ -178,17 +175,17 @@ void Menu::Title(std::string title, int textureHandle, float customSize) {
     headerHeight = titleHeight;
 }
 
-void Menu::Subtitle(std::string subtitle) {    
+void Menu::Subtitle(const std::string& subtitle) {    
     float subtitleY = subtitleTextureOffset + menuY + totalHeight;
     float subtitleTextY = menuY + totalHeight;
     textDraws.push_back(
-        std::bind(&Menu::drawText, this, subtitle, optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, 
-                  subtitleTextY, subtitleTextSize, subtitleTextSize, titleTextColor, 1)
+        [=]() { drawText(subtitle, optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, 
+                  subtitleTextY, subtitleTextSize, subtitleTextSize, titleTextColor, 1); }
     );
 
     backgroundRectDraws.push_back(
-        std::bind(&Menu::drawRect, this, 
-        menuX, subtitleY, menuWidth, subtitleHeight, solidBlack)
+        [=]() { drawRect(
+        menuX, subtitleY, menuWidth, subtitleHeight, solidBlack); }
     );
 
     totalHeight += subtitleHeight;
@@ -200,20 +197,20 @@ void Menu::Footer(Color color) {
     footerColor = color;
 }
 
-void Menu::Footer(std::string dict, std::string texture) {
+void Menu::Footer(const std::string& dict, const std::string& texture) {
     footerType = FooterType::Sprite;
-    footerSprite.Dictionary = std::move(dict);
-    footerSprite.Name = std::move(texture);
+    footerSprite.Dictionary = dict;
+    footerSprite.Name = texture;
 }
 
 /*
  * Section Options
  */
-bool Menu::Option(std::string option, const std::vector<std::string>& details) {
-    return Option(std::move(option), optionsBackgroundSelectColor, details);
+bool Menu::Option(const std::string& option, const std::vector<std::string>& details) {
+    return Option(option, optionsBackgroundSelectColor, details);
 }
 
-bool Menu::Option(std::string option, Color highlight, const std::vector<std::string>& details) {
+bool Menu::Option(const std::string& option, Color highlight, const std::vector<std::string>& details) {
     optioncount++;
 
     bool highlighted = currentoption == optioncount;
@@ -238,18 +235,19 @@ bool Menu::Option(std::string option, Color highlight, const std::vector<std::st
     if (visible) {
         const float chaletLondonMult = optionsFont == 0 ? 0.75f : 1.0f;
         bool appendDots = false;
-        while (getStringWidth(option, optionTextSize * chaletLondonMult, optionsFont) > (menuWidth - 2.0f * menuTextMargin)) {
-            option.pop_back();
+        std::string optionTrunc = option;
+        while (getStringWidth(optionTrunc, optionTextSize * chaletLondonMult, optionsFont) > (menuWidth - 2.0f * menuTextMargin)) {
+            optionTrunc.pop_back();
             appendDots = true;
         }
         if (appendDots) {
-            option.pop_back();
-            option.pop_back();
-            option.pop_back();
-            option += "...";
+            optionTrunc.pop_back();
+            optionTrunc.pop_back();
+            optionTrunc.pop_back();
+            optionTrunc += "...";
         }
         textDraws.push_back([=]() {
-            drawText(option, optionsFont, 
+            drawText(optionTrunc, optionsFont,
                 (menuX - menuWidth / 2.0f) + menuTextMargin, 
                 optiontexty, 
                 optionTextSize, optionTextSize, 
@@ -265,8 +263,8 @@ bool Menu::Option(std::string option, Color highlight, const std::vector<std::st
                 oldSmoothY = highlightY;
             }
             highlightsSpriteDraws.push_back(
-                std::bind(&Menu::drawSprite, this, textureDicts[highlTextureIndex], textureNames[highlTextureIndex],
-                    menuX, highlightY, menuWidth, optionHeight, 0.0f, highlight)
+                [=]() { drawSprite(textureDicts[highlTextureIndex], textureNames[highlTextureIndex],
+                    menuX, highlightY, menuWidth, optionHeight, 0.0f, highlight); }
             );
 
             if (!details.empty()) {
@@ -279,44 +277,44 @@ bool Menu::Option(std::string option, Color highlight, const std::vector<std::st
     return optionpress && currentoption == optioncount;
 }
 
-bool Menu::MenuOption(std::string option, std::string menu, const std::vector<std::string>& details) {
-    Option(std::move(option), details);
+bool Menu::MenuOption(const std::string& option, const std::string& menu, const std::vector<std::string>& details) {
+    Option(option, details);
     float indicatorHeight = totalHeight - optionHeight; // why the hell was this menu designed like *this*?
     bool highlighted = currentoption == optioncount;
 
     if (currentoption <= maxDisplay && optioncount <= maxDisplay) {
         textDraws.push_back(
-            std::bind(&Menu::drawText, this,
+            [=]() { drawText(
             "2", 3,
             menuX + menuWidth / 2.0f - optionRightMargin,
             indicatorHeight + menuY,
             optionTextSize * 0.75f, optionTextSize * 0.75f,
             highlighted ? optionsTextSelectColor : optionsTextColor, 2
-            ));
+            ); });
     }
     else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption) {
         textDraws.push_back(
-            std::bind(&Menu::drawText, this,
+            [=]() { drawText(
             "2", 3,
             menuX + menuWidth / 2.0f - optionRightMargin,
             menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight,
             optionTextSize * 0.75f, optionTextSize * 0.75f,
             highlighted ? optionsTextSelectColor : optionsTextColor, 2
-        ));
+        ); });
     }
 
     if (optionpress && currentoption == optioncount) {
         optionpress = false;
-        changeMenu(std::move(menu));
+        changeMenu(menu);
         return true;
     }
     return false;
 }
 
-bool Menu::OptionPlus(std::string option, const std::vector<std::string>& extra, bool *_highlighted,
+bool Menu::OptionPlus(const std::string& option, const std::vector<std::string>& extra, bool *_highlighted,
                       const std::function<void() >& onRight, const std::function<void() >& onLeft,
-                      std::string title, const std::vector<std::string>& details) {
-    Option(std::move(option), details);
+                      const std::string& title, const std::vector<std::string>& details) {
+    Option(option, details);
     size_t infoLines = extra.size();
     bool highlighted = currentoption == optioncount;
     if (_highlighted != nullptr) {
@@ -339,18 +337,18 @@ bool Menu::OptionPlus(std::string option, const std::vector<std::string>& extra,
     if (highlighted && infoLines > 0 && 
         ((currentoption <= maxDisplay && optioncount <= maxDisplay) ||
         ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption))) {
-        drawOptionPlusExtras(extra, std::move(title));
+        drawOptionPlusExtras(extra, title);
     }
 
     return optionpress && currentoption == optioncount;
 }
 
-void Menu::OptionPlusPlus(const std::vector<std::string>& extra, std::string title) {
-    drawOptionPlusExtras(extra, std::move(title));
+void Menu::OptionPlusPlus(const std::vector<std::string>& extra, const std::string& title) {
+    drawOptionPlusExtras(extra, title);
 }
 
-bool Menu::IntOption(std::string option, int &var, int min, int max, int step, const std::vector<std::string>& details) {
-    Option(std::move(option), details);
+bool Menu::IntOption(const std::string& option, int &var, int min, int max, int step, const std::vector<std::string>& details) {
+    Option(option, details);
     std::string printVar = std::to_string(var);
     bool highlighted = currentoption == optioncount;
 
@@ -358,9 +356,9 @@ bool Menu::IntOption(std::string option, int &var, int min, int max, int step, c
     return processOptionItemControls(var, min, max, step);
 }
 
-bool Menu::FloatOption(std::string option, float &var, float min, float max, float step, 
+bool Menu::FloatOption(const std::string& option, float &var, float min, float max, float step,
                        const std::vector<std::string>& details) {
-    Option(std::move(option), details);
+    Option(option, details);
     unsigned precision = behindDec(step);
     if (precision < 2) precision = 2;
     if (precision > 6) precision = 6;
@@ -376,8 +374,8 @@ bool Menu::FloatOption(std::string option, float &var, float min, float max, flo
     return processOptionItemControls(var, min, max, step);
 }
 
-bool Menu::BoolOption(std::string option, bool &var, const std::vector<std::string>& details) {
-    Option(std::move(option), details);
+bool Menu::BoolOption(const std::string& option, bool &var, const std::vector<std::string>& details) {
+    Option(option, details);
     float indicatorHeight = totalHeight - optionHeight;
     bool highlighted = currentoption == optioncount;
     
@@ -409,9 +407,9 @@ bool Menu::BoolOption(std::string option, bool &var, const std::vector<std::stri
         GRAPHICS::_GET_ACTIVE_SCREEN_RESOLUTION(&resX, &resY);
         float ratio = static_cast<float>(resX) / static_cast<float>(resY);
         foregroundSpriteCalls.push_back(
-            std::bind(&Menu::drawSprite, this, "commonmenu", tickBoxTexture,
-            menuX + menuWidth/2.0f - optionRightMargin, textureY, boxSz/ratio, boxSz, 0.0f, optionColors)
-        );
+            [=]() { drawSprite("commonmenu", tickBoxTexture,
+                menuX + menuWidth / 2.0f - optionRightMargin, textureY, boxSz / ratio, boxSz, 0.0f, optionColors)
+        ; });
     }
 
     if (optionpress && currentoption == optioncount) {
@@ -421,32 +419,32 @@ bool Menu::BoolOption(std::string option, bool &var, const std::vector<std::stri
     return false;
 }
 
-bool Menu::BoolSpriteOption(std::string option, bool enabled, std::string category, std::string spriteOn, 
-                            std::string spriteOff, const std::vector<std::string>& details) {
-    Option(std::move(option), details);
+bool Menu::BoolSpriteOption(const std::string& option, bool enabled, std::string category, const std::string& spriteOn,
+                            const std::string& spriteOff, const std::vector<std::string>& details) {
+    Option(option, details);
     float indicatorHeight = totalHeight - optionHeight;
     bool highlighted = currentoption == optioncount;
     
     if (currentoption <= maxDisplay && optioncount <= maxDisplay) {
         foregroundSpriteCalls.push_back(
-            std::bind(&Menu::drawSprite, this, category, enabled ? spriteOn : spriteOff,
+            [=]() { drawSprite(category, enabled ? spriteOn : spriteOff,
             menuX + menuWidth/2.0f - optionRightMargin, 
             (indicatorHeight + (menuY + 0.016f)), 
-            0.03f, 0.05f, 0.0f, highlighted ? optionsTextSelectColor : optionsTextColor));
+            0.03f, 0.05f, 0.0f, highlighted ? optionsTextSelectColor : optionsTextColor); });
     }
     else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption) {
         foregroundSpriteCalls.push_back(
-            std::bind(&Menu::drawSprite, this, category, enabled ? spriteOn : spriteOff,
+            [=]() { drawSprite(category, enabled ? spriteOn : spriteOff,
             menuX + menuWidth/2.0f - optionRightMargin, 
             menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight + 0.016f,
-            0.03f, 0.05f, 0.0f, highlighted ? optionsTextSelectColor : optionsTextColor));
+            0.03f, 0.05f, 0.0f, highlighted ? optionsTextSelectColor : optionsTextColor); });
     }
 
     return optionpress && currentoption == optioncount;
 }
 
-bool Menu::IntArray(std::string option, std::vector<int> display, int &iterator, const std::vector<std::string>& details) {
-    Option(std::move(option), details);
+bool Menu::IntArray(const std::string& option, std::vector<int> display, int &iterator, const std::vector<std::string>& details) {
+    Option(option, details);
     bool highlighted = currentoption == optioncount;
 
     std::string printVar = std::to_string(display[iterator]);
@@ -458,9 +456,9 @@ bool Menu::IntArray(std::string option, std::vector<int> display, int &iterator,
     return processOptionItemControls(iterator, min, max, 1);
 }
 
-bool Menu::FloatArray(std::string option, std::vector<float> display, int &iterator, 
+bool Menu::FloatArray(const std::string& option, std::vector<float> display, int &iterator,
                       const std::vector<std::string>& details) {
-    Option(std::move(option), details);
+    Option(option, details);
     bool highlighted = currentoption == optioncount;
     int min = 0;
     int max = static_cast<int>(display.size()) - 1;
@@ -482,9 +480,9 @@ bool Menu::FloatArray(std::string option, std::vector<float> display, int &itera
     return processOptionItemControls(iterator, min, max, 1);
 }
 
-bool Menu::StringArray(std::string option, std::vector<std::string>display, int &iterator,
+bool Menu::StringArray(const std::string& option, const std::vector<std::string>& display, int &iterator,
                        const std::vector<std::string>& details) {
-    Option(std::move(option), details);
+    Option(option, details);
     bool highlighted = currentoption == optioncount; 
     int min = 0;
     int max = static_cast<int>(display.size()) - 1;
@@ -516,7 +514,7 @@ void Menu::drawInstructionalButtons() {
     instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 3, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneDown, 0)), std::string("Previous option") });
 
     //int count = 2;
-    //for (auto button : instructionalButtons) {
+    //for (const auto& button : instructionalButtons) {
     //    if (button.ItemBind == null || MenuItems[CurrentSelection] == button.ItemBind) {
     //        instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { count, button.GetButtonId(), button.Text });
     //        count++;
@@ -544,39 +542,39 @@ void Menu::drawMenuDetails() {
     switch (footerType) {
         case FooterType::Color: {
             backgroundRectDraws.push_back(
-                std::bind(&Menu::drawRect, this,
-                          menuX, footerBackY, menuWidth, optionHeight, footerColor)
+                [=]() { drawRect(
+                          menuX, footerBackY, menuWidth, optionHeight, footerColor); }
             );
             break;
         }
         case FooterType::Sprite: {
             backgroundSpriteDraws.push_back(
-                std::bind(&Menu::drawSprite, this, footerSprite.Dictionary, footerSprite.Name,
-                          menuX, footerBackY, menuWidth, optionHeight, 0.0f, titleBackgroundColor)
+                [=]() { drawSprite(footerSprite.Dictionary, footerSprite.Name,
+                          menuX, footerBackY, menuWidth, optionHeight, 0.0f, titleBackgroundColor); }
             );
             break;
         }
         default: {
             backgroundRectDraws.push_back(
-                std::bind(&Menu::drawRect, this,
-                          menuX, footerBackY, menuWidth, optionHeight, solidBlack)
+                [=]() { drawRect(
+                          menuX, footerBackY, menuWidth, optionHeight, solidBlack); }
             );
             break;
         }
     }
     
     textDraws.push_back(
-        std::bind(&Menu::drawText, this, std::to_string(currentoption) + " / " + std::to_string(optioncount),
-                  optionsFont, menuX - 0.1f, footerTextY, optionTextSize, optionTextSize, titleTextColor, 2)
+        [=]() { drawText(std::to_string(currentoption) + " / " + std::to_string(optioncount),
+                  optionsFont, menuX - 0.1f, footerTextY, optionTextSize, optionTextSize, titleTextColor, 2); }
     );
 
     // Options background
     backgroundSpriteDraws.push_back(
-        std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex], 
+        [=]() { drawSprite(textureDicts[backgTextureIndex], textureNames[backgTextureIndex], 
                   menuX, 
                   menuY + headerHeight + maxOptionCount * optionHeight / 2,
                   menuWidth, 
-                  optionHeight * maxOptionCount, 0.0f, optionsBackgroundColor)
+                  optionHeight * maxOptionCount, 0.0f, optionsBackgroundColor); }
     );
 
     // Menu detail box
@@ -587,32 +585,32 @@ void Menu::drawMenuDetails() {
     // Indicators
     if (currentoption == 1) {
         foregroundSpriteCalls.push_back(
-            std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
+            [=]() { drawSprite("commonmenu", "arrowright",
                       menuX, 
                       (footerTextY + 0.0175f),
-                      0.02f, 0.02f, 90.0f, titleTextColor)
+                      0.02f, 0.02f, 90.0f, titleTextColor); }
         );
     }
     else if (currentoption == optioncount) {
         foregroundSpriteCalls.push_back(
-            std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
+            [=]() { drawSprite("commonmenu", "arrowright",
                       menuX, 
                       (footerTextY + 0.0175f),
-                      0.02f, 0.02f, 270.0f, titleTextColor)
+                      0.02f, 0.02f, 270.0f, titleTextColor); }
         );
     }
     else {
         foregroundSpriteCalls.push_back(
-            std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
+            [=]() { drawSprite("commonmenu", "arrowright",
                       menuX, 
                       (footerTextY + 0.0125f),
-                      0.02f, 0.02f, 270.0f, titleTextColor)
+                      0.02f, 0.02f, 270.0f, titleTextColor); }
         );
         foregroundSpriteCalls.push_back(
-            std::bind(&Menu::drawSprite, this, "commonmenu", "arrowright",
+            [=]() { drawSprite("commonmenu", "arrowright",
                       menuX, 
                       (footerTextY + 0.0225f),
-                      0.02f, 0.02f, 90.0f, titleTextColor)
+                      0.02f, 0.02f, 90.0f, titleTextColor); }
         );
     }
 }
@@ -657,7 +655,7 @@ void Menu::CheckKeys() {
     controls.Update();
     optionpress = false;
 
-    if (GetTickCount() - delay > menuTime ||
+    if (GetTickCount64() - delay > menuTime ||
         controls.IsKeyJustPressed(MenuControls::MenuKey) ||
         controls.IsKeyJustPressed(MenuControls::MenuSelect) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneSelect) ||
         controls.IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneCancel) ||
@@ -695,7 +693,7 @@ void Menu::CheckKeys() {
     }
 
 
-    if (!useNative && GetTickCount() - delay > 1000) {
+    if (!useNative && GetTickCount64() - delay > 1000) {
         useNative = true;
     }
 
@@ -739,7 +737,7 @@ float Menu::getStringWidth(const std::string& text, float scale, int font) {
     return UI::_END_TEXT_COMMAND_GET_WIDTH(true);
 }
 
-std::vector<std::string> Menu::splitString(float maxWidth, std::string &details, float scale, int font) {
+std::vector<std::string> Menu::splitString(float maxWidth, const std::string& details, float scale, int font) {
     std::vector<std::string> splitLines;
 
     std::vector<std::string> words = split(details, ' ');
@@ -795,9 +793,10 @@ void Menu::drawSprite(const std::string& textureDict, const std::string& texture
     }
 }
 
-void Menu::drawOptionPlusTitle(std::string title) {
+void Menu::drawOptionPlusTitle(const std::string& title) {
     float newSize;
-    fitTitle(title, newSize, titleTextSize);
+    std::string newTitle = title;
+    fitTitle(newTitle, newSize, titleTextSize);
 
     float extrax = menuX + menuWidth;
 
@@ -805,17 +804,17 @@ void Menu::drawOptionPlusTitle(std::string title) {
     float titley = menuY + titleTextureOffset;
 
     textDraws.push_back(
-        std::bind(&Menu::drawText, this, title, titleFont, extrax, titletexty, newSize, newSize, titleTextColor, 0)
+        [=]() { drawText(newTitle, titleFont, extrax, titletexty, newSize, newSize, titleTextColor, 0); }
     );
 
     backgroundSpriteDraws.push_back(
-        std::bind(&Menu::drawSprite, this, textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
-        extrax, titley, menuWidth, titleHeight, 180.0f, titleBackgroundColor)
+        [=]() { drawSprite(textureDicts[titleTextureIndex], textureNames[titleTextureIndex],
+        extrax, titley, menuWidth, titleHeight, 180.0f, titleBackgroundColor); }
     );
     
 }
 
-void Menu::drawOptionPlusImage(std::string &extra, float &finalHeight) {
+void Menu::drawOptionPlusImage(const std::string& extra, float &finalHeight) {
     int imgHandle;
     int imgWidth; 
     int imgHeight;
@@ -824,8 +823,8 @@ void Menu::drawOptionPlusImage(std::string &extra, float &finalHeight) {
     if (nParams != 3) {
         std::string errTxt = "Format error: " + extra;
         textDraws.push_back(
-            std::bind(&Menu::drawText, this,
-                      errTxt, optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1));
+            [=]() { drawText(
+                      errTxt, optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1); });
         finalHeight += optionHeight;
         return;
     }
@@ -867,7 +866,7 @@ void Menu::drawOptionPlusImage(std::string &extra, float &finalHeight) {
     finalHeight += drawHeight * ar + 2.0f * menuTextMargin;
 }
 
-void Menu::drawOptionPlusSprite(std::string &extra, float &finalHeight) {
+void Menu::drawOptionPlusSprite(const std::string& extra, float &finalHeight) {
     const unsigned max_sz = 128;
     char dict[max_sz];
     char name[max_sz];
@@ -878,8 +877,8 @@ void Menu::drawOptionPlusSprite(std::string &extra, float &finalHeight) {
     if (nParams != 4) {
         std::string errTxt = "Format error: " + extra;
         textDraws.push_back(
-            std::bind(&Menu::drawText, this,
-                      errTxt, optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1));
+            [=]() { drawText(
+                      errTxt, optionsFont, menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight), optionTextSize, optionTextSize, optionsTextColor, 1); });
         finalHeight += optionHeight;
         return;
     }
@@ -889,44 +888,44 @@ void Menu::drawOptionPlusSprite(std::string &extra, float &finalHeight) {
     float imgYpos = finalHeight + drawHeight/2.0f + (menuY + headerHeight) + menuTextMargin;
             
     foregroundSpriteCalls.push_back(
-        std::bind(&Menu::drawSprite, this, std::string(dict), std::string(name),
-                  imgXpos, imgYpos, drawWidth, drawHeight, 0.0f, titleTextColor)
+        [=]() { drawSprite(std::string(dict), std::string(name),
+                  imgXpos, imgYpos, drawWidth, drawHeight, 0.0f, titleTextColor); }
     );
             
     finalHeight += drawHeight + 2.0f * menuTextMargin;
 }
 
-void Menu::drawOptionPlusText(std::string &extra, float &finalHeight) {
+void Menu::drawOptionPlusText(const std::string& extra, float &finalHeight) {
     std::vector<std::string> splitExtra;
     const float big_ass_Chalet_London_mult = optionsFont == 0 ? 0.75f : 1.0f;
     auto splitLines = splitString(menuWidth, extra, optionTextSize * big_ass_Chalet_London_mult, optionsFont);
     splitExtra.insert(std::end(splitExtra), std::begin(splitLines), std::end(splitLines));
     float heightModifier = 0.8f;
-    for (auto line = 0; line < splitExtra.size(); line++) {
+    for (size_t line = 0; line < splitExtra.size(); line++) {
         textDraws.push_back(
-            std::bind(&Menu::drawText, this,
+            [=]() { drawText(
                       splitExtra[line], optionsFont, 
                       menuX + menuWidth / 2.0f + menuTextMargin, finalHeight + (menuY + headerHeight) + line * optionHeight * heightModifier,
                       optionTextSize, optionTextSize, 
-                      optionsTextColor, 1));
+                      optionsTextColor, 1); });
     }
     finalHeight += splitExtra.size() * optionHeight * heightModifier;
 }
 
 void Menu::drawOptionPlusExtras(const std::vector<std::string>& extras, std::string title) {
     float extrax = menuX + menuWidth;
-    drawOptionPlusTitle(std::move(title));
+    drawOptionPlusTitle(title);
 
     if (headerHeight == titleHeight + subtitleHeight) {
         float subtitleY = subtitleTextureOffset + menuY + titleHeight;
         backgroundRectDraws.push_back(
-            std::bind(&Menu::drawRect, this, extrax, subtitleY, menuWidth, subtitleHeight, solidBlack)
+            [=]() { drawRect(extrax, subtitleY, menuWidth, subtitleHeight, solidBlack); }
         );
     }
 
     float finalHeight = 0;
 
-    for (auto extra : extras) {
+    for (const auto& extra : extras) {
         if (extra.compare(0, ImagePrefix.size(), ImagePrefix) == 0) {
             drawOptionPlusImage(extra, finalHeight);
         }
@@ -939,34 +938,34 @@ void Menu::drawOptionPlusExtras(const std::vector<std::string>& extras, std::str
     }
 
     backgroundSpriteDraws.push_back(
-        std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
-        extrax, menuY + headerHeight + finalHeight / 2.0f, menuWidth, finalHeight, 0.0f, optionsBackgroundColor)
+        [=]() { drawSprite(textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
+        extrax, menuY + headerHeight + finalHeight / 2.0f, menuWidth, finalHeight, 0.0f, optionsBackgroundColor); }
     );
 }
 
-void Menu::drawMenuDetails(std::vector<std::string> details, float y) {
+void Menu::drawMenuDetails(const std::vector<std::string>& details, float y) {
     std::vector<std::string> splitDetails;
     const float big_ass_Chalet_London_mult = optionsFont == 0 ? 0.75f : 1.0f;
-    for (auto detailLine : details) {
+    for (const auto& detailLine : details) {
         auto splitLines = splitString(menuWidth, detailLine, optionTextSize * big_ass_Chalet_London_mult, optionsFont);
         splitDetails.insert(std::end(splitDetails), std::begin(splitLines), std::end(splitLines));
     }
 
     for (unsigned i = 0; i < splitDetails.size(); ++i) {
         textDraws.push_back(
-            std::bind(&Menu::drawText, this,
-            splitDetails[i], optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, i * detailLineHeight + y, optionTextSize, optionTextSize, optionsTextColor, 1));
+            [=]() { drawText(
+            splitDetails[i], optionsFont, (menuX - menuWidth / 2.0f) + menuTextMargin, i * detailLineHeight + y, optionTextSize, optionTextSize, optionsTextColor, 1); });
     }
 
     // The thin line
-    backgroundRectDraws.push_back(std::bind(&Menu::drawRect, this,
-                                  menuX, y, menuWidth, optionHeight / 16.0f, solidBlack));
+    backgroundRectDraws.push_back([=]() { drawRect(
+                                  menuX, y, menuWidth, optionHeight / 16.0f, solidBlack); });
 
     float boxHeight = (splitDetails.size() * detailLineHeight) + (optionHeight - detailLineHeight);
 
     backgroundSpriteDraws.push_back(
-        std::bind(&Menu::drawSprite, this, textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
-        menuX, y + boxHeight / 2, menuWidth, boxHeight, 0.0f, optionsBackgroundColor));
+        [=]() { drawSprite(textureDicts[backgTextureIndex], textureNames[backgTextureIndex],
+        menuX, y + boxHeight / 2, menuWidth, boxHeight, 0.0f, optionsBackgroundColor); });
 }
 
 void Menu::drawOptionValue(const std::string& printVar, bool highlighted, int items) {
@@ -978,21 +977,21 @@ void Menu::drawOptionValue(const std::string& printVar, bool highlighted, int it
         leftArrow = rightArrow = "";
     }
     if (currentoption <= maxDisplay && optioncount <= maxDisplay) {
-        textDraws.push_back(std::bind(&Menu::drawText, this, leftArrow + printVar + rightArrow, optionsFont,
+        textDraws.push_back([=]() { drawText(leftArrow + printVar + rightArrow, optionsFont,
                                       menuX + menuWidth / 2.0f - optionRightMargin,
                                       indicatorHeight + menuY,
                                       optionTextSize, optionTextSize,
-                                      highlighted ? optionsTextSelectColor : optionsTextColor, 2));
+                                      highlighted ? optionsTextSelectColor : optionsTextColor, 2); });
     }
 
 
         
     else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption) {
-        textDraws.push_back(std::bind(&Menu::drawText, this, leftArrow + printVar + rightArrow, optionsFont,
+        textDraws.push_back([=]() { drawText(leftArrow + printVar + rightArrow, optionsFont,
                                       menuX + menuWidth / 2.0f - optionRightMargin,
                                       menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight,
                                       optionTextSize, optionTextSize,
-                                      highlighted ? optionsTextSelectColor : optionsTextColor, 2));
+                                      highlighted ? optionsTextSelectColor : optionsTextColor, 2); });
     }
 
 }
@@ -1000,11 +999,11 @@ void Menu::drawOptionValue(const std::string& printVar, bool highlighted, int it
 /*
  * Section Actions/Input
  */
-void Menu::changeMenu(std::string menuname) {
+void Menu::changeMenu(const std::string& menuname) {
     currentmenu[menulevel] = actualmenu;
     lastoption[actualmenu] = currentoption;
     menulevel++;
-    actualmenu = std::move(menuname);
+    actualmenu = menuname;
     previousoption = currentoption;
     currentoption = getWithDef(lastoption, actualmenu, 1);
     menuBeep();
@@ -1122,7 +1121,7 @@ void Menu::processMenuNav() {
                 onExit();
             }
         }
-        delay = GetTickCount();
+        delay = GetTickCount64();
         return;
     }
     if (controls.IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel)) {
@@ -1136,23 +1135,23 @@ void Menu::processMenuNav() {
             backMenu();
 
         }
-        delay = GetTickCount();
+        delay = GetTickCount64();
     }
     if (controls.IsKeyJustPressed(MenuControls::MenuSelect) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendAccept)) {
         if (menulevel > 0) {
             menuBeep();
         }
         optionpress = true;
-        delay = GetTickCount();
+        delay = GetTickCount64();
     }
     if (controls.IsKeyPressed(MenuControls::MenuDown) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
         nextOption();
-        delay = GetTickCount();
+        delay = GetTickCount64();
         downpress = true;
     }
     if (controls.IsKeyPressed(MenuControls::MenuUp) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
         previousOption();
-        delay = GetTickCount();
+        delay = GetTickCount64();
         uppress = true;
     }
     if (controls.IsKeyPressed(MenuControls::MenuLeft) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
@@ -1160,14 +1159,14 @@ void Menu::processMenuNav() {
             menuBeep();
         }
         leftpress = true;
-        delay = GetTickCount();
+        delay = GetTickCount64();
     }
     if (controls.IsKeyPressed(MenuControls::MenuRight) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
         if (menulevel > 0) {
             menuBeep();
         }
         rightpress = true;
-        delay = GetTickCount();
+        delay = GetTickCount64();
     }
 }
 

@@ -16,12 +16,6 @@ namespace NativeMenu {
 class Menu {
 public:
     /*
-     * c'tor and d'tor. As of current they don't do a lot.
-     */
-    Menu();
-    ~Menu();
-
-    /*
      * Specify settings file name/location. If not set, it will use default settings.
      * Calling this is pretty much mandatory. It's advised to call this just once after
      * figuring out the directory structure.
@@ -55,38 +49,38 @@ public:
     /*
      * Always assign a title to a submenu!
      */
-    void Title(std::string title);
-    void Title(std::string title, float customSize);
-    void Title(std::string title, std::string dict, std::string texture);
-    void Title(std::string title, std::string dict, std::string texture, float customSize);
+    void Title(const std::string& title);
+    void Title(const std::string& title, float customSize);
+    void Title(const std::string& title, const std::string& dict, const std::string& texture);
+    void Title(const std::string& title, const std::string& dict, const std::string& texture, float customSize);
 
     /*
      * Custom title textures have a resolution of 512x128, but any other
      * resolution with the same aspect ratio should work (4:1)
      */
-    void Title(std::string title, int textureHandle);
-    void Title(std::string title, int textureHandle, float customSize);
+    void Title(const std::string& title, int textureHandle);
+    void Title(const std::string& title, int textureHandle, float customSize);
 
     /*
      * A menu subtitle. This is optional. If added, this must be added directly
      * below the title, before any options are specified.
      */
-    void Subtitle(std::string subtitle);
+    void Subtitle(const std::string& subtitle);
 
     /*
      * Optional: Specify a different background texture for the footer.
      * If not used, solid black is used by default.
      */
     void Footer(Color color);
-    void Footer(std::string dict, std::string texture);
+    void Footer(const std::string& dict, const std::string& texture);
 
     /*
      * Normal option.
      * Shows nothing special.
      * Returns true on accept.
      */
-    bool Option(std::string option, const std::vector<std::string>& details = {});
-    bool Option(std::string option, Color highlight, const std::vector<std::string>& details = {});
+    bool Option(const std::string& option, const std::vector<std::string>& details = {});
+    bool Option(const std::string& option, Color highlight, const std::vector<std::string>& details = {});
 
     /*
      * Submenu option.
@@ -94,7 +88,7 @@ public:
      * Switches menu on action.
      * Returns true on accept.
      */
-    bool MenuOption(std::string option, std::string menu, const std::vector<std::string>& details = {});
+    bool MenuOption(const std::string& option, const std::string& menu, const std::vector<std::string>& details = {});
 
     /*
      * Option that shows an extra pane to the right.
@@ -107,47 +101,47 @@ public:
      * "highlighted" indicates the highlight status of the option. It can be a nullptr.
      * Returns true on accept.
      */
-    bool OptionPlus(std::string option, const std::vector<std::string>& extra, bool *highlighted = nullptr,
+    bool OptionPlus(const std::string& option, const std::vector<std::string>& extra, bool *highlighted = nullptr,
                     const std::function<void()>& onRight = nullptr, const std::function<void()>& onLeft = nullptr,
-                    std::string title = "Info", const std::vector<std::string>& details = {});
+                    const std::string& title = "Info", const std::vector<std::string>& details = {});
 
     /*
      * Can be used to draw the OptionPlus extras separately. Useful when generating
      * the extra text is costful or if no other things are needed. Running this when
      * OptionPlus is highlighted can improve performance.
      */
-    void OptionPlusPlus(const std::vector<std::string>& extra, std::string title = "Info");
+    void OptionPlusPlus(const std::vector<std::string>& extra, const std::string& title = "Info");
 
     /*
      * Option that changes an int value with optional custom-sized steps.
      * Shows option with the value inside < > brackets.
      * Returns true on accept, left and right.
      */
-    bool IntOption(        std::string option, int &var,    int min,    int max,    int step = 1, const std::vector<std::string>&
-                               details = {});
+    bool IntOption(const std::string& option, int &var, int min, int max, int step = 1, const std::vector<std::string>&
+                    details = {});
 
     /*
      * Option that changes a float value with optional custom-sized steps.
      * Shows option with the value inside < > brackets.
      * Returns true on accept, left and right.
      */
-    bool FloatOption(    std::string option, float &var, float min,    float max,    float step = 0.1f, const std::vector<std::string>
-                         & details = {});
+    bool FloatOption(const std::string& option, float &var, float min, float max, float step = 0.1f, const std::vector<std::string>
+                     & details = {});
 
     /*
      * Option that toggles a boolean.
      * Shows option with a checkbox, which is checked when the passed var is "true".
      * Returns true on accept.
      */
-    bool BoolOption(std::string option, bool &var, const std::vector<std::string>& details = {});
+    bool BoolOption(const std::string& option, bool &var, const std::vector<std::string>& details = {});
 
     /*
      * Option that displays a boolean with a specifyable texture.
      * Shows option with a checkbox, which is checked when the passed var is "true".
      * Returns true on accept.
      */
-    bool BoolSpriteOption(std::string option, bool enabled, std::string category, std::string spriteOn, 
-                          std::string spriteOff, const std::vector<std::string>& details = {});
+    bool BoolSpriteOption(const std::string& option, bool enabled, std::string category, const std::string& spriteOn,
+                          const std::string& spriteOff, const std::vector<std::string>& details = {});
 
     /*
      * Option that shows a scrollable list of supplied ints.
@@ -156,7 +150,7 @@ public:
      * On left or right press, iterator's value is incremented or decremented.
      * Returns true on accept, left and right.
      */
-    bool IntArray(std::string option, std::vector<int> display, int &iterator, const std::vector<std::string>& details = {});
+    bool IntArray(const std::string& option, std::vector<int> display, int &iterator, const std::vector<std::string>& details = {});
 
     /*
      * Option that shows a scrollable list of supplied floats.
@@ -165,7 +159,7 @@ public:
      * On left or right press, iterator's value is incremented or decremented.
      * Returns true on accept, left and right.
      */
-    bool FloatArray(std::string option, std::vector<float> display, int &iterator, 
+    bool FloatArray(const std::string& option, std::vector<float> display, int &iterator,
                     const std::vector<std::string>& details = {});
     
     /*
@@ -175,7 +169,7 @@ public:
      * On left or right press, iterator's value is incremented or decremented.
      * Returns true on accept, left and right.
      */
-    bool StringArray(std::string option, std::vector<std::string> display, int &iterator, 
+    bool StringArray(const std::string& option, const std::vector<std::string>& display, int &iterator,
                      const std::vector<std::string>& details = {});
     void drawInstructionalButtons();
     void drawMenuDetails();
@@ -270,9 +264,9 @@ private:
      * problem when the backgrounds were just rects, but with sprites this is
      * important.
      */
-    typedef std::vector<std::function<void(void)>> functionList;
+    typedef std::vector<std::function<void()>> functionList;
     functionList backgroundSpriteDraws;        // drawSprite
-    functionList backgroundRectDraws;        // drawRect
+    functionList backgroundRectDraws;          // drawRect
     functionList highlightsSpriteDraws;        // drawSprite
     functionList foregroundSpriteCalls;        // drawSprite
     functionList textDraws;                    // drawText
@@ -343,7 +337,7 @@ private:
     /*
      * Navigation-related members.
      */
-    unsigned int delay = GetTickCount();
+    uint64_t delay = GetTickCount64();
     std::vector<int> menuTimeDelays = {
         240,
         120,
@@ -383,7 +377,7 @@ private:
     int backgTextureIndex = 3;
     int highlTextureIndex = 4;
 
-    const std::map<int, int, std::greater<int>> recordGlobals{
+    const std::map<int, int, std::greater<>> recordGlobals{
         { 0, 0 },
         { 10, 0x42CA + 0x09 },
         { 14, 0x42DE + 0x09 },
@@ -399,19 +393,19 @@ private:
      * Functions! Should be self-explanatory.
      */
     float getStringWidth(const std::string& text, float scale, int font);
-    std::vector<std::string> splitString(float maxWidth, std::string &details, float scale, int font);
+    std::vector<std::string> splitString(float maxWidth, const std::string& details, float scale, int font);
     void drawText(const std::string& text, int font, float x, float y, float pUnknown, float scale, Color color, int justify);
     void drawRect(float x, float y, float width, float height, Color color);
     void drawSprite(const std::string& textureDict, const std::string& textureName, float x, float y, float width, float height, float rotation, Color color);
-    void drawOptionPlusTitle(std::string title);
-    void drawOptionPlusImage(std::string &extra, float &finalHeight);
-    void drawOptionPlusSprite(std::string &extra, float &finalHeight);
-    void drawOptionPlusText(std::string &extra, float &finalHeight);
+    void drawOptionPlusTitle(const std::string& title);
+    void drawOptionPlusImage(const std::string& extra, float &finalHeight);
+    void drawOptionPlusSprite(const std::string& extra, float &finalHeight);
+    void drawOptionPlusText(const std::string& extra, float &finalHeight);
     void drawOptionPlusExtras(const std::vector<std::string>& extra, std::string title = "Info");
-    void drawMenuDetails(std::vector<std::string> details, float y);
-    void drawOptionValue(const std::string& printVar, bool highlighted, int max = 0);
+    void drawMenuDetails(const std::vector<std::string>& details, float y);
+    void drawOptionValue(const std::string& printVar, bool highlighted, int items = 0);
 
-    void changeMenu(std::string menuname);
+    void changeMenu(const std::string& menuname);
     void nextOption();
     void previousOption();
     void backMenu();
@@ -443,15 +437,13 @@ private:
             if (var > max) var = min;
         }
 
-        if (optionpress && currentoption == optioncount)
-            return true;
-        return false;
+        return optionpress && currentoption == optioncount;
     }
 
     // https://stackoverflow.com/questions/2333728/stdmap-default-value
     template <template<class, class, class...> class C, typename K, typename V, typename... Args>
     V getWithDef(const C<K, V, Args...>& m, K const& key, const V & defval) {
-        typename C<K, V, Args...>::const_iterator it = m.find(key);
+        auto it = m.find(key);
         if (it == m.end())
             return defval;
         return it->second;
