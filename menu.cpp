@@ -293,11 +293,12 @@ bool Menu::MenuOption(const std::string& option, const std::string& menu, const 
             ); });
     }
     else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption) {
+        int optioncount_ = optioncount;
         textDraws.push_back(
             [=]() { drawText(
             "2", 3,
             menuX + menuWidth / 2.0f - optionRightMargin,
-            menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight,
+            menuY + headerHeight + (optioncount_ - (currentoption - maxDisplay + 1)) * optionHeight,
             optionTextSize * 0.75f, optionTextSize * 0.75f,
             highlighted ? optionsTextSelectColor : optionsTextColor, 2
         ); });
@@ -433,10 +434,11 @@ bool Menu::BoolSpriteOption(const std::string& option, bool enabled, std::string
             0.03f, 0.05f, 0.0f, highlighted ? optionsTextSelectColor : optionsTextColor); });
     }
     else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption) {
+        int optioncount_ = optioncount;
         foregroundSpriteCalls.push_back(
             [=]() { drawSprite(category, enabled ? spriteOn : spriteOff,
             menuX + menuWidth/2.0f - optionRightMargin, 
-            menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight + 0.016f,
+            menuY + headerHeight + (optioncount_ - (currentoption - maxDisplay + 1)) * optionHeight + 0.016f,
             0.03f, 0.05f, 0.0f, highlighted ? optionsTextSelectColor : optionsTextColor); });
     }
 
@@ -976,6 +978,7 @@ void Menu::drawOptionValue(const std::string& printVar, bool highlighted, int it
     if (items == 0) {
         leftArrow = rightArrow = "";
     }
+    // Non-scroll
     if (currentoption <= maxDisplay && optioncount <= maxDisplay) {
         textDraws.push_back([=]() { drawText(leftArrow + printVar + rightArrow, optionsFont,
                                       menuX + menuWidth / 2.0f - optionRightMargin,
@@ -983,17 +986,15 @@ void Menu::drawOptionValue(const std::string& printVar, bool highlighted, int it
                                       optionTextSize, optionTextSize,
                                       highlighted ? optionsTextSelectColor : optionsTextColor, 2); });
     }
-
-
-        
-    else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption) {
+    // Scroll
+    else if (optioncount > currentoption - maxDisplay && optioncount <= currentoption) {
+        int optioncount_ = optioncount;
         textDraws.push_back([=]() { drawText(leftArrow + printVar + rightArrow, optionsFont,
                                       menuX + menuWidth / 2.0f - optionRightMargin,
-                                      menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight,
+                                      menuY + headerHeight + (optioncount_ - (currentoption - maxDisplay + 1)) * optionHeight,
                                       optionTextSize, optionTextSize,
                                       highlighted ? optionsTextSelectColor : optionsTextColor, 2); });
     }
-
 }
 
 /*
