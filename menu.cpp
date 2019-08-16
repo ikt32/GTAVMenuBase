@@ -3,7 +3,6 @@
 #include "menu.h"
 
 #include <locale>
-#include <map>
 #include <utility>
 
 #include <inc/main.h>
@@ -11,6 +10,7 @@
 #include <inc/enums.h>
 #include "menucontrols.h"
 #include "menuutils.h"
+#include "menumemutils.hpp"
 #include "Scaleform.h"
 
 // TODO: Fixes:
@@ -25,6 +25,10 @@
 //      - Re-write to OO
 
 namespace NativeMenu {
+void Menu::Initialize() {
+    mRecordGlobal = FindRecordGlobal();
+}
+
 void Menu::SetFiles(const std::string &fileName) {
     settings.SetFiles(fileName);
 }
@@ -1060,13 +1064,9 @@ void Menu::resetButtonStates() {
 }
 
 void Menu::enableKeysOnce(bool enable) {
-    int recordGlobal = recordGlobals.lower_bound(getGameVersion())->second;
-    if (recordGlobalOverride != -1) {
-        recordGlobal = recordGlobalOverride;
-    }
     CAM::SET_CINEMATIC_BUTTON_ACTIVE(enable);
-    if (recordGlobal != 0) {
-        auto* ptr = getGlobalPtr(recordGlobal);
+    if (mRecordGlobal != 0) {
+        auto* ptr = getGlobalPtr(mRecordGlobal);
         if (ptr)
             *ptr = !enable;
     }

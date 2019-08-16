@@ -38,7 +38,7 @@ namespace NativeMenu {
 
         menuOpts->menuX = settingsMenu.GetDoubleValue("MENU", "MenuX", 0.0);
         menuOpts->menuY = settingsMenu.GetDoubleValue("MENU", "MenuY", 0.0);
-        menuOpts->recordGlobalOverride = settingsMenu.GetLongValue("MENU", "RecordGlobalOverride", -1);
+
         menuOpts->useSmoothScroll = settingsMenu.GetBoolValue("Navigation", "Smooth Scrolling", false);
         menuOpts->smoothFactor = settingsMenu.GetDoubleValue("Navigation", "Smooth Factor", 0.00001); 
 

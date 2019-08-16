@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <iterator>
 
 /*
  * Misc utilities that don't use natives and would clutter the main
@@ -46,5 +45,5 @@ namespace NativeMenu {
 
     //std::string makeCaps(std::string input);
 
-float lerp(float a, float b, float f);
+    float lerp(float a, float b, float f);
 }

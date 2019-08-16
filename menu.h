@@ -6,7 +6,6 @@
 #include <functional>
 #include <array>
 #include <unordered_map>
-#include <map>
 
 #include "menucontrols.h"
 #include "menuutils.h"
@@ -15,6 +14,11 @@
 namespace NativeMenu {
 class Menu {
 public:
+    /**
+     * Find the global variable.
+     */
+    void Initialize();
+
     /*
      * Specify settings file name/location. If not set, it will use default settings.
      * Calling this is pretty much mandatory. It's advised to call this just once after
@@ -238,7 +242,7 @@ public:
 
     bool useSmoothScroll = false;
     float smoothFactor = 0.00001f;
-    int recordGlobalOverride = -1;
+    uint16_t mRecordGlobal = 0;
 
 private:
     static const unsigned maxMenus = 255;
@@ -376,18 +380,6 @@ private:
     int titleTextureIndex = 2;
     int backgTextureIndex = 3;
     int highlTextureIndex = 4;
-
-    const std::map<int, int, std::greater<>> recordGlobals{
-        { 0, 0 },
-        { 10, 0x42CA + 0x09 },
-        { 14, 0x42DE + 0x09 },
-        { 26, 0x42FF + 0x09 },
-        { 28, 0x42FF + 0x82 },
-        { 38, 0x430A + 0x82 },
-        { 42, 0x4336 + 0x82 },
-        { 46, 0x434C + 0x82 },
-        { 50, 0x4378 + 0x82 },
-    };
 
     /*
      * Functions! Should be self-explanatory.
