@@ -765,9 +765,9 @@ std::vector<std::string> Menu::splitString(float maxWidth, const std::string& de
     return splitLines;
 }
 
-    // if justify == 2, treat x as right-dist?
 void Menu::drawText(const std::string& text, int font, float x, float y, float pUnknown, float scale, Color color, int justify) {
     // justify: 0 - center, 1 - left, 2 - right
+    // if justify == 2, treat x as right-dist?
     if (justify == 2) {
         UI::SET_TEXT_WRAP(menuX - menuWidth / 2, menuX + menuWidth / 2 - x/* - optionRightMargin / 2.0f*/);
     }
