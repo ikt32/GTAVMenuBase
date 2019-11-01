@@ -290,7 +290,7 @@ bool Menu::MenuOption(const std::string& option, const std::string& menu, const 
         textDraws.push_back(
             [=]() { drawText(
             "2", 3,
-            menuX + menuWidth / 2.0f - optionRightMargin,
+            optionRightMargin / 2.0f,//menuX + menuWidth / 2.0f - optionRightMargin,
             indicatorHeight + menuY,
             optionTextSize * 0.75f, optionTextSize * 0.75f,
             highlighted ? optionsTextSelectColor : optionsTextColor, 2
@@ -301,7 +301,7 @@ bool Menu::MenuOption(const std::string& option, const std::string& menu, const 
         textDraws.push_back(
             [=]() { drawText(
             "2", 3,
-            menuX + menuWidth / 2.0f - optionRightMargin,
+            optionRightMargin / 2.0f, //menuX + menuWidth / 2.0f - optionRightMargin,
             menuY + headerHeight + (optioncount_ - (currentoption - maxDisplay + 1)) * optionHeight,
             optionTextSize * 0.75f, optionTextSize * 0.75f,
             highlighted ? optionsTextSelectColor : optionsTextColor, 2
@@ -765,10 +765,11 @@ std::vector<std::string> Menu::splitString(float maxWidth, const std::string& de
     return splitLines;
 }
 
+    // if justify == 2, treat x as right-dist?
 void Menu::drawText(const std::string& text, int font, float x, float y, float pUnknown, float scale, Color color, int justify) {
     // justify: 0 - center, 1 - left, 2 - right
     if (justify == 2) {
-        UI::SET_TEXT_WRAP(menuX - menuWidth / 2, menuX + menuWidth / 2 - optionRightMargin / 2.0f);
+        UI::SET_TEXT_WRAP(menuX - menuWidth / 2, menuX + menuWidth / 2 - x/* - optionRightMargin / 2.0f*/);
     }
     UI::SET_TEXT_JUSTIFICATION(justify);
 
@@ -977,15 +978,50 @@ void Menu::drawMenuDetails(const std::vector<std::string>& details, float y) {
 void Menu::drawOptionValue(const std::string& printVar, bool highlighted, int items) {
     float indicatorHeight = totalHeight - optionHeight;
 
-    std::string leftArrow = "< ";
-    std::string rightArrow = " >";
-    if (items == 0) {
-        leftArrow = rightArrow = "";
+    const float chaletLondonMult = optionsFont == 0 ? 0.75f : 1.0f;
+    float textWidth = getStringWidth(printVar, optionTextSize * chaletLondonMult, optionsFont);
+    const float spriteSz = 0.025f;
+
+    float arrowBuff = 0.0f;
+    if (items > 0) {
+        bool doDraw = false;
+        float textureY;
+        if (currentoption <= maxDisplay && optioncount <= maxDisplay) {
+            doDraw = true;
+            textureY = (indicatorHeight + (menuY + 0.0175f));
+        }
+        else if ((optioncount > (currentoption - maxDisplay)) && optioncount <= currentoption) {
+            doDraw = true;
+            textureY = menuY + headerHeight + (optioncount - (currentoption - maxDisplay + 1)) * optionHeight + 0.0175f;
+        }
+
+        if (doDraw) {
+            int resX, resY;
+            GRAPHICS::_GET_ACTIVE_SCREEN_RESOLUTION(&resX, &resY);
+            float ratio = static_cast<float>(resX) / static_cast<float>(resY);
+            foregroundSpriteCalls.push_back(
+                [=]() {
+                    drawSprite("commonmenu", "arrowleft",
+                        menuX + menuWidth / 2.0f - optionRightMargin - textWidth - spriteSz / ratio,
+                        textureY,
+                        spriteSz / ratio, spriteSz,
+                        0.0f,
+                        highlighted ? solidBlack : solidWhite);
+                    drawSprite("commonmenu", "arrowright",
+                        menuX + menuWidth / 2.0f - optionRightMargin,
+                        textureY,
+                        spriteSz / ratio, spriteSz,
+                        0.0f,
+                        highlighted ? solidBlack : solidWhite);
+                });
+            arrowBuff = spriteSz / ratio;
+        }
     }
+
     // Non-scroll
     if (currentoption <= maxDisplay && optioncount <= maxDisplay) {
-        textDraws.push_back([=]() { drawText(leftArrow + printVar + rightArrow, optionsFont,
-                                      menuX + menuWidth / 2.0f - optionRightMargin,
+        textDraws.push_back([=]() { drawText(printVar, optionsFont,
+                                      optionRightMargin / 2.0f + arrowBuff,
                                       indicatorHeight + menuY,
                                       optionTextSize, optionTextSize,
                                       highlighted ? optionsTextSelectColor : optionsTextColor, 2); });
@@ -993,8 +1029,8 @@ void Menu::drawOptionValue(const std::string& printVar, bool highlighted, int it
     // Scroll
     else if (optioncount > currentoption - maxDisplay && optioncount <= currentoption) {
         int optioncount_ = optioncount;
-        textDraws.push_back([=]() { drawText(leftArrow + printVar + rightArrow, optionsFont,
-                                      menuX + menuWidth / 2.0f - optionRightMargin,
+        textDraws.push_back([=]() { drawText(printVar, optionsFont,
+                                      optionRightMargin / 2.0f + arrowBuff,
                                       menuY + headerHeight + (optioncount_ - (currentoption - maxDisplay + 1)) * optionHeight,
                                       optionTextSize, optionTextSize,
                                       highlighted ? optionsTextSelectColor : optionsTextColor, 2); });
