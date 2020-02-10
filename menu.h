@@ -131,6 +131,8 @@ public:
      */
     bool FloatOption(const std::string& option, float &var, float min, float max, float step = 0.1f, const std::vector<std::string>
                      & details = {});
+    bool FloatOptionCb(const std::string& option, float& var, float min, float max, float step, 
+                       const std::function<bool(float&)>& extFunc, const std::vector<std::string>& details = {});
 
     /*
      * Option that toggles a boolean.
@@ -427,6 +429,35 @@ private:
                 return true;
             }
             if (var > max) var = min;
+        }
+
+        return optionpress && currentoption == optioncount;
+    }
+
+    template <typename T>
+    bool processOptionItemControls(T& var, T min, T max, T step, const std::function<bool(T&)>& f) {
+        if (currentoption == optioncount) {
+            if (leftpress) {
+                if (var <= min) var = max;
+                else var -= step;
+                leftpress = false;
+                return true;
+            }
+            if (var < min) var = max;
+            if (rightpress) {
+                if (var >= max) var = min;
+                else var += step;
+                rightpress = false;
+                return true;
+            }
+            if (var > max) var = min;
+
+            if (optionpress) {
+                float var_ = var;
+                if (f(var_)) {
+                    var = var_;
+                }
+            }
         }
 
         return optionpress && currentoption == optioncount;

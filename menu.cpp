@@ -379,6 +379,24 @@ bool Menu::FloatOption(const std::string& option, float &var, float min, float m
     return processOptionItemControls(var, min, max, step);
 }
 
+bool Menu::FloatOptionCb(const std::string& option, float& var, float min, float max, float step,
+                         const std::function<bool(float&)>& extFunc, const std::vector<std::string>& details) {
+    Option(option, details);
+    unsigned precision = behindDec(step);
+    if (precision < 2) precision = 2;
+    if (precision > 6) precision = 6;
+
+    char buf[100];
+    _snprintf_s(buf, sizeof(buf), "%.*f", precision, var);
+    std::string printVar = buf;
+    int items = min != max ? 1 : 0;
+
+    bool highlighted = currentoption == optioncount;
+
+    drawOptionValue(printVar, highlighted, items);
+    return processOptionItemControls(var, min, max, step, extFunc);
+}
+
 bool Menu::BoolOption(const std::string& option, bool &var, const std::vector<std::string>& details) {
     Option(option, details);
     float indicatorHeight = totalHeight - optionHeight;
