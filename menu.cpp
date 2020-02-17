@@ -27,6 +27,7 @@
 namespace NativeMenu {
 void Menu::Initialize() {
     mRecordGlobal = FindRecordGlobal();
+    currentmenu[0] = "reserved_nomenu";
 }
 
 void Menu::SetFiles(const std::string &fileName) {
