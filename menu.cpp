@@ -404,7 +404,7 @@ bool Menu::BoolOption(const std::string& option, bool &var, const std::vector<st
     float indicatorHeight = totalHeight - optionHeight;
     bool highlighted = currentoption == optioncount;
     
-    char *tickBoxTexture;
+    const char* tickBoxTexture;
     Color optionColors = optionsTextColor;
     float boxSz = 0.0475f;
 
