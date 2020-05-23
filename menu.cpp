@@ -676,6 +676,9 @@ void Menu::CheckKeys() {
     if (!cheatString.empty()) {
         if (GAMEPLAY::_HAS_CHEAT_STRING_JUST_BEEN_ENTERED(GAMEPLAY::GET_HASH_KEY((char*)cheatString.c_str()))) {
             OpenMenu();
+            controls.Update();
+            optionpress = false;
+            return;
         }
     }
     controls.Update();
@@ -689,7 +692,6 @@ void Menu::CheckKeys() {
         controls.IsKeyJustPressed(MenuControls::MenuDown) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendDown) ||
         controls.IsKeyJustPressed(MenuControls::MenuLeft) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneLeft) ||
         controls.IsKeyJustPressed(MenuControls::MenuRight) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneRight)) {
-
         processMenuNav();
     }
 
@@ -1156,16 +1158,16 @@ void Menu::disableKeys() {
 }
 
 void Menu::processMenuNav() {
-    if (controls.IsKeyJustPressed(MenuControls::MenuSelect) ||
-        controls.IsKeyJustPressed(MenuControls::MenuCancel) ||
-        controls.IsKeyJustPressed(MenuControls::MenuUp) ||
-        controls.IsKeyJustPressed(MenuControls::MenuDown) ||
-        controls.IsKeyJustPressed(MenuControls::MenuLeft) ||
-        controls.IsKeyJustPressed(MenuControls::MenuRight)) {
+    if (controls.IsKeyPressed(MenuControls::MenuSelect) ||
+        controls.IsKeyPressed(MenuControls::MenuCancel) ||
+        controls.IsKeyPressed(MenuControls::MenuUp) ||
+        controls.IsKeyPressed(MenuControls::MenuDown) ||
+        controls.IsKeyPressed(MenuControls::MenuLeft) ||
+        controls.IsKeyPressed(MenuControls::MenuRight)) {
         useNative = false;
     }
 
-    if (controls.IsKeyJustPressed(MenuControls::MenuKey) || useNative &&
+    if (controls.IsKeyJustReleased(MenuControls::MenuKey) || useNative &&
         CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, controls.ControllerButton1) &&
         CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, controls.ControllerButton2)) {
         if (menulevel == 0) {
@@ -1181,7 +1183,8 @@ void Menu::processMenuNav() {
         delay = GetTickCount64();
         return;
     }
-    if (controls.IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel)) {
+    if (controls.IsKeyJustReleased(MenuControls::MenuCancel) || 
+        useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendCancel)) {
         if (menulevel > 0) {
             if (menulevel == 1) {
                 enableKeysOnce(true);
@@ -1194,31 +1197,36 @@ void Menu::processMenuNav() {
         }
         delay = GetTickCount64();
     }
-    if (controls.IsKeyJustPressed(MenuControls::MenuSelect) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendAccept)) {
+    if (controls.IsKeyJustReleased(MenuControls::MenuSelect) || 
+        useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendAccept)) {
         if (menulevel > 0) {
             menuBeep();
         }
         optionpress = true;
         delay = GetTickCount64();
     }
-    if (controls.IsKeyPressed(MenuControls::MenuDown) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
+    if (controls.IsKeyPressed(MenuControls::MenuDown) || 
+        useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
         nextOption();
         delay = GetTickCount64();
         downpress = true;
     }
-    if (controls.IsKeyPressed(MenuControls::MenuUp) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
+    if (controls.IsKeyPressed(MenuControls::MenuUp) || 
+        useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
         previousOption();
         delay = GetTickCount64();
         uppress = true;
     }
-    if (controls.IsKeyPressed(MenuControls::MenuLeft) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
+    if (controls.IsKeyPressed(MenuControls::MenuLeft) || 
+        useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
         if (menulevel > 0) {
             menuBeep();
         }
         leftpress = true;
         delay = GetTickCount64();
     }
-    if (controls.IsKeyPressed(MenuControls::MenuRight) || useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
+    if (controls.IsKeyPressed(MenuControls::MenuRight) || 
+        useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
         if (menulevel > 0) {
             menuBeep();
         }
