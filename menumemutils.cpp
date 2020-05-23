@@ -10,6 +10,7 @@
 #include <Windows.h>
 #include <Psapi.h>
 #include <array>
+#include <string>
 
 namespace NativeMenu {
     uint16_t gRecordGlobal = 0;
