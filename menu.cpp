@@ -591,7 +591,9 @@ void Menu::drawMenuDetails() {
     
     textDraws.push_back(
         [=]() { drawText(std::to_string(currentoption) + " / " + std::to_string(optioncount),
-                  optionsFont, menuX - 0.1f, footerTextY, optionTextSize, optionTextSize, titleTextColor, 2); }
+                  optionsFont,
+                  optionRightMargin / 2.0f,
+                  footerTextY, optionTextSize, optionTextSize, titleTextColor, 2); }
     );
 
     // Options background
