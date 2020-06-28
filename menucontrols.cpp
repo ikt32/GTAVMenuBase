@@ -62,16 +62,16 @@ bool MenuControls::IsKeyPressed(ControlType control) {
         // Size of eControl
         for (unsigned i = 0; i < eControlSize; ++i) {
             nControlPrev[i] = nControlCurr[i];
-            nControlCurr[i] = CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, i) != 0;
+            nControlCurr[i] = PAD::IS_DISABLED_CONTROL_PRESSED(0, i) != 0;
         }
     }
 
     bool MenuControls::IsControlDownFor(eControl control, unsigned long long millis) {
-        if (CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, control)) {
+        if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, control)) {
             nPressTime[control] = milliseconds_now();
         }
 
-        return CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, control) &&
+        return PAD::IS_DISABLED_CONTROL_PRESSED(0, control) &&
             (milliseconds_now() - nPressTime[control]) >= millis;
     }
 }

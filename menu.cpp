@@ -265,7 +265,7 @@ bool Menu::Option(const std::string& option, Color highlight, const std::vector<
             if (useSmoothScroll) {
                 highlightY = lerp(oldSmoothY,
                     optiony,
-                    1.0f - pow(smoothFactor, GAMEPLAY::GET_FRAME_TIME()));
+                    1.0f - pow(smoothFactor, MISC::GET_FRAME_TIME()));
                 oldSmoothY = highlightY;
             }
             highlightsSpriteDraws.push_back(
@@ -534,10 +534,10 @@ void Menu::drawInstructionalButtons() {
     instructionalButtonsScaleform.CallFunction("CLEAR_ALL");
     instructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", { 0 });
     instructionalButtonsScaleform.CallFunction("CREATE_CONTAINER");
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 0, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneSelect, 0)), std::string(UI::_GET_LABEL_TEXT("HUD_INPUT2")) });
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 1, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneCancel, 0)), std::string(UI::_GET_LABEL_TEXT("HUD_INPUT3")) });
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 2, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneUp, 0)), std::string("Next option") });
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 3, std::string(CONTROLS::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneDown, 0)), std::string("Previous option") });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 0, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneSelect, 0)), std::string(HUD::_GET_LABEL_TEXT("HUD_INPUT2")) });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 1, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneCancel, 0)), std::string(HUD::_GET_LABEL_TEXT("HUD_INPUT3")) });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 2, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneUp, 0)), std::string("Next option") });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 3, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTON(2, ControlPhoneDown, 0)), std::string("Previous option") });
 
     //int count = 2;
     //for (const auto& button : instructionalButtons) {
@@ -649,14 +649,14 @@ void Menu::EndMenu() {
 
     drawMenuDetails();
 
-    GRAPHICS::_SCREEN_DRAW_POSITION_BEGIN(76, 84);
-    GRAPHICS::_SCREEN_DRAW_POSITION_RATIO(0, 0, 0, 0);
+    GRAPHICS::SET_SCRIPT_GFX_ALIGN('L', 'T');
+    GRAPHICS::SET_SCRIPT_GFX_ALIGN_PARAMS(0, 0, 0, 0);
     for (const auto& f : backgroundSpriteDraws) { f(); }
     for (const auto& f : backgroundRectDraws)   { f(); }
     for (const auto& f : highlightsSpriteDraws) { f(); }
     for (const auto& f : foregroundSpriteCalls) { f(); }
     for (const auto& f : textDraws)             { f(); }
-    GRAPHICS::_SCREEN_DRAW_POSITION_END();
+    GRAPHICS::RESET_SCRIPT_GFX_ALIGN();
 
     backgroundSpriteDraws.clear();
     backgroundRectDraws.clear();
@@ -668,7 +668,10 @@ void Menu::EndMenu() {
 
     hideHUDComponents();
     disableKeys();
+
+    GRAPHICS::SET_SCRIPT_GFX_ALIGN(76, 84);
     drawInstructionalButtons();
+    GRAPHICS::RESET_SCRIPT_GFX_ALIGN();
 }
 
 /*
@@ -676,7 +679,7 @@ void Menu::EndMenu() {
  */
 void Menu::CheckKeys() {
     if (!cheatString.empty()) {
-        if (GAMEPLAY::_HAS_CHEAT_STRING_JUST_BEEN_ENTERED(GAMEPLAY::GET_HASH_KEY((char*)cheatString.c_str()))) {
+        if (MISC::_HAS_CHEAT_STRING_JUST_BEEN_ENTERED(MISC::GET_HASH_KEY((char*)cheatString.c_str()))) {
             OpenMenu();
             controls.Update();
             optionpress = false;
@@ -688,12 +691,12 @@ void Menu::CheckKeys() {
 
     if (GetTickCount64() - delay > menuTime ||
         controls.IsKeyJustPressed(MenuControls::MenuKey) ||
-        controls.IsKeyJustPressed(MenuControls::MenuSelect) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneSelect) ||
-        controls.IsKeyJustPressed(MenuControls::MenuCancel) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneCancel) ||
-        controls.IsKeyJustPressed(MenuControls::MenuUp) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendUp) ||
-        controls.IsKeyJustPressed(MenuControls::MenuDown) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendDown) ||
-        controls.IsKeyJustPressed(MenuControls::MenuLeft) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneLeft) ||
-        controls.IsKeyJustPressed(MenuControls::MenuRight) || useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneRight)) {
+        controls.IsKeyJustPressed(MenuControls::MenuSelect) || useNative && PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneSelect) ||
+        controls.IsKeyJustPressed(MenuControls::MenuCancel) || useNative && PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneCancel) ||
+        controls.IsKeyJustPressed(MenuControls::MenuUp) || useNative && PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendUp) ||
+        controls.IsKeyJustPressed(MenuControls::MenuDown) || useNative && PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlFrontendDown) ||
+        controls.IsKeyJustPressed(MenuControls::MenuLeft) || useNative && PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneLeft) ||
+        controls.IsKeyJustPressed(MenuControls::MenuRight) || useNative && PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, ControlPhoneRight)) {
         processMenuNav();
     }
 
@@ -704,12 +707,12 @@ void Menu::CheckKeys() {
         controls.IsKeyJustReleased(MenuControls::MenuDown) || controls.IsKeyJustPressed(MenuControls::MenuDown) ||
         controls.IsKeyJustReleased(MenuControls::MenuLeft) || controls.IsKeyJustPressed(MenuControls::MenuLeft) ||
         controls.IsKeyJustReleased(MenuControls::MenuRight) || controls.IsKeyJustPressed(MenuControls::MenuRight) ||
-        CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneSelect) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlPhoneSelect) ||
-        CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneCancel) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlPhoneCancel) ||
-        CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendUp) ||
-        CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendDown) ||
-        CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlPhoneLeft) ||
-        CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight) || CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlPhoneRight)) {
+        PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneSelect) || PAD::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlPhoneSelect) ||
+        PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneCancel) || PAD::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlPhoneCancel) ||
+        PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp) || PAD::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendUp) ||
+        PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown) || PAD::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendDown) ||
+        PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft) || PAD::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlPhoneLeft) ||
+        PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight) || PAD::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlPhoneRight)) {
         menuTime = menuTimeRepeat;
     }
 
@@ -760,11 +763,11 @@ bool Menu::IsThisOpen() {
  * Section Draw/Utils
  */
 float Menu::getStringWidth(const std::string& text, float scale, int font) {
-    UI::_BEGIN_TEXT_COMMAND_WIDTH("STRING");
-    UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char *)text.c_str());
-    UI::SET_TEXT_FONT( font);
-    UI::SET_TEXT_SCALE( scale, scale);
-    return UI::_END_TEXT_COMMAND_GET_WIDTH(true);
+    HUD::_BEGIN_TEXT_COMMAND_GET_WIDTH("STRING");
+    HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
+    HUD::SET_TEXT_FONT( font);
+    HUD::SET_TEXT_SCALE( scale, scale);
+    return HUD::_END_TEXT_COMMAND_GET_WIDTH(true);
 }
 
 std::vector<std::string> Menu::splitString(float maxWidth, const std::string& details, float scale, int font) {
@@ -793,34 +796,34 @@ void Menu::drawText(const std::string& text, int font, float x, float y, float p
     // justify: 0 - center, 1 - left, 2 - right
     // if justify == 2, treat x as right-dist?
     if (justify == 2) {
-        UI::SET_TEXT_WRAP(menuX - menuWidth / 2, menuX + menuWidth / 2 - x/* - optionRightMargin / 2.0f*/);
+        HUD::SET_TEXT_WRAP(menuX - menuWidth / 2, menuX + menuWidth / 2 - x/* - optionRightMargin / 2.0f*/);
     }
-    UI::SET_TEXT_JUSTIFICATION(justify);
+    HUD::SET_TEXT_JUSTIFICATION(justify);
 
-    UI::SET_TEXT_FONT(font);
+    HUD::SET_TEXT_FONT(font);
     // TODO: Handle Chalet London elsewhere
     if (font == 0) { // big-ass Chalet London
         scale *= 0.75f;
         y += 0.003f;
     }
-    UI::SET_TEXT_SCALE(0.0f, scale);
-    UI::SET_TEXT_COLOUR(color.R, color.G, color.B, color.A);
-    UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-    UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char *)text.c_str());
-    UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y);
+    HUD::SET_TEXT_SCALE(0.0f, scale);
+    HUD::SET_TEXT_COLOUR(color.R, color.G, color.B, color.A);
+    HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
+    HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
+    HUD::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, 0);
 }
 
 void Menu::drawRect(float x, float y, float width, float height, Color color) {
-    GRAPHICS::DRAW_RECT(x, y, width, height, color.R, color.G, color.B, color.A);
+    GRAPHICS::DRAW_RECT(x, y, width, height, color.R, color.G, color.B, color.A, 0);
 }
 
 void Menu::drawSprite(const std::string& textureDict, const std::string& textureName, float x, float y, float width, 
                       float height, float rotation, Color color) {
-    if (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED((char *)textureDict.c_str())) {
-        GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT((char *)textureDict.c_str(), false);
+    if (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED(textureDict.c_str())) {
+        GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT(textureDict.c_str(), false);
     }
     else {
-        GRAPHICS::DRAW_SPRITE((char *)textureDict.c_str(), (char *)textureName.c_str(), x, y, width, height, rotation, color.R, color.G, color.B, color.A);
+        GRAPHICS::DRAW_SPRITE(textureDict.c_str(), textureName.c_str(), x, y, width, height, rotation, color.R, color.G, color.B, color.A, 0);
     }
 }
 
@@ -1133,12 +1136,12 @@ void Menu::enableKeysOnce(bool enable) {
 }
 
 void Menu::hideHUDComponents() {
-    UI::HIDE_HELP_TEXT_THIS_FRAME();
-    UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentVehicleName);
-    UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentAreaName);
-    UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentUnused);
-    UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentStreetName);
-    UI::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentHelpText);
+    HUD::HIDE_HELP_TEXT_THIS_FRAME();
+    HUD::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentVehicleName);
+    HUD::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentAreaName);
+    HUD::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentUnused);
+    HUD::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentStreetName);
+    HUD::HIDE_HUD_COMPONENT_THIS_FRAME(HudComponentHelpText);
 }
 
 void Menu::disableKeys() {
@@ -1146,17 +1149,17 @@ void Menu::disableKeys() {
 
     // sjaak327
     // http://gtaforums.com/topic/796908-simple-trainer-for-gtav/?view=findpost&p=1069587144
-    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlPhone, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlTalk, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleHeadlight, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleCinCam, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleRadioWheel, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackLight, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackHeavy, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackAlternate, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeBlock, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlHUDSpecial, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(2, ControlCharacterWheel, true);
+    PAD::DISABLE_CONTROL_ACTION(2, ControlPhone, true);
+    PAD::DISABLE_CONTROL_ACTION(2, ControlTalk, true);
+    PAD::DISABLE_CONTROL_ACTION(2, ControlVehicleHeadlight, true);
+    PAD::DISABLE_CONTROL_ACTION(2, ControlVehicleCinCam, true);
+    PAD::DISABLE_CONTROL_ACTION(2, ControlVehicleRadioWheel, true);
+    PAD::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackLight, true);
+    PAD::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackHeavy, true);
+    PAD::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackAlternate, true);
+    PAD::DISABLE_CONTROL_ACTION(2, ControlMeleeBlock, true);
+    PAD::DISABLE_CONTROL_ACTION(2, ControlHUDSpecial, true);
+    PAD::DISABLE_CONTROL_ACTION(2, ControlCharacterWheel, true);
 }
 
 void Menu::processMenuNav() {
@@ -1170,8 +1173,8 @@ void Menu::processMenuNav() {
     }
 
     if (controls.IsKeyJustReleased(MenuControls::MenuKey) || useNative &&
-        CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, controls.ControllerButton1) &&
-        CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, controls.ControllerButton2)) {
+        PAD::IS_DISABLED_CONTROL_PRESSED(0, controls.ControllerButton1) &&
+        PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, controls.ControllerButton2)) {
         if (menulevel == 0) {
             OpenMenu();
         }
@@ -1186,7 +1189,7 @@ void Menu::processMenuNav() {
         return;
     }
     if (controls.IsKeyJustReleased(MenuControls::MenuCancel) || 
-        useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendCancel)) {
+        useNative && PAD::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendCancel)) {
         if (menulevel > 0) {
             if (menulevel == 1) {
                 enableKeysOnce(true);
@@ -1200,7 +1203,7 @@ void Menu::processMenuNav() {
         delay = GetTickCount64();
     }
     if (controls.IsKeyJustReleased(MenuControls::MenuSelect) || 
-        useNative && CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendAccept)) {
+        useNative && PAD::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendAccept)) {
         if (menulevel > 0) {
             menuBeep();
         }
@@ -1208,19 +1211,19 @@ void Menu::processMenuNav() {
         delay = GetTickCount64();
     }
     if (controls.IsKeyPressed(MenuControls::MenuDown) || 
-        useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
+        useNative && PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
         nextOption();
         delay = GetTickCount64();
         downpress = true;
     }
     if (controls.IsKeyPressed(MenuControls::MenuUp) || 
-        useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
+        useNative && PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
         previousOption();
         delay = GetTickCount64();
         uppress = true;
     }
     if (controls.IsKeyPressed(MenuControls::MenuLeft) || 
-        useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
+        useNative && PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
         if (menulevel > 0) {
             menuBeep();
         }
@@ -1228,7 +1231,7 @@ void Menu::processMenuNav() {
         delay = GetTickCount64();
     }
     if (controls.IsKeyPressed(MenuControls::MenuRight) || 
-        useNative && CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
+        useNative && PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
         if (menulevel > 0) {
             menuBeep();
         }
