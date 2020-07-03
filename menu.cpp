@@ -669,9 +669,7 @@ void Menu::EndMenu() {
     hideHUDComponents();
     disableKeys();
 
-    GRAPHICS::SET_SCRIPT_GFX_ALIGN(76, 84);
     drawInstructionalButtons();
-    GRAPHICS::RESET_SCRIPT_GFX_ALIGN();
 }
 
 /*
