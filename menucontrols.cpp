@@ -6,33 +6,16 @@
 #include "menukeyboard.h"
 
 namespace NativeMenu {
-    long long milliseconds_now() { // static
-        LARGE_INTEGER s_frequency; // static
-        BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency); // static
-        if (s_use_qpc) {
-            LARGE_INTEGER now;
-            QueryPerformanceCounter(&now);
-            return (1000LL * now.QuadPart) / s_frequency.QuadPart;
-        }
-        return GetTickCount64();
-    }
-
     MenuControls::MenuControls()
     : ControlKeys{}
     , controlCurr{}
     , controlPrev{}
     , pressTime{}
-    , releaseTime{}
-    , nControlCurr{}
-    , nControlPrev{}
-    , nPressTime{}
-    , nReleaseTime{}{
+    , releaseTime{} {
     std::fill(controlPrev, std::end(controlPrev), false);
     std::fill(controlCurr, std::end(controlCurr), false);
     std::fill(ControlKeys, std::end(ControlKeys), -1);
 }
-
-MenuControls::~MenuControls() = default;
 
 bool MenuControls::IsKeyPressed(ControlType control) {
         return IsKeyDown(ControlKeys[control]);
@@ -47,11 +30,12 @@ bool MenuControls::IsKeyPressed(ControlType control) {
     }
 
     bool MenuControls::IsKeyDownFor(ControlType control, unsigned long long millis) {
+        auto tNow = GetTickCount64();
         if (IsKeyJustPressed(control)) {
-            pressTime[control] = milliseconds_now();
+            pressTime[control] = tNow;
         }
 
-        return IsKeyPressed(control) && (milliseconds_now() - pressTime[control]) >= millis;
+        return IsKeyPressed(control) && (tNow - pressTime[control]) >= millis;
     }
 
     void MenuControls::Update() {
@@ -59,19 +43,20 @@ bool MenuControls::IsKeyPressed(ControlType control) {
             controlPrev[i] = controlCurr[i];
             controlCurr[i] = IsKeyDown(ControlKeys[i]);
         }
-        // Size of eControl
-        for (unsigned i = 0; i < eControlSize; ++i) {
-            nControlPrev[i] = nControlCurr[i];
-            nControlCurr[i] = PAD::IS_DISABLED_CONTROL_PRESSED(0, i) != 0;
+
+        for (const auto& input : nControlCurr) {
+            nControlPrev[input.first] = nControlCurr[input.first];
+            nControlCurr[input.first] = PAD::IS_DISABLED_CONTROL_PRESSED(0, input.first);
         }
     }
 
     bool MenuControls::IsControlDownFor(eControl control, unsigned long long millis) {
+        auto tNow = GetTickCount64();
         if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, control)) {
-            nPressTime[control] = milliseconds_now();
+            nPressTime[control] = tNow;
         }
 
         return PAD::IS_DISABLED_CONTROL_PRESSED(0, control) &&
-            (milliseconds_now() - nPressTime[control]) >= millis;
+            (tNow - nPressTime[control]) >= millis;
     }
 }

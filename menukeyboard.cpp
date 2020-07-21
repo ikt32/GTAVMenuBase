@@ -23,8 +23,7 @@ namespace NativeMenu {
 
     bool IsKeyDown(DWORD key) {
         if (!IsWindowFocused()) return false;
-        if (GetAsyncKeyState(key) & 0x8000) return true;
-        return false;
+        return (GetAsyncKeyState(key) & 0x8000) != 0;
     }
 
     bool IsKeyJustUp(DWORD key, bool exclusive) {
@@ -37,7 +36,7 @@ namespace NativeMenu {
         return false;
     }
 
-    DWORD str2key(std::string humanReadableKey) {
+    DWORD str2key(const std::string& humanReadableKey) {
         if (humanReadableKey.length() == 1) {
             char letter = humanReadableKey.c_str()[0];
             if ((letter >= 0x30 && letter <= 0x39) || (letter >= 0x41 && letter <= 0x5A)) {

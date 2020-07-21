@@ -1,10 +1,8 @@
 #pragma once
+#include <unordered_map>
 #include <inc/enums.h>
 
 namespace NativeMenu {
-
-    const int eControlSize = 338;
-
     class Settings;
 
     class MenuControls
@@ -24,7 +22,6 @@ namespace NativeMenu {
         };
 
         MenuControls();
-        ~MenuControls();
         bool IsKeyPressed(ControlType control);
         bool IsKeyJustPressed(ControlType control);
         bool IsKeyJustReleased(ControlType control);
@@ -43,11 +40,11 @@ namespace NativeMenu {
         unsigned long long pressTime[controlSize];
         unsigned long long releaseTime[controlSize];
 
-        bool nControlCurr[eControlSize];
-        bool nControlPrev[eControlSize];
+        std::unordered_map<eControl, bool> nControlCurr;
+        std::unordered_map<eControl, bool> nControlPrev;
 
-        unsigned long long nPressTime[eControlSize];
-        unsigned long long nReleaseTime[eControlSize];
+        std::unordered_map<eControl, __int64> nPressTime;
+        std::unordered_map<eControl, __int64> nReleaseTime;
     };
 
 }
