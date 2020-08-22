@@ -5,10 +5,14 @@
  */
 
 #include "menumemutils.hpp"
-#include "inc/main.h"
-#include "inc/types.h"
+
+#include <inc/main.h>
+#include <inc/types.h>
+
 #include <Windows.h>
 #include <Psapi.h>
+
+#include <algorithm>
 #include <array>
 #include <string>
 
