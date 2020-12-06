@@ -123,6 +123,8 @@ public:
      */
     bool IntOption(const std::string& option, int &var, int min, int max, int step = 1, const std::vector<std::string>&
                     details = {});
+    bool IntOptionCb(const std::string& option, int& var, int min, int max, int step, 
+                     const std::function<bool(int&)>& extFunc, const std::vector<std::string>& details = {});
 
     /*
      * Option that changes a float value with optional custom-sized steps.
@@ -453,7 +455,7 @@ private:
             if (var > max) var = min;
 
             if (optionpress) {
-                float var_ = var;
+                T var_ = var;
                 if (f(var_)) {
                     var = var_;
                 }

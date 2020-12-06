@@ -363,6 +363,17 @@ bool Menu::IntOption(const std::string& option, int &var, int min, int max, int 
     return processOptionItemControls(var, min, max, step);
 }
 
+bool Menu::IntOptionCb(const std::string& option, int& var, int min, int max, int step,
+    const std::function<bool(int&)>& extFunc, const std::vector<std::string>& details) {
+    Option(option, details);
+    std::string printVar = std::to_string(var);
+
+    bool highlighted = currentoption == optioncount;
+
+    drawOptionValue(printVar, highlighted, max - min);
+    return processOptionItemControls(var, min, max, step, extFunc);
+}
+
 bool Menu::FloatOption(const std::string& option, float &var, float min, float max, float step,
                        const std::vector<std::string>& details) {
     Option(option, details);
