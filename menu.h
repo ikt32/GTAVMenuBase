@@ -116,6 +116,9 @@ public:
      */
     void OptionPlusPlus(const std::vector<std::string>& extra, const std::string& title = "Info");
 
+    bool UInt8Option(const std::string& option, uint8_t& var, uint8_t min, uint8_t max, uint8_t step,
+        const std::vector<std::string>& details = {});
+
     /*
      * Option that changes an int value with optional custom-sized steps.
      * Shows option with the value inside < > brackets.
@@ -248,6 +251,7 @@ public:
     float smoothFactor = 0.00001f;
     uint16_t mRecordGlobal = 0;
 
+    float MenuWidth() const { return menuWidth; }
 private:
     static const unsigned maxMenus = 255;
     enum class FooterType {
