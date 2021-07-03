@@ -625,31 +625,31 @@ void Menu::drawMenuDetails() {
     if (currentoption == 1) {
         foregroundSpriteCalls.push_back(
             [=]() { drawSprite("commonmenu", "arrowright",
-                      menuX, 
-                      (footerTextY + 0.0175f),
-                      0.02f, 0.02f, 90.0f, titleTextColor); }
+                menuX,
+                (footerTextY + 0.0175f),
+                0.016f, 0.026f, 90.0f, titleTextColor); }
         );
     }
     else if (currentoption == optioncount) {
         foregroundSpriteCalls.push_back(
             [=]() { drawSprite("commonmenu", "arrowright",
-                      menuX, 
-                      (footerTextY + 0.0175f),
-                      0.02f, 0.02f, 270.0f, titleTextColor); }
+                menuX,
+                (footerTextY + 0.0175f),
+                0.016f, 0.026f, 270.0f, titleTextColor); }
         );
     }
     else {
         foregroundSpriteCalls.push_back(
             [=]() { drawSprite("commonmenu", "arrowright",
-                      menuX, 
-                      (footerTextY + 0.0125f),
-                      0.02f, 0.02f, 270.0f, titleTextColor); }
+                menuX,
+                (footerTextY + 0.0105f),
+                0.016f, 0.026f, 270.0f, titleTextColor); }
         );
         foregroundSpriteCalls.push_back(
             [=]() { drawSprite("commonmenu", "arrowright",
-                      menuX, 
-                      (footerTextY + 0.0225f),
-                      0.02f, 0.02f, 90.0f, titleTextColor); }
+                menuX,
+                (footerTextY + 0.0245f),
+                0.016f, 0.026f, 90.0f, titleTextColor); }
         );
     }
 }
