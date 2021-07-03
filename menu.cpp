@@ -354,6 +354,15 @@ void Menu::OptionPlusPlus(const std::vector<std::string>& extra, const std::stri
     drawOptionPlusExtras(extra, title);
 }
 
+bool Menu::UInt8Option(const std::string& option, uint8_t& var, uint8_t min, uint8_t max, uint8_t step, const std::vector<std::string>& details) {
+    Option(option, details);
+    std::string printVar = std::to_string(var);
+    bool highlighted = currentoption == optioncount;
+
+    drawOptionValue(printVar, highlighted, max - min);
+    return processOptionItemControls(var, min, max, step);
+}
+
 bool Menu::IntOption(const std::string& option, int &var, int min, int max, int step, const std::vector<std::string>& details) {
     Option(option, details);
     std::string printVar = std::to_string(var);

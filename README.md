@@ -101,4 +101,4 @@ Good luck modding!
   * DireDan for the [original implementation for sudomod](https://www.unknowncheats.me/forum/grand-theft-auto-v/200692-originbase-sudomod-1-37-a.html)
   * Sudomod authors
   * NativeUI authors
-  * Unknown Modder
+  * alloc8or
