@@ -1167,17 +1167,16 @@ void Menu::disableKeys() {
 
     // sjaak327
     // http://gtaforums.com/topic/796908-simple-trainer-for-gtav/?view=findpost&p=1069587144
-    PAD::DISABLE_CONTROL_ACTION(2, ControlPhone, true);
-    PAD::DISABLE_CONTROL_ACTION(2, ControlTalk, true);
-    PAD::DISABLE_CONTROL_ACTION(2, ControlVehicleHeadlight, true);
-    PAD::DISABLE_CONTROL_ACTION(2, ControlVehicleCinCam, true);
-    PAD::DISABLE_CONTROL_ACTION(2, ControlVehicleRadioWheel, true);
-    PAD::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackLight, true);
-    PAD::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackHeavy, true);
-    PAD::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackAlternate, true);
-    PAD::DISABLE_CONTROL_ACTION(2, ControlMeleeBlock, true);
-    PAD::DISABLE_CONTROL_ACTION(2, ControlHUDSpecial, true);
-    PAD::DISABLE_CONTROL_ACTION(2, ControlCharacterWheel, true);
+    PAD::DISABLE_CONTROL_ACTION(0, ControlPhone, true);
+    PAD::DISABLE_CONTROL_ACTION(0, ControlTalk, true);
+    PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleCinCam, true);
+    PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleRadioWheel, true);
+    PAD::DISABLE_CONTROL_ACTION(0, ControlMeleeAttackLight, true);
+    PAD::DISABLE_CONTROL_ACTION(0, ControlMeleeAttackHeavy, true);
+    PAD::DISABLE_CONTROL_ACTION(0, ControlMeleeAttackAlternate, true);
+    PAD::DISABLE_CONTROL_ACTION(0, ControlMeleeBlock, true);
+    PAD::DISABLE_CONTROL_ACTION(0, ControlHUDSpecial, true);
+    PAD::DISABLE_CONTROL_ACTION(0, ControlCharacterWheel, true);
 }
 
 void Menu::processMenuNav() {
