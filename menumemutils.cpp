@@ -191,8 +191,14 @@ namespace NativeMenu {
             //logger.Write(ERROR, "Aborting...");
             return false;
         }
-        while (!Item->IsLoaded())
-            Sleep(100);
+
+        startTime = GetTickCount();
+        while (!Item->IsLoaded()) {
+            scriptWait(100);
+            if (GetTickCount() > startTime + timeout) {
+                return false;
+            }
+        }
 
         *script = Item->Header;
         //logger.Write(INFO, "Found script %s [0x%X]", scriptName.c_str(), joaat(scriptName));
