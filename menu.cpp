@@ -30,7 +30,6 @@ void Menu::Initialize() {
     mRecordGlobal = FindRecordGlobal();
     currentmenu[0] = "reserved_nomenu";
     actualmenu = "reserved_nomenu";
-    InitializeAllKeys();
 }
 
 void Menu::SetFiles(const std::string &fileName) {
