@@ -1,6 +1,7 @@
 #include "menukeyboard.h"
 #include <map>
 
+namespace {
 const int sKeysSize = 255;
 const int sNowPeriod = 100;
 const int sMaxDown = 30000;
@@ -169,6 +170,7 @@ V GetWithDef(const C<K, V, Args...>& m, K const& key, const V& defval) {
 void ResetKeyState(DWORD key) {
     if (key < sKeysSize)
         memset(&keyStates[key], 0, sizeof(keyStates[0]));
+}
 }
 
 void NativeMenu::OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow) {
