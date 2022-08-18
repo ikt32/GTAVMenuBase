@@ -12,7 +12,7 @@ Requirements:
 * [ScriptHookV SDK by Alexander Blade](http://www.dev-c.com/gtav/scripthookv/)
   * Added such that `#include <inc/main.h>` can be found
   * Uses `natives.h` generated from [alloc8ors Native DB](https://alloc8or.re/gta5/nativedb/)
-* [simpleini](https://github.com/brofield/simpleini)
+* [simpleini](https://github.com/brofield/simpleini) 4.x
   * Added such that `#include <simpleini/SimpleIni.h` can be found
 
 Add this repository as submodule:  
@@ -86,6 +86,8 @@ should be enough.
 * [commit 3b37182](https://github.com/E66666666/GTAVMenuBase/commit/3b37182181e73c28439838b6107eae53a2844e03) restores the selected bool pointer requirement in OptionPlus
 * [commit ec9477b](https://github.com/E66666666/GTAVMenuBase/commit/ec9477b0b203efc2fcc83e7dcce33045d2198917) removes the automatic uppercase menu subtitle argument
 * [commit d7a1e72](https://github.com/E66666666/GTAVMenuBase/commit/d7a1e72756919c2499a7f7446e40bd6083c2e928) updates to C++17  for `std::any` (changed to `std::variant` in [commit a61461d](https://github.com/E66666666/GTAVMenuBase/commit/a61461d0e0506469507b6d09b7a0faff253b9d26))
+* [commit d88ec66](https://github.com/E66666666/GTAVMenuBase/commit/d88ec66b30c12b07b00afaa193c3470c49c6512f) requires the implementing project to include simpleini 4.x
+* [commit 0ed127b](https://github.com/E66666666/GTAVMenuBase/commit/0ed127b29f11fee9fe4461a3402ff06a7c9bb85b) requires the implementing project to register the keyboard handler
 
 ## Questions/Suggestions/Discussion
 
