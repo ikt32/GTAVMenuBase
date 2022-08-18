@@ -23,13 +23,20 @@ namespace NativeMenu {
         CSimpleIniA settingsMenu;
         settingsMenu.SetUnicode();
         settingsMenu.LoadFile(settingsMenuFile.c_str());
-        control->ControlKeys[MenuControls::ControlType::MenuKey] = str2key(settingsMenu.GetValue("MENU", "MenuKey", "VK_OEM_4"));
-        control->ControlKeys[MenuControls::ControlType::MenuUp] = str2key(settingsMenu.GetValue("MENU", "MenuUp", "UP"));
-        control->ControlKeys[MenuControls::ControlType::MenuDown] = str2key(settingsMenu.GetValue("MENU", "MenuDown", "DOWN"));
-        control->ControlKeys[MenuControls::ControlType::MenuLeft] = str2key(settingsMenu.GetValue("MENU", "MenuLeft", "LEFT"));
-        control->ControlKeys[MenuControls::ControlType::MenuRight] = str2key(settingsMenu.GetValue("MENU", "MenuRight", "RIGHT"));
-        control->ControlKeys[MenuControls::ControlType::MenuSelect] = str2key(settingsMenu.GetValue("MENU", "MenuSelect", "RETURN"));
-        control->ControlKeys[MenuControls::ControlType::MenuCancel] = str2key(settingsMenu.GetValue("MENU", "MenuCancel", "BACKSPACE"));
+        control->ControlKeys[MenuControls::ControlType::MenuKey] =
+            GetKeyFromName(settingsMenu.GetValue("MENU", "MenuKey", "VK_OEM_4"));
+        control->ControlKeys[MenuControls::ControlType::MenuUp] =
+            GetKeyFromName(settingsMenu.GetValue("MENU", "MenuUp", "UP"));
+        control->ControlKeys[MenuControls::ControlType::MenuDown] =
+            GetKeyFromName(settingsMenu.GetValue("MENU", "MenuDown", "DOWN"));
+        control->ControlKeys[MenuControls::ControlType::MenuLeft] =
+            GetKeyFromName(settingsMenu.GetValue("MENU", "MenuLeft", "LEFT"));
+        control->ControlKeys[MenuControls::ControlType::MenuRight] =
+            GetKeyFromName(settingsMenu.GetValue("MENU", "MenuRight", "RIGHT"));
+        control->ControlKeys[MenuControls::ControlType::MenuSelect] =
+            GetKeyFromName(settingsMenu.GetValue("MENU", "MenuSelect", "RETURN"));
+        control->ControlKeys[MenuControls::ControlType::MenuCancel] =
+            GetKeyFromName(settingsMenu.GetValue("MENU", "MenuCancel", "BACKSPACE"));
 
         control->ControllerButton1 = settingsMenu.GetLongValue("MENU", "ControllerButton1", -1);
         control->ControllerButton2 = settingsMenu.GetLongValue("MENU", "ControllerButton2", -1);

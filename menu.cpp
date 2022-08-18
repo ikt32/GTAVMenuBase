@@ -12,6 +12,7 @@
 #include "menuutils.h"
 #include "menumemutils.hpp"
 #include "Scaleform.h"
+#include "menukeyboard.h"
 
 // TODO: Fixes:
 //      - Reduce code duplication (titles, OptionPlus title)
@@ -25,6 +26,10 @@
 //      - Re-write to OO
 
 namespace NativeMenu {
+    void Menu::OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow) {
+        NativeMenu::OnKeyboardMessage(key, repeats, scanCode, isExtended, isWithAlt, wasDownBefore, isUpNow);
+}
+
 void Menu::Initialize() {
     mRecordGlobal = FindRecordGlobal();
     currentmenu[0] = "reserved_nomenu";
