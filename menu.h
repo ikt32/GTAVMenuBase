@@ -1,17 +1,28 @@
 #pragma once
 
-#include <string>
-#include <windows.h>
-#include <vector>
-#include <functional>
-#include <array>
-#include <unordered_map>
-
 #include "menucontrols.h"
 #include "menuutils.h"
 #include "menusettings.h"
 
+#include <windows.h>
+
+#include <array>
+#include <functional>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 namespace NativeMenu {
+
+/*
+ * Indicates what the state of an option is.
+ */
+struct Result {
+    bool Triggered;         // True when the user pressed <Enter/Select>.
+    bool ValueChanged;      // True when this option modified the value it controls.
+    bool Highlighted;       // True when this is the current option.
+};
+
 class Menu {
 public:
     /**
@@ -116,28 +127,25 @@ public:
      */
     void OptionPlusPlus(const std::vector<std::string>& extra, const std::string& title = "Info");
 
-    bool UInt8Option(const std::string& option, uint8_t& var, uint8_t min, uint8_t max, uint8_t step,
-        const std::vector<std::string>& details = {});
-
     /*
      * Option that changes an int value with optional custom-sized steps.
      * Shows option with the value inside < > brackets.
      * Returns true on accept, left and right.
      */
-    bool IntOption(const std::string& option, int &var, int min, int max, int step = 1, const std::vector<std::string>&
-                    details = {});
-    bool IntOptionCb(const std::string& option, int& var, int min, int max, int step, 
-                     const std::function<bool(int&)>& extFunc, const std::vector<std::string>& details = {});
+    Result IntOption(const std::string& option,
+        int& var, int min, int max, int step,
+        const std::function<bool(int&)>& extFunc = {},
+        const std::vector<std::string>& details = {});
 
     /*
      * Option that changes a float value with optional custom-sized steps.
      * Shows option with the value inside < > brackets.
      * Returns true on accept, left and right.
      */
-    bool FloatOption(const std::string& option, float &var, float min, float max, float step = 0.1f, const std::vector<std::string>
-                     & details = {});
-    bool FloatOptionCb(const std::string& option, float& var, float min, float max, float step, 
-                       const std::function<bool(float&)>& extFunc, const std::vector<std::string>& details = {});
+    Result FloatOption(const std::string& option,
+        float& var, float min, float max, float step,
+        const std::function<bool(float&)>& extFunc = {},
+        const std::vector<std::string>& details = {});
 
     /*
      * Option that toggles a boolean.
@@ -419,46 +427,22 @@ private:
     void fitTitle(std::string &title, float &newSize, float titleSize);
 
     template <typename T>
-    bool processOptionItemControls(T &var, T min, T max, T step) {
+    bool processOptionItemControls(T& var, T min, T max, T step, const std::function<bool(T&)>& f = {}) {
         if (currentoption == optioncount) {
             if (leftpress) {
                 if (var <= min) var = max;
                 else var -= step;
                 leftpress = false;
-                return true;
             }
             if (var < min) var = max;
             if (rightpress) {
                 if (var >= max) var = min;
                 else var += step;
                 rightpress = false;
-                return true;
-            }
-            if (var > max) var = min;
-        }
-
-        return optionpress && currentoption == optioncount;
-    }
-
-    template <typename T>
-    bool processOptionItemControls(T& var, T min, T max, T step, const std::function<bool(T&)>& f) {
-        if (currentoption == optioncount) {
-            if (leftpress) {
-                if (var <= min) var = max;
-                else var -= step;
-                leftpress = false;
-                return true;
-            }
-            if (var < min) var = max;
-            if (rightpress) {
-                if (var >= max) var = min;
-                else var += step;
-                rightpress = false;
-                return true;
             }
             if (var > max) var = min;
 
-            if (optionpress) {
+            if (f && optionpress) {
                 T var_ = var;
                 if (f(var_)) {
                     var = var_;
