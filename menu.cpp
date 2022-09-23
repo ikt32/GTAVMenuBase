@@ -215,11 +215,11 @@ void Menu::Footer(const std::string& dict, const std::string& texture) {
 /*
  * Section Options
  */
-bool Menu::Option(const std::string& option, const std::vector<std::string>& details) {
-    return Option(option, optionsBackgroundSelectColor, details);
-}
+Result Menu::Option(const std::string& option, const std::vector<std::string>& details, std::optional<Color> customBgCol) {
+    Color highlight = optionsBackgroundSelectColor;
+    if (customBgCol.has_value())
+        highlight = customBgCol.value();
 
-bool Menu::Option(const std::string& option, Color highlight, const std::vector<std::string>& details) {
     optioncount++;
 
     bool highlighted = currentoption == optioncount;
@@ -283,10 +283,15 @@ bool Menu::Option(const std::string& option, Color highlight, const std::vector<
     }
 
     totalHeight += optionHeight;
-    return optionpress && currentoption == optioncount;
+
+    return {
+        .Triggered = optionpress && highlighted,
+        .ValueChanged = false, // No value to change
+        .Highlighted = highlighted
+    };
 }
 
-bool Menu::MenuOption(const std::string& option, const std::string& menu, const std::vector<std::string>& details) {
+Result Menu::MenuOption(const std::string& option, const std::string& menu, const std::vector<std::string>& details) {
     Option(option, details);
     float indicatorHeight = totalHeight - optionHeight; // why the hell was this menu designed like *this*?
     bool highlighted = currentoption == optioncount;
@@ -313,15 +318,20 @@ bool Menu::MenuOption(const std::string& option, const std::string& menu, const 
         ); });
     }
 
-    if (optionpress && currentoption == optioncount) {
+    bool triggered = optionpress && highlighted;
+    if (optionpress && highlighted) {
         optionpress = false;
         changeMenu(menu);
-        return true;
     }
-    return false;
+
+    return {
+        .Triggered = triggered,
+        .ValueChanged = false, // No value to change
+        .Highlighted = highlighted
+    };
 }
 
-bool Menu::OptionPlus(const std::string& option, const std::vector<std::string>& extra, bool *_highlighted,
+Result Menu::OptionPlus(const std::string& option, const std::vector<std::string>& extra, bool *_highlighted,
                       const std::function<void() >& onRight, const std::function<void() >& onLeft,
                       const std::string& title, const std::vector<std::string>& details) {
     Option(option, details);
@@ -335,12 +345,20 @@ bool Menu::OptionPlus(const std::string& option, const std::vector<std::string>&
         if (onLeft && leftpress) {
             onLeft();
             leftpress = false;
-            return false;
+            return {
+                .Triggered = false,
+                .ValueChanged = true,
+                .Highlighted = highlighted
+            };
         }
         if (onRight && rightpress) {
             onRight();
             rightpress = false;
-            return false;
+            return {
+                .Triggered = false,
+                .ValueChanged = true,
+                .Highlighted = highlighted
+            };
         }
     }
 
@@ -350,7 +368,11 @@ bool Menu::OptionPlus(const std::string& option, const std::vector<std::string>&
         drawOptionPlusExtras(extra, title);
     }
 
-    return optionpress && currentoption == optioncount;
+    return {
+        .Triggered = optionpress && highlighted,
+        .ValueChanged = true,
+        .Highlighted = highlighted
+    };
 }
 
 void Menu::OptionPlusPlus(const std::vector<std::string>& extra, const std::string& title) {
@@ -361,8 +383,8 @@ Result Menu::IntOption(const std::string& option,
     int &var, int min, int max, int step,
     const std::function<bool(int&)>& extFunc,
     const std::vector<std::string>& details) {
-    auto oldValue = var;
     Option(option, details);
+    auto oldValue = var;
 
     bool highlighted = currentoption == optioncount;
 
@@ -373,7 +395,7 @@ Result Menu::IntOption(const std::string& option,
         processOptionItemControls(var, min, max, step);
 
     return {
-        .Triggered = triggered,
+        .Triggered = triggered && highlighted,
         .ValueChanged = var != oldValue,
         .Highlighted = highlighted
     };
@@ -400,13 +422,13 @@ Result Menu::FloatOption(const std::string& option,
         processOptionItemControls(var, min, max, step);
 
     return {
-        .Triggered = triggered,
+        .Triggered = triggered && highlighted,
         .ValueChanged = var != oldValue,
         .Highlighted = highlighted
     };
 }
 
-bool Menu::BoolOption(const std::string& option, bool &var, const std::vector<std::string>& details) {
+Result Menu::BoolOption(const std::string& option, bool &var, const std::vector<std::string>& details) {
     Option(option, details);
     float indicatorHeight = totalHeight - optionHeight;
     bool highlighted = currentoption == optioncount;
@@ -444,14 +466,20 @@ bool Menu::BoolOption(const std::string& option, bool &var, const std::vector<st
         ; });
     }
 
+    bool valChanged = false;
     if (optionpress && currentoption == optioncount) {
         var ^= 1;
-        return true;
+        valChanged = true;
     }
-    return false;
+
+    return {
+        .Triggered = optionpress && highlighted,
+        .ValueChanged = valChanged,
+        .Highlighted = highlighted
+    };
 }
 
-bool Menu::BoolSpriteOption(const std::string& option, bool enabled, std::string category, const std::string& spriteOn,
+Result Menu::BoolSpriteOption(const std::string& option, bool enabled, std::string category, const std::string& spriteOn,
                             const std::string& spriteOff, const std::vector<std::string>& details) {
     Option(option, details);
     float indicatorHeight = totalHeight - optionHeight;
@@ -473,11 +501,16 @@ bool Menu::BoolSpriteOption(const std::string& option, bool enabled, std::string
             0.03f, 0.05f, 0.0f, highlighted ? optionsTextSelectColor : optionsTextColor); });
     }
 
-    return optionpress && currentoption == optioncount;
+    return {
+        .Triggered = optionpress && highlighted,
+        .ValueChanged = false,
+        .Highlighted = highlighted
+    };
 }
 
-bool Menu::IntArray(const std::string& option, std::vector<int> display, int &iterator, const std::vector<std::string>& details) {
+Result Menu::IntArray(const std::string& option, std::vector<int> display, int &iterator, const std::vector<std::string>& details) {
     Option(option, details);
+    int oldValue = iterator;
     bool highlighted = currentoption == optioncount;
 
     std::string printVar = std::to_string(display[iterator]);
@@ -486,19 +519,29 @@ bool Menu::IntArray(const std::string& option, std::vector<int> display, int &it
     int max = static_cast<int>(display.size()) - 1;
     
     drawOptionValue(printVar, highlighted, max);
-    return processOptionItemControls(iterator, min, max, 1);
+    bool triggered = processOptionItemControls(iterator, min, max, 1);
+    return {
+        .Triggered = triggered,
+        .ValueChanged = oldValue != iterator,
+        .Highlighted = highlighted
+    };
 }
 
-bool Menu::FloatArray(const std::string& option, std::vector<float> display, int &iterator,
+Result Menu::FloatArray(const std::string& option, std::vector<float> display, int &iterator,
                       const std::vector<std::string>& details) {
     Option(option, details);
+    int oldValue = iterator;
     bool highlighted = currentoption == optioncount;
     int min = 0;
     int max = static_cast<int>(display.size()) - 1;
 
     if (iterator > static_cast<int>(display.size()) || iterator < 0) {
         drawOptionValue("error", highlighted, max);
-        return false;
+        return {
+            .Triggered = false,
+            .ValueChanged = false,
+            .Highlighted = highlighted
+        };
     }
 
     unsigned precision = behindDec(display[iterator]);
@@ -510,24 +553,39 @@ bool Menu::FloatArray(const std::string& option, std::vector<float> display, int
     std::string printVar = buf;
 
     drawOptionValue(printVar, highlighted, max);
-    return processOptionItemControls(iterator, min, max, 1);
+    bool triggered = processOptionItemControls(iterator, min, max, 1);
+    return {
+        .Triggered = triggered,
+        .ValueChanged = oldValue != iterator,
+        .Highlighted = highlighted
+    };
 }
 
-bool Menu::StringArray(const std::string& option, const std::vector<std::string>& display, int &iterator,
+Result Menu::StringArray(const std::string& option, const std::vector<std::string>& display, int &iterator,
                        const std::vector<std::string>& details) {
     Option(option, details);
-    bool highlighted = currentoption == optioncount; 
+    int oldValue = iterator;
+    bool highlighted = currentoption == optioncount;
     int min = 0;
     int max = static_cast<int>(display.size()) - 1;
 
     if (iterator > static_cast<int>(display.size()) || iterator < 0) {
         drawOptionValue("error (" + std::to_string(iterator) + ")", highlighted, max);
-        return false;
+        return {
+            .Triggered = false,
+            .ValueChanged = false,
+            .Highlighted = highlighted
+        };
     }
 
     std::string printVar = display[iterator];
     drawOptionValue(printVar, highlighted, max);
-    return processOptionItemControls(iterator, min, max, 1);
+    bool triggered = processOptionItemControls(iterator, min, max, 1);
+    return {
+        .Triggered = triggered,
+        .ValueChanged = oldValue != iterator,
+        .Highlighted = highlighted
+    };
 }
 
 

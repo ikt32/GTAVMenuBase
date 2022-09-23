@@ -8,6 +8,7 @@
 
 #include <array>
 #include <functional>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -94,8 +95,7 @@ public:
      * Shows nothing special.
      * Returns true on accept.
      */
-    bool Option(const std::string& option, const std::vector<std::string>& details = {});
-    bool Option(const std::string& option, Color highlight, const std::vector<std::string>& details = {});
+    Result Option(const std::string& option, const std::vector<std::string>& details = {}, std::optional<Color> customBgCol = {});
 
     /*
      * Submenu option.
@@ -103,7 +103,7 @@ public:
      * Switches menu on action.
      * Returns true on accept.
      */
-    bool MenuOption(const std::string& option, const std::string& menu, const std::vector<std::string>& details = {});
+    Result MenuOption(const std::string& option, const std::string& menu, const std::vector<std::string>& details = {});
 
     /*
      * Option that shows an extra pane to the right.
@@ -116,7 +116,7 @@ public:
      * "highlighted" indicates the highlight status of the option. It can be a nullptr.
      * Returns true on accept.
      */
-    bool OptionPlus(const std::string& option, const std::vector<std::string>& extra, bool *highlighted = nullptr,
+    Result OptionPlus(const std::string& option, const std::vector<std::string>& extra, bool *highlighted = nullptr,
                     const std::function<void()>& onRight = nullptr, const std::function<void()>& onLeft = nullptr,
                     const std::string& title = "Info", const std::vector<std::string>& details = {});
 
@@ -152,14 +152,14 @@ public:
      * Shows option with a checkbox, which is checked when the passed var is "true".
      * Returns true on accept.
      */
-    bool BoolOption(const std::string& option, bool &var, const std::vector<std::string>& details = {});
+    Result BoolOption(const std::string& option, bool &var, const std::vector<std::string>& details = {});
 
     /*
      * Option that displays a boolean with a specifyable texture.
      * Shows option with a checkbox, which is checked when the passed var is "true".
      * Returns true on accept.
      */
-    bool BoolSpriteOption(const std::string& option, bool enabled, std::string category, const std::string& spriteOn,
+    Result BoolSpriteOption(const std::string& option, bool enabled, std::string category, const std::string& spriteOn,
                           const std::string& spriteOff, const std::vector<std::string>& details = {});
 
     /*
@@ -169,7 +169,7 @@ public:
      * On left or right press, iterator's value is incremented or decremented.
      * Returns true on accept, left and right.
      */
-    bool IntArray(const std::string& option, std::vector<int> display, int &iterator, const std::vector<std::string>& details = {});
+    Result IntArray(const std::string& option, std::vector<int> display, int &iterator, const std::vector<std::string>& details = {});
 
     /*
      * Option that shows a scrollable list of supplied floats.
@@ -178,7 +178,7 @@ public:
      * On left or right press, iterator's value is incremented or decremented.
      * Returns true on accept, left and right.
      */
-    bool FloatArray(const std::string& option, std::vector<float> display, int &iterator,
+    Result FloatArray(const std::string& option, std::vector<float> display, int &iterator,
                     const std::vector<std::string>& details = {});
     
     /*
@@ -188,7 +188,7 @@ public:
      * On left or right press, iterator's value is incremented or decremented.
      * Returns true on accept, left and right.
      */
-    bool StringArray(const std::string& option, const std::vector<std::string>& display, int &iterator,
+    Result StringArray(const std::string& option, const std::vector<std::string>& display, int &iterator,
                      const std::vector<std::string>& details = {});
     void drawInstructionalButtons();
     void drawMenuDetails();
