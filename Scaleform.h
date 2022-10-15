@@ -22,7 +22,7 @@ class Scaleform
     using ScaleArg = std::variant<std::string, int, float, double, bool, ScaleformArgumentTXD>;
 public:
     Scaleform(std::string scaleformID) {
-        m_handle = GRAPHICS::REQUEST_SCALEFORM_MOVIE((char *)scaleformID.c_str());
+        m_handle = GRAPHICS::REQUEST_SCALEFORM_MOVIE(scaleformID.c_str());
     }
 
     ~Scaleform() {
@@ -44,11 +44,11 @@ public:
     }
 
     void CallFunction(std::string function, std::vector<ScaleArg> args = {}) {
-        GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(m_handle, (char *)function.c_str());
+        GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(m_handle, function.c_str());
         for (auto arg : args) {
             if (std::holds_alternative<std::string>(arg)) {
                 GRAPHICS::BEGIN_TEXT_COMMAND_SCALEFORM_STRING("STRING");
-                HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)std::get<std::string>(arg).c_str());
+                HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(std::get<std::string>(arg).c_str());
                 GRAPHICS::END_TEXT_COMMAND_SCALEFORM_STRING();
             }
             else if (std::holds_alternative<int>(arg)) {
@@ -67,7 +67,7 @@ public:
 
             }
             else if (std::holds_alternative<ScaleformArgumentTXD>(arg)) {
-                GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING((char *)std::get<ScaleformArgumentTXD>(arg).Txd().c_str());
+                GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(std::get<ScaleformArgumentTXD>(arg).Txd().c_str());
             }
             else {
             }
@@ -80,7 +80,7 @@ public:
     }
 
     void Render2DScreenSpace(float x, float y, float width, float height) {
-        GRAPHICS::DRAW_SCALEFORM_MOVIE(m_handle, x + (width / 2.0f), y + (height / 2.0f), width, height, 255, 255, 255, 255, 0);
+        GRAPHICS::DRAW_SCALEFORM_MOVIE(m_handle, { x + (width / 2.0f), y + (height / 2.0f) }, width, height, 255, 255, 255, 255, 0);
     }
 
 private:
