@@ -80,7 +80,9 @@ public:
     }
 
     void Render2DScreenSpace(float x, float y, float width, float height) {
-        GRAPHICS::DRAW_SCALEFORM_MOVIE(m_handle, x + (width / 2.0f), y + (height / 2.0f), width, height, 255, 255, 255, 255, 0);
+        GRAPHICS::DRAW_SCALEFORM_MOVIE(m_handle,
+            { x + (width / 2.0f), y + (height / 2.0f) },
+            width, height, 255, 255, 255, 255, 0);
     }
 
 private:
