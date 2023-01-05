@@ -555,10 +555,10 @@ void Menu::drawInstructionalButtons() {
     instructionalButtonsScaleform.CallFunction("CLEAR_ALL");
     instructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", { 0 });
     instructionalButtonsScaleform.CallFunction("CREATE_CONTAINER");
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 0, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRINGS_STRING(2, ControlPhoneSelect, 0)), std::string(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION("HUD_INPUT2")) });
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 1, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRINGS_STRING(2, ControlPhoneCancel, 0)), std::string(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION("HUD_INPUT3")) });
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 2, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRINGS_STRING(2, ControlPhoneUp, 0)), std::string("Next option") });
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 3, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRINGS_STRING(2, ControlPhoneDown, 0)), std::string("Previous option") });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 0, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING(2, ControlPhoneSelect, 0)), std::string(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION("HUD_INPUT2")) });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 1, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING(2, ControlPhoneCancel, 0)), std::string(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION("HUD_INPUT3")) });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 2, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING(2, ControlPhoneUp, 0)), std::string("Next option") });
+    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 3, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING(2, ControlPhoneDown, 0)), std::string("Previous option") });
 
     //int count = 2;
     //for (const auto& button : instructionalButtons) {
