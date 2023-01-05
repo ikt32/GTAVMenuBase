@@ -194,7 +194,7 @@ namespace NativeMenu {
 
         startTime = GetTickCount();
         while (!Item->IsLoaded()) {
-            scriptWait(100);
+            Sleep(100);
             if (GetTickCount() > startTime + timeout) {
                 return false;
             }
