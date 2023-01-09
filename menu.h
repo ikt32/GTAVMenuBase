@@ -220,6 +220,9 @@ public:
      */
     bool IsThisOpen();
 
+    void NextOption() { nextOption(); }
+    void PreviousOption() { previousOption(); }
+
     /*
      * Image prefix string for if you want to show an image in an OptionPlus.
      */
