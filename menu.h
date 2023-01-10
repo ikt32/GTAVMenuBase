@@ -220,8 +220,17 @@ public:
      */
     bool IsThisOpen();
 
-    void NextOption() { nextOption(); }
-    void PreviousOption() { previousOption(); }
+    /*
+     * Selects next option in the menu, if available.
+     * Does not play a menu input sound.
+     */
+    void NextOption();
+
+    /*
+     * Selects previous option in the menu, if available.
+     * Does not play a menu input sound.
+     */
+    void PreviousOption();
 
     /*
      * Image prefix string for if you want to show an image in an OptionPlus.
@@ -334,8 +343,6 @@ private:
     bool optionpress = false;
     bool leftpress = false;
     bool rightpress = false;
-    bool uppress = false;
-    bool downpress = false;
     std::array<std::string, maxMenus> currentmenu;
     std::string actualmenu;
     //std::array<int, 100> lastoption;

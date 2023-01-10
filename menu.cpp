@@ -778,6 +778,22 @@ bool Menu::IsThisOpen() {
     return menulevel > 0;
 }
 
+void Menu::NextOption() {
+    previousoption = currentoption;
+    if (currentoption < optioncount)
+        currentoption++;
+    else
+        currentoption = 1;
+}
+
+void Menu::PreviousOption() {
+    previousoption = currentoption;
+    if (currentoption > 1)
+        currentoption--;
+    else
+        currentoption = optioncount;
+}
+
 /*
  * Section Draw/Utils
  */
@@ -1141,8 +1157,6 @@ void Menu::resetButtonStates() {
     optionpress = false;
     leftpress = false;
     rightpress = false;
-    uppress = false;
-    downpress = false;
 }
 
 void Menu::enableKeysOnce(bool enable) {
@@ -1232,13 +1246,11 @@ void Menu::processMenuNav() {
         useNative && PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
         nextOption();
         delay = GetTickCount64();
-        downpress = true;
     }
     if (controls.IsKeyPressed(MenuControls::MenuUp) || 
         useNative && PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
         previousOption();
         delay = GetTickCount64();
-        uppress = true;
     }
     if (controls.IsKeyPressed(MenuControls::MenuLeft) || 
         useNative && PAD::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
