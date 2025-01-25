@@ -14,7 +14,28 @@
 
 #include <algorithm>
 #include <array>
+#include <iterator>
+#include <sstream>
 #include <string>
+#include <vector>
+
+namespace {
+    template<typename Out>
+    void split(const std::string& s, char delim, Out result) {
+        std::stringstream ss;
+        ss.str(s);
+        std::string item;
+        while (std::getline(ss, item, delim)) {
+            *(result++) = item;
+        }
+    }
+
+    std::vector<std::string> split(const std::string& s, char delim) {
+        std::vector<std::string> elems;
+        ::split(s, delim, std::back_inserter(elems));
+        return elems;
+    }
+}
 
 namespace NativeMenu {
     uint16_t gRecordGlobal = 0;
@@ -24,6 +45,7 @@ namespace NativeMenu {
         void Init();
         uintptr_t FindPattern(const char* pattern, const char* mask, const char* startAddress, size_t size);
         uintptr_t FindPattern(const char* pattern, const char* mask);
+        uintptr_t FindPattern(const char* pattern, const char* startAddress, size_t size);
         uint16_t findRecordGlobal(ScriptHeader* script);
         bool findScript(const std::string& scriptName, ScriptHeader** script);
     }
@@ -147,6 +169,31 @@ namespace NativeMenu {
         return FindPattern(pattern, mask, reinterpret_cast<const char*>(modInfo.lpBaseOfDll), modInfo.SizeOfImage);
     }
 
+    uintptr_t MemoryAccess::FindPattern(const char* pattern, const char* startAddress, size_t size) {
+        std::vector<std::string> bytesStr = split(pattern, ' ');
+
+        uint64_t pos = 0;
+        const uintptr_t searchLen = bytesStr.size();
+        std::vector<uint8_t> bytes;
+        for (const auto& str : bytesStr) {
+            if (str == "??" || str == "?") bytes.push_back(0);
+            else bytes.push_back(static_cast<uint8_t>(std::strtoul(str.c_str(), nullptr, 16)));
+        }
+
+        for (auto* retAddress = startAddress; retAddress < startAddress + size; retAddress++) {
+            if (bytesStr[pos] == "??" || bytesStr[pos] == "?" ||
+                *retAddress == bytes[pos]) {
+                if (pos + 1 == bytesStr.size())
+                    return (reinterpret_cast<uintptr_t>(retAddress) - searchLen + 1);
+                pos++;
+            }
+            else {
+                pos = 0;
+            }
+        }
+        return 0;
+    }
+
     GlobalTable globalTable;
     ScriptTable* scriptTable;
 
@@ -194,7 +241,7 @@ namespace NativeMenu {
 
         startTime = GetTickCount();
         while (!Item->IsLoaded()) {
-            scriptWait(100);
+            Sleep(100);
             if (GetTickCount() > startTime + timeout) {
                 return false;
             }
@@ -207,15 +254,13 @@ namespace NativeMenu {
 
     // Unknown Modder
     uint16_t MemoryAccess::findRecordGlobal(ScriptHeader* script) {
-        const char* patt = "\x70\x25\x13\x2C\x09\x00\x00\x06\x2A\x56\x09\x00\x70\x25\x13\x2C\x09\x00\x00\x06\x1F\x56\x06\x00\x6E\x52\x00\x00\x42\x00\x70";
-        const char* mask = "xxxxx??xxxxxxxxxx??xxxxxxx??x?x";
-
+        const char* patt = "? 25 13 2C 09 ? ? 06 2A 56 09 00 ? 25 13 2C 09 ? ? 06 1F 56 06 00 ? 52 ? ? 42 ? ?";
         for (int i = 0; i < script->CodePageCount(); i++)
         {
             int size = script->GetCodePageSize(i);
             if (size)
             {
-                uintptr_t address = FindPattern(patt, mask, (const char*)script->GetCodePageAddress(i), size);
+                uintptr_t address = FindPattern(patt, (const char*)script->GetCodePageAddress(i), size);
                 if (address)
                 {
                     uint16_t globalId = *(uint16_t*)(address + 26);
