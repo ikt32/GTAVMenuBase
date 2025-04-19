@@ -26,6 +26,10 @@
 //      - Re-write to OO
 
 namespace NativeMenu {
+Menu::Menu()
+    : mInstructionalButtonsScaleform("instructional_buttons") {
+}
+
 void Menu::Initialize() {
     mRecordGlobal = FindRecordGlobal();
     currentmenu[0] = "reserved_nomenu";
@@ -549,27 +553,20 @@ bool Menu::StringArray(const std::string& option, const std::vector<std::string>
  * Section Draw
  */
 void Menu::drawInstructionalButtons() {
-    //std::vector<InstructionalButton> instructionalButtons;
-    Scaleform instructionalButtonsScaleform("instructional_buttons");
+    const auto buttonSelect = std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING(2, ControlPhoneSelect, 0));
+    const auto textSelect = std::string(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION("HUD_INPUT2")); // Select
+    
+    const auto buttonBack = std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING(2, ControlPhoneCancel, 0));
+    const auto textBack = std::string(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION("HUD_INPUT3")); // Back
 
-    instructionalButtonsScaleform.CallFunction("CLEAR_ALL");
-    instructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", { 0 });
-    instructionalButtonsScaleform.CallFunction("CREATE_CONTAINER");
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 0, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING(2, ControlPhoneSelect, 0)), std::string(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION("HUD_INPUT2")) });
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 1, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING(2, ControlPhoneCancel, 0)), std::string(HUD::GET_FILENAME_FOR_AUDIO_CONVERSATION("HUD_INPUT3")) });
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 2, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING(2, ControlPhoneUp, 0)), std::string("Next option") });
-    instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 3, std::string(PAD::GET_CONTROL_INSTRUCTIONAL_BUTTONS_STRING(2, ControlPhoneDown, 0)), std::string("Previous option") });
+    mInstructionalButtonsScaleform.CallFunction("CLEAR_ALL");
+    mInstructionalButtonsScaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", { 0 });
+    mInstructionalButtonsScaleform.CallFunction("CREATE_CONTAINER");
+    mInstructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 0, buttonSelect, textSelect });
+    mInstructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { 1, buttonBack, textBack });
 
-    //int count = 2;
-    //for (const auto& button : instructionalButtons) {
-    //    if (button.ItemBind == null || MenuItems[CurrentSelection] == button.ItemBind) {
-    //        instructionalButtonsScaleform.CallFunction("SET_DATA_SLOT", { count, button.GetButtonId(), button.Text });
-    //        count++;
-    //    }
-    //}
-
-    instructionalButtonsScaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", { -1 });
-    instructionalButtonsScaleform.Render2D();
+    mInstructionalButtonsScaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", { -1 });
+    mInstructionalButtonsScaleform.Render2D();
 }
 
 void Menu::drawMenuDetails() {
@@ -758,8 +755,7 @@ void Menu::OpenMenu() {
         if (onMain) {
             onMain();
         }
-        //instructionalButtonsScaleform.Request("instructional_buttons");
-        //while (!instructionalButtonsScaleform.IsLoaded()) WAIT(0);
+        mInstructionalButtonsScaleform.Init();
     }
 }
 
@@ -767,7 +763,10 @@ void Menu::CloseMenu() {
     while (menulevel > 0) {
         backMenu();
     }
-    if (onExit) onExit();
+    if (onExit) {
+        onExit();
+    }
+    mInstructionalButtonsScaleform.Deinit();
 }
 
 const MenuControls &Menu::GetControls() {

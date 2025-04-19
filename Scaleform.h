@@ -5,47 +5,55 @@
 #include <variant>
 #include <inc/natives.h>
 
-class ScaleformArgumentTXD {
+class CScaleformArgumentTxd {
 public:
-    ScaleformArgumentTXD(std::string s) {
-        m_txd = s;
+    CScaleformArgumentTxd(const std::string& s)
+        : mTxd(s)
+    {
     }
-    std::string Txd() {
-        return m_txd;
+    std::string Txd() const {
+        return mTxd;
     }
 private:
-    std::string m_txd;
+    std::string mTxd;
 };
 
-class Scaleform
+class CScaleform
 {
-    using ScaleArg = std::variant<std::string, int, float, double, bool, ScaleformArgumentTXD>;
+    using TScaleArg = std::variant<std::string, int, float, double, bool, CScaleformArgumentTxd>;
 public:
-    Scaleform(std::string scaleformID) {
-        m_handle = GRAPHICS::REQUEST_SCALEFORM_MOVIE(scaleformID.c_str());
+    CScaleform(const std::string& scaleformId)
+        : mId(scaleformId)
+    {
     }
 
-    ~Scaleform() {
-        if (IsLoaded()) {
-            GRAPHICS::SET_SCALEFORM_MOVIE_AS_NO_LONGER_NEEDED(&m_handle);
+    ~CScaleform() {
+        Deinit();
+    }
+
+    void Init() {
+        if (!mHandle)
+            mHandle = GRAPHICS::REQUEST_SCALEFORM_MOVIE(mId.c_str());
+    }
+
+    void Deinit() {
+        if (mHandle) {
+            GRAPHICS::SET_SCALEFORM_MOVIE_AS_NO_LONGER_NEEDED(&mHandle);
+            mHandle = 0;
         }
     }
 
-    int Handle() {
-        return m_handle;
+    int Handle() const {
+        return mHandle;
     }
 
-    bool IsValid() {
-        return m_handle != 0;
+    bool Initialized() {
+        return GRAPHICS::HAS_SCALEFORM_MOVIE_LOADED(mHandle);
     }
 
-    bool IsLoaded() {
-        return GRAPHICS::HAS_SCALEFORM_MOVIE_LOADED(m_handle);
-    }
-
-    void CallFunction(std::string function, std::vector<ScaleArg> args = {}) {
-        GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(m_handle, function.c_str());
-        for (auto arg : args) {
+    void CallFunction(std::string function, const std::vector<TScaleArg>& args = {}) {
+        GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(mHandle, function.c_str());
+        for (const auto& arg : args) {
             if (std::holds_alternative<std::string>(arg)) {
                 GRAPHICS::BEGIN_TEXT_COMMAND_SCALEFORM_STRING("STRING");
                 HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(std::get<std::string>(arg).c_str());
@@ -56,18 +64,15 @@ public:
             }
             else if (std::holds_alternative<float>(arg)) {
                 GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_FLOAT(std::get<float>(arg));
-
             }
             else if (std::holds_alternative<double>(arg)) {
-                GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_FLOAT((float)std::get<double>(arg));
-
+                GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_FLOAT(static_cast<float>(std::get<double>(arg)));
             }
             else if (std::holds_alternative<bool>(arg)) {
                 GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_BOOL(std::get<bool>(arg));
-
             }
-            else if (std::holds_alternative<ScaleformArgumentTXD>(arg)) {
-                GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(std::get<ScaleformArgumentTXD>(arg).Txd().c_str());
+            else if (std::holds_alternative<CScaleformArgumentTxd>(arg)) {
+                GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(std::get<CScaleformArgumentTxd>(arg).Txd().c_str());
             }
             else {
             }
@@ -76,15 +81,14 @@ public:
     }
 
     void Render2D() {
-        GRAPHICS::DRAW_SCALEFORM_MOVIE_FULLSCREEN(m_handle, 255, 255, 255, 255, 0);
+        GRAPHICS::DRAW_SCALEFORM_MOVIE_FULLSCREEN(mHandle, 255, 255, 255, 255, 0);
     }
 
     void Render2DScreenSpace(float x, float y, float width, float height) {
-        GRAPHICS::DRAW_SCALEFORM_MOVIE(m_handle, { x + (width / 2.0f), y + (height / 2.0f) }, width, height, 255, 255, 255, 255, 0);
+        GRAPHICS::DRAW_SCALEFORM_MOVIE(mHandle, { x + (width / 2.0f), y + (height / 2.0f) }, width, height, 255, 255, 255, 255, 0);
     }
 
 private:
-    int m_handle;
-
+    std::string mId;
+    int mHandle = 0;
 };
-

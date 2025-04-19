@@ -10,10 +10,13 @@
 #include "menucontrols.h"
 #include "menuutils.h"
 #include "menusettings.h"
+#include "Scaleform.h"
 
 namespace NativeMenu {
 class Menu {
 public:
+    Menu();
+
     /**
      * Find the global variable.
      */
@@ -266,6 +269,8 @@ public:
     float MenuWidth() const { return menuWidth; }
 private:
     static const unsigned maxMenus = 255;
+    CScaleform mInstructionalButtonsScaleform;
+
     enum class FooterType {
         Default,
         Color,
