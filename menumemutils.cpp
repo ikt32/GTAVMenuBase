@@ -282,6 +282,13 @@ namespace NativeMenu {
             //logger.Write(INFO, "Finding Record global...");
             MemoryAccess::Init();
         }
+        // Temporary (?) fallback for Enhanced
+        if (!gRecordGlobal) {
+            // Global_23831.f_134
+            if (getGameVersion() >= 1000) {
+                gRecordGlobal = 0x5D28 + 0x82;
+            }
+        }
         return gRecordGlobal;
     }
 }
