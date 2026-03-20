@@ -1204,8 +1204,8 @@ void Menu::processMenuNav() {
     }
 
     if (controls.IsKeyJustReleased(MenuControls::MenuKey) || useNative &&
-        PAD::IS_DISABLED_CONTROL_PRESSED(0, controls.ControllerButton1) &&
-        PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, controls.ControllerButton2)) {
+        NMPAD::IS_DISABLED_CONTROL_PRESSED(0, controls.ControllerButton1) &&
+        NMPAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, controls.ControllerButton2)) {
         if (menulevel == 0) {
             OpenMenu();
         }

@@ -46,17 +46,29 @@ bool MenuControls::IsKeyPressed(ControlType control) {
 
         for (const auto& input : nControlCurr) {
             nControlPrev[input.first] = nControlCurr[input.first];
-            nControlCurr[input.first] = PAD::IS_DISABLED_CONTROL_PRESSED(0, input.first);
+            nControlCurr[input.first] = NMPAD::IS_DISABLED_CONTROL_PRESSED(0, input.first);
         }
     }
 
     bool MenuControls::IsControlDownFor(eControl control, unsigned long long millis) {
         auto tNow = GetTickCount64();
-        if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, control)) {
+        if (NMPAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, control)) {
             nPressTime[control] = tNow;
         }
 
-        return PAD::IS_DISABLED_CONTROL_PRESSED(0, control) &&
+        return NMPAD::IS_DISABLED_CONTROL_PRESSED(0, control) &&
             (tNow - nPressTime[control]) >= millis;
     }
+}
+
+BOOL NMPAD::IS_DISABLED_CONTROL_PRESSED(int control, int action) {
+    if (action < 0)
+        return false;
+    return PAD::IS_DISABLED_CONTROL_PRESSED(control, action);
+}
+
+BOOL NMPAD::IS_DISABLED_CONTROL_JUST_PRESSED(int control, int action) {
+    if (action < 0)
+        return false;
+    return PAD::IS_DISABLED_CONTROL_JUST_PRESSED(control, action);
 }

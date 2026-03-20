@@ -46,5 +46,10 @@ namespace NativeMenu {
         std::unordered_map<eControl, __int64> nPressTime;
         std::unordered_map<eControl, __int64> nReleaseTime;
     };
+}
 
+// Wrappers for PAD::IS_X_PRESSED natives to explicitly ignore -1 actions.
+namespace NMPAD {
+BOOL IS_DISABLED_CONTROL_PRESSED(int control, int action);
+BOOL IS_DISABLED_CONTROL_JUST_PRESSED(int control, int action);
 }
