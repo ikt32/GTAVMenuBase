@@ -1,294 +1,187 @@
-/** 
- * Edited global finding from AddonSpawner
- * Credits
- * Find record global: zorg93 & Unknown Modder
- */
+// Credits
+// Find record global: zorg93 & Unknown Modder
+// Enhanced bits and bobs: Chiheb-Bacha
 
 #include "menumemutils.hpp"
-
 #include <inc/main.h>
-#include <inc/types.h>
-
 #include <Windows.h>
 #include <Psapi.h>
-
-#include <algorithm>
-#include <array>
-#include <iterator>
-#include <sstream>
-#include <string>
 #include <vector>
-
-namespace {
-    template<typename Out>
-    void split(const std::string& s, char delim, Out result) {
-        std::stringstream ss;
-        ss.str(s);
-        std::string item;
-        while (std::getline(ss, item, delim)) {
-            *(result++) = item;
-        }
-    }
-
-    std::vector<std::string> split(const std::string& s, char delim) {
-        std::vector<std::string> elems;
-        ::split(s, delim, std::back_inserter(elems));
-        return elems;
-    }
-}
+#include <string>
+#include <chrono>
 
 namespace NativeMenu {
-    uint16_t gRecordGlobal = 0;
 
-    struct ScriptHeader;
-    namespace MemoryAccess {
-        void Init();
-        uintptr_t FindPattern(const char* pattern, const char* mask, const char* startAddress, size_t size);
-        uintptr_t FindPattern(const char* pattern, const char* mask);
-        uintptr_t FindPattern(const char* pattern, const char* startAddress, size_t size);
-        uint16_t findRecordGlobal(ScriptHeader* script);
-        bool findScript(const std::string& scriptName, ScriptHeader** script);
+uint16_t gRecordGlobal = 0;
+
+namespace Utils {
+inline uint32_t Joaat(const std::string& s) {
+    uint32_t hash = 0;
+    for (char c : s) {
+        hash += std::tolower(static_cast<unsigned char>(c));
+        hash += (hash << 10);
+        hash ^= (hash >> 6);
     }
+    hash += (hash << 3);
+    hash ^= (hash >> 11);
+    hash += (hash << 15);
+    return hash;
+}
+
+inline bool IsEnhanced() {
+    return getGameVersion() >= 1000;
+}
+}
 
 #pragma pack(push, 1)
-    struct ScriptHeader {
-        char padding1[16];                  //0x0
-        unsigned char** codeBlocksOffset;   //0x10
-        char padding2[4];                   //0x18
-        int codeLength;                     //0x1C
-        char padding3[4];                   //0x20
-        int localCount;                     //0x24
-        char padding4[4];                   //0x28
-        int nativeCount;                    //0x2C
-        __int64* localOffset;               //0x30
-        char padding5[8];                   //0x38
-        __int64* nativeOffset;              //0x40
-        char padding6[16];                  //0x48
-        int nameHash;                       //0x58
-        char padding7[4];                   //0x5C
-        char* name;                         //0x60
-        char** stringsOffset;               //0x68
-        int stringSize;                     //0x70
-        char padding8[12];                  //0x74
-                                            //END_OF_HEADER
+struct ScriptHeader {
+    char padding1[16];
+    unsigned char** codeBlocksOffset;
+    char padding2[4];
+    int codeLength;
+    char padding3[4];
+    int localCount;
+    char padding4[4];
+    int nativeCount;
+    int64_t* localOffset;
+    char padding5[8];
+    int64_t* nativeOffset;
+    char padding6[16];
+    int nameHash;
+    char padding7[4];
+    char* name;
+    char** stringsOffset;
+    int stringSize;
 
-        bool IsValid() const { return codeLength > 0; }
-        int CodePageCount() const { return (codeLength + 0x3FFF) >> 14; }
-        int GetCodePageSize(int page) const {
-            return (page < 0 || page >= CodePageCount() ? 0 : (page == CodePageCount() - 1) ? codeLength & 0x3FFF : 0x4000);
-        }
-        unsigned char* GetCodePageAddress(int page) const { return codeBlocksOffset[page]; }
-        unsigned char* GetCodePositionAddress(int codePosition) const {
-            return codePosition < 0 || codePosition >= codeLength ? NULL : &codeBlocksOffset[codePosition >> 14][codePosition & 0x3FFF];
-        }
-        char* GetString(int stringPosition)const {
-            return stringPosition < 0 || stringPosition >= stringSize ? NULL : &stringsOffset[stringPosition >> 14][stringPosition & 0x3FFF];
-        }
+    bool IsValid() const {
+        return codeLength > 0;
+    }
+    int PageCount() const {
+        return (codeLength + 0x3FFF) >> 14;
+    }
+    int GetPageSize(int page) const {
+        if (page < 0 || page >= PageCount()) return 0;
+        return (page == PageCount() - 1) ? (codeLength & 0x3FFF) : 0x4000;
+    }
+    unsigned char* GetPageAddress(int page) const {
+        return codeBlocksOffset[page];
+    }
+};
 
-    };
+struct ScriptTableItem {
+    ScriptHeader* Header;
+    char padding[4];
+    int hash;
+    bool IsLoaded() const {
+        return Header != nullptr;
+    }
+};
+
+struct ScriptTable {
+    ScriptTableItem* TablePtr;
+    char padding[16];
+    int count;
+
+    ScriptTableItem* FindScript(uint32_t hash) {
+        if (!TablePtr) return nullptr;
+        for (int i = 0; i < count; i++) {
+            if (TablePtr[i].hash == (int)hash) return &TablePtr[i];
+        }
+        return nullptr;
+    }
+};
 #pragma pack(pop)
 
-    struct ScriptTableItem {
-        ScriptHeader* Header;
-        char padding[4];
-        int hash;
+namespace MemoryAccess {
+uintptr_t FindPattern(const std::string& pattern, const uint8_t* startAddress, size_t size) {
+    std::vector<int> bytes;
+    std::stringstream ss(pattern);
+    std::string temp;
 
-        inline bool IsLoaded() const {
-            return Header != NULL;
-        }
-    };
-
-    struct ScriptTable {
-        ScriptTableItem* TablePtr;
-        char padding[16];
-        int count;
-        ScriptTableItem* FindScript(int hash) {
-            if (TablePtr == NULL) {
-                return NULL;//table initialisation hasnt happened yet
-            }
-            for (int i = 0; i < count; i++) {
-                if (TablePtr[i].hash == hash) {
-                    return &TablePtr[i];
-                }
-            }
-            return NULL;
-        }
-    };
-
-    struct GlobalTable {
-        __int64** GlobalBasePtr;
-        __int64* AddressOf(int index) const { return &GlobalBasePtr[index >> 18 & 0x3F][index & 0x3FFFF]; }
-        bool IsInitialised()const { return *GlobalBasePtr != NULL; }
-    };
-
-    Hash joaat(std::string s) {
-        std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-
-        Hash hash = 0;
-        for (int i = 0; i < s.size(); i++) {
-            hash += s[i];
-            hash += (hash << 10);
-            hash ^= (hash >> 6);
-        }
-        hash += (hash << 3);
-        hash ^= (hash >> 11);
-        hash += (hash << 15);
-        return hash;
+    while (ss >> temp) {
+        if (temp == "?" || temp == "??") bytes.push_back(-1);
+        else bytes.push_back(std::stoi(temp, nullptr, 16));
     }
 
-    void MemoryAccess::Init() {
-        ScriptHeader* selector = nullptr;
+    for (size_t i = 0; i <= size - bytes.size(); ++i) {
+        bool found = true;
+        for (size_t j = 0; j < bytes.size(); ++j) {
+            if (bytes[j] != -1 && startAddress[i + j] != static_cast<uint8_t>(bytes[j])) {
+                found = false;
+                break;
+            }
+        }
+        if (found) return reinterpret_cast<uintptr_t>(&startAddress[i]);
+    }
+    return 0;
+}
 
-        // find enable MP cars patterns
-        if (findScript("selector", &selector))
-            gRecordGlobal = findRecordGlobal(selector);
+uintptr_t FindModulePattern(const std::string& pattern) {
+    MODULEINFO modInfo = {};
+    GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &modInfo, sizeof(MODULEINFO));
+    return FindPattern(pattern, reinterpret_cast<const uint8_t*>(modInfo.lpBaseOfDll), modInfo.SizeOfImage);
+}
+
+bool FindScript(const std::string& name, ScriptHeader** script) {
+    uintptr_t patternAddr = Utils::IsEnhanced()
+        ? FindModulePattern("48 03 05 ? ? ? ? 4c 85 c0 0f 84 ? ? ? ? e9")
+        : FindModulePattern("48 03 15 ? ? ? ? 4C 23 C2 49 8B 08");
+
+    if (!patternAddr) return false;
+
+    auto* table = reinterpret_cast<ScriptTable*>(patternAddr + *reinterpret_cast<int*>(patternAddr + 3) + 7);
+    uint32_t hash = Utils::Joaat(name);
+
+    // Wait for script to register
+    auto timeout = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+    ScriptTableItem* item = nullptr;
+
+    while (!(item = table->FindScript(hash))) {
+        scriptWait(100);
+        if (std::chrono::steady_clock::now() > timeout) return false;
     }
 
-    uintptr_t MemoryAccess::FindPattern(const char* pattern, const char* mask, const char* startAddress, size_t size) {
-        const char* address_end = startAddress + size;
-        const auto mask_length = static_cast<size_t>(strlen(mask) - 1);
-
-        for (size_t i = 0; startAddress < address_end; startAddress++) {
-            if (*startAddress == pattern[i] || mask[i] == '?') {
-                if (mask[i + 1] == '\0') {
-                    return reinterpret_cast<uintptr_t>(startAddress) - mask_length;
-                }
-                i++;
-            }
-            else {
-                i = 0;
-            }
-        }
-        return 0;
+    while (!item->IsLoaded()) {
+        Sleep(100);
+        if (std::chrono::steady_clock::now() > timeout) return false;
     }
 
-    uintptr_t MemoryAccess::FindPattern(const char* pattern, const char* mask) {
-        MODULEINFO modInfo = { };
-        GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &modInfo, sizeof(MODULEINFO));
+    *script = item->Header;
+    //LOG(Info, "Found script {} [0x{:X}]", name, hash);
+    return true;
+}
 
-        return FindPattern(pattern, mask, reinterpret_cast<const char*>(modInfo.lpBaseOfDll), modInfo.SizeOfImage);
+uint16_t FindRecordGlobal(ScriptHeader* script) {
+    // script: selector(.c)
+    // PAD::IS_CONTROL_PRESSED(2, 19), aka
+    // PAD::IS_CONTROL_PRESSED(FRONTEND_CONTROL, INPUT_CHARACTER_WHEEL)
+    const char* patt = "?? 25 13 2C 09 ?? ?? 06 2A 56 09 00 ?? 25 13 2C 09 ?? ?? 06 1F 56 06 00 ?? 52 ?? ?? 42 ?? ??";
+
+    for (int i = 0; i < script->PageCount(); i++) {
+        int size = script->GetPageSize(i);
+        if (size <= 0) continue;
+
+        uintptr_t addr = FindPattern(patt, script->GetPageAddress(i), size);
+        if (addr) {
+            uint16_t globalId = *reinterpret_cast<uint16_t*>(addr + 26);
+            uint8_t structOff = *reinterpret_cast<uint8_t*>(addr + 29);
+            //LOG(Info, "Global Match: ID {}, Offset 0x{:X}", globalId, structOff);
+            return globalId + structOff;
+        }
+    }
+    return 0;
+}
+}
+
+uint16_t GetRecordGlobal() {
+    if (gRecordGlobal) return gRecordGlobal;
+
+    ScriptHeader* selector = nullptr;
+    if (MemoryAccess::FindScript("selector", &selector)) {
+        gRecordGlobal = MemoryAccess::FindRecordGlobal(selector);
     }
 
-    uintptr_t MemoryAccess::FindPattern(const char* pattern, const char* startAddress, size_t size) {
-        std::vector<std::string> bytesStr = split(pattern, ' ');
-
-        uint64_t pos = 0;
-        const uintptr_t searchLen = bytesStr.size();
-        std::vector<uint8_t> bytes;
-        for (const auto& str : bytesStr) {
-            if (str == "??" || str == "?") bytes.push_back(0);
-            else bytes.push_back(static_cast<uint8_t>(std::strtoul(str.c_str(), nullptr, 16)));
-        }
-
-        for (auto* retAddress = startAddress; retAddress < startAddress + size; retAddress++) {
-            if (bytesStr[pos] == "??" || bytesStr[pos] == "?" ||
-                *retAddress == bytes[pos]) {
-                if (pos + 1 == bytesStr.size())
-                    return (reinterpret_cast<uintptr_t>(retAddress) - searchLen + 1);
-                pos++;
-            }
-            else {
-                pos = 0;
-            }
-        }
-        return 0;
-    }
-
-    GlobalTable globalTable;
-    ScriptTable* scriptTable;
-
-    // from EnableMPCars by drp4lyf
-    bool MemoryAccess::findScript(const std::string & scriptName, ScriptHeader** script) {
-
-        __int64 patternAddr = FindPattern("\x4C\x8D\x05\x00\x00\x00\x00\x4D\x8B\x08\x4D\x85\xC9\x74\x11", "xxx????xxxxxxxx");
-        if (!patternAddr) {
-            //logger.Write(ERROR, "ERROR: finding address 0");
-            //logger.Write(ERROR, "Aborting...");
-            return false;
-        }
-        globalTable.GlobalBasePtr = (__int64**)(patternAddr + *(int*)(patternAddr + 3) + 7);
-
-
-        patternAddr = FindPattern("\x48\x03\x15\x00\x00\x00\x00\x4C\x23\xC2\x49\x8B\x08", "xxx????xxxxxx");
-        if (!patternAddr) {
-            //logger.Write(ERROR, "ERROR: finding address 1");
-            //logger.Write(ERROR, "Aborting...");
-            return false;
-        }
-        scriptTable = (ScriptTable*)(patternAddr + *(int*)(patternAddr + 3) + 7);
-
-        DWORD startTime = GetTickCount();
-        DWORD timeout = 10000; // in millis
-
-        // FindScriptAddresses
-        while (!globalTable.IsInitialised()) {
-            scriptWait(100); //Wait for GlobalInitialisation before continuing
-            if (GetTickCount() > startTime + timeout) {
-                //logger.Write(ERROR, "ERROR: couldn't init global table");
-                //logger.Write(ERROR, "Aborting...");
-                return false;
-            }
-        }
-
-        //logger.Write(INFO, "Found global base pointer 0x%lX", globalTable.GlobalBasePtr);
-
-        ScriptTableItem* Item = scriptTable->FindScript(joaat(scriptName));
-        if (Item == NULL) {
-            //logger.Write(ERROR, "ERROR: finding address 2");
-            //logger.Write(ERROR, "Aborting...");
-            return false;
-        }
-
-        startTime = GetTickCount();
-        while (!Item->IsLoaded()) {
-            Sleep(100);
-            if (GetTickCount() > startTime + timeout) {
-                return false;
-            }
-        }
-
-        *script = Item->Header;
-        //logger.Write(INFO, "Found script %s [0x%X]", scriptName.c_str(), joaat(scriptName));
-        return true;
-    }
-
-    // Unknown Modder
-    uint16_t MemoryAccess::findRecordGlobal(ScriptHeader* script) {
-        const char* patt = "? 25 13 2C 09 ? ? 06 2A 56 09 00 ? 25 13 2C 09 ? ? 06 1F 56 06 00 ? 52 ? ? 42 ? ?";
-        for (int i = 0; i < script->CodePageCount(); i++)
-        {
-            int size = script->GetCodePageSize(i);
-            if (size)
-            {
-                uintptr_t address = FindPattern(patt, (const char*)script->GetCodePageAddress(i), size);
-                if (address)
-                {
-                    uint16_t globalId = *(uint16_t*)(address + 26);
-                    uint8_t structOff = *(uint8_t*)(address + 29);
-
-                    //logger.Write(INFO, "global id: %u, struct offset: 0x%X\n", globalId, structOff);
-
-                    return globalId + structOff;
-                }
-            }
-        }
-
-        //logger.Write(ERROR, "Global Variable not found");
-        return 0;
-    }
-
-    uint16_t FindRecordGlobal() {
-        if (!gRecordGlobal) {
-            //logger.Write(INFO, "Finding Record global...");
-            MemoryAccess::Init();
-        }
-        // Temporary (?) fallback for Enhanced
-        if (!gRecordGlobal) {
-            // Global_23831.f_134
-            if (getGameVersion() >= 1000) {
-                gRecordGlobal = 0x5D28 + 0x82;
-            }
-        }
-        return gRecordGlobal;
-    }
+    //if (!gRecordGlobal) LOG(Error, "Failed to find Record Global");
+    return gRecordGlobal;
+}
 }

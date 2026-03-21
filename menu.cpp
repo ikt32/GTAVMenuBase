@@ -31,7 +31,7 @@ Menu::Menu()
 }
 
 void Menu::Initialize() {
-    mRecordGlobal = FindRecordGlobal();
+    mRecordGlobal = GetRecordGlobal();
     currentmenu[0] = "reserved_nomenu";
     actualmenu = "reserved_nomenu";
 }
