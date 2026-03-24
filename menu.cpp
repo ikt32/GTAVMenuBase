@@ -34,6 +34,7 @@ void Menu::Initialize() {
     mRecordGlobal = GetRecordGlobal();
     currentmenu[0] = "reserved_nomenu";
     actualmenu = "reserved_nomenu";
+    visible = false;
 }
 
 void Menu::SetFiles(const std::string &fileName) {
@@ -662,7 +663,7 @@ void Menu::drawMenuDetails() {
 }
 
 void Menu::EndMenu() {
-    if (menulevel < 1)
+    if (menulevel < 1 || !visible)
         return;
 
     drawMenuDetails();
@@ -749,8 +750,13 @@ void Menu::CheckKeys() {
 }
 
 void Menu::OpenMenu() {
-    if (menulevel == 0) {
-        changeMenu("mainmenu");
+    // If the menu stack is empty, we need to initialize it to the main menu.
+    // If the stack already contains menus but the menu is hidden, just show it.
+    if (!visible) {
+        visible = true;
+        if (menulevel == 0) {
+            changeMenu("mainmenu");
+        }
         updateScreenSize();
         if (onMain) {
             onMain();
@@ -760,6 +766,14 @@ void Menu::OpenMenu() {
 }
 
 void Menu::CloseMenu() {
+    // Hide the menu but preserve the menu stack so reopening will restore the same page.
+    if (visible) {
+        visible = false;
+        mInstructionalButtonsScaleform.Deinit();
+        return;
+    }
+
+    // Fallback: if already hidden, perform full close (clear stack and call onExit).
     while (menulevel > 0) {
         backMenu();
     }
@@ -774,7 +788,7 @@ const MenuControls &Menu::GetControls() {
 }
 
 bool Menu::IsThisOpen() {
-    return menulevel > 0;
+    return visible;
 }
 
 void Menu::NextOption() {
@@ -927,10 +941,14 @@ void Menu::drawOptionPlusImage(const std::string& extra, float &finalHeight) {
         safeOffsetX *= ar / ar_true;
     }
 
-    drawTexture(imgHandle, 0, -9999, 60,                            // handle, index, depth, time
-                drawWidth, drawHeight, 0.0f, 0.0f,                  // width, height, origin x, origin y
-                imgXpos + safeOffsetX, imgYpos + safeOffset, 0.0f,   // pos x, pos y, rot
-                ar, 1.0f, 1.0f, 1.0f, 1.0f);                        // screen correct, rgba
+    foregroundSpriteCalls.push_back(
+        [=]() {
+            drawTexture(imgHandle, 0, -9999, 60,                            // handle, index, depth, time
+                        drawWidth, drawHeight, 0.0f, 0.0f,                  // width, height, origin x, origin y
+                        imgXpos + safeOffsetX, imgYpos + safeOffset, 0.0f,   // pos x, pos y, rot
+                        ar, 1.0f, 1.0f, 1.0f, 1.0f);                        // screen correct, rgba
+        }
+    );
     finalHeight += drawHeight * ar + 2.0f * menuTextMargin;
 }
 
@@ -1206,15 +1224,14 @@ void Menu::processMenuNav() {
     if (controls.IsKeyJustReleased(MenuControls::MenuKey) || useNative &&
         NMPAD::IS_DISABLED_CONTROL_PRESSED(0, controls.ControllerButton1) &&
         NMPAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, controls.ControllerButton2)) {
-        if (menulevel == 0) {
+        if (!visible) {
             OpenMenu();
         }
         else {
+            // Toggle: hide the menu but keep the stack. Do not call onExit here; onExit
+            // should only be called when the menu stack is fully closed via backMenu.
             CloseMenu();
             enableKeysOnce(true);
-            if (onExit) {
-                onExit();
-            }
         }
         delay = GetTickCount64();
         return;
@@ -1223,12 +1240,23 @@ void Menu::processMenuNav() {
         useNative && PAD::IS_DISABLED_CONTROL_JUST_RELEASED(0, ControlFrontendCancel)) {
         if (menulevel > 0) {
             if (menulevel == 1) {
+                // User pressed cancel on the top-level menu: fully close the menu
+                // so the menu toggle button will reopen it with a single press.
                 enableKeysOnce(true);
+                // clear the menu stack
+                while (menulevel > 0) {
+                    backMenu();
+                }
+                // mark hidden and deinitialize
+                visible = false;
+                mInstructionalButtonsScaleform.Deinit();
                 if (onExit) {
                     onExit();
                 }
             }
-            backMenu();
+            else {
+                backMenu();
+            }
 
         }
         delay = GetTickCount64();
