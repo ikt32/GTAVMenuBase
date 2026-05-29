@@ -350,6 +350,9 @@ private:
     bool rightpress = false;
     std::array<std::string, maxMenus> currentmenu;
     std::string actualmenu;
+    // Whether the menu is currently visible (shown). When false the menu is hidden but
+    // the menu stack (menulevel/actualmenu) is preserved.
+    bool visible = false;
     //std::array<int, 100> lastoption;
     std::unordered_map<std::string, int> lastoption; // lastoption is now per unique submenu
     int menulevel = 0;
